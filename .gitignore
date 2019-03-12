@@ -164,7 +164,7 @@ modules.xml
 .mtj.tmp/
 
 # Package Files #
-*.jar
+#*.jar
 *.war
 *.nar
 *.ear
@@ -176,3 +176,5 @@ modules.xml
 hs_err_pid*
 
 # End of https://www.gitignore.io/api/java,eclipse,intellij+iml
+
+.idea/*
