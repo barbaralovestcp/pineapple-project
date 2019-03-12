@@ -2,6 +2,6 @@ package org.pineapple.server.stateMachine;
 
 public interface State {
 
-    void handle(Command entry, String arg );
+    void handle(final Context context, final Command entry, final String arg);
 
 }

@@ -18,13 +18,14 @@ public class Context {
             The server will receive a String message from the Client.
             That String will need to be processed to get Command + Args.
 
-            I don't know yet where's the best place to put this process, make the server handle it and pass
+            I don't know yet where's the best place to put this process
+            (split the received string into enum + string), make the server handle it and pass
             it to the StateMachine, or give the StateMachine/State the responsability to process it ?
      */
 
 
-    public void handle(Command entry, String arg) {
-        currentState.handle(entry, arg);
+    public void handle(final Command entry, final String arg) {
+        currentState.handle(this, entry, arg);
     }
 
     /**
