@@ -1,4 +1,4 @@
-package org.pineapple;
+package org.pineapple.server;
 
 public class Message {
 
