@@ -11,17 +11,15 @@ public class Client{
 	static boolean quitter = false;
 
 	private String adress = "127.0.0.1";
-	private String im = "rose.jpg";
-	private String fic = "avis-recette.txt";
+	private boolean connected = false;
 
 
 	public Client() {
 		System.out.println("Connexion...");
 		try{
-			Socket con_serv = new Socket(InetAddress.getByName(adress),80);
+			Socket con_serv = new Socket(InetAddress.getByName(adress),110);
 			try {
-
-				System.out.println("Connected");
+				this.setConnected(true);
 
 				//flux de sortie
 				InputStream inp = con_serv.getInputStream();
@@ -41,7 +39,8 @@ public class Client{
 				int i = sc.nextInt();
 				if (i == 0) {
 					quitter = true;
-					con_serv.close();
+                    this.setConnected(false);
+                    con_serv.close();
 				}
 
 				if(!quitter){
@@ -66,7 +65,7 @@ public class Client{
 		System.out.println("--------");
 		System.out.println("Bienvenue !");
 		System.out.println("--------");
-		System.out.println("Serveur WEB : Par Valentin Berger, Léa Chemoul, Philippine Cluniat, Elie Ensuque");
+		System.out.println("Client POP3 : Par Valentin Berger, Léa Chemoul, Philippine Cluniat, Elie Ensuque");
 		System.out.println("--------");
 	}
 
@@ -91,6 +90,7 @@ public class Client{
 
 			byte[] data = baos.toByteArray();
 
+			//TODO change to POP3
 			out_data.print("PUT "  + f.getName() + " HTTP/1.1\r\n");
 			out_data.print("Content-Length: " + data.length + "\r\n");
 			out_data.print("\r\n");
@@ -115,4 +115,11 @@ public class Client{
 		}
 	}
 
+    public boolean isConnected() {
+        return connected;
+    }
+
+    public void setConnected(boolean connected) {
+        this.connected = connected;
+    }
 }
