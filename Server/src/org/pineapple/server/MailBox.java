@@ -12,4 +12,30 @@ public class MailBox {
         this.password = password;
         this.messages = messages;
     }
+
+   //GETTERS
+
+    public String getName() {
+        return name;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public ArrayList<Message> getMessages() {
+        return messages;
+    }
+
+    public int getMessagesNumber() {
+        return messages.size();
+    }
+
+    public int getTotalSize() {
+        int size = 0;
+        for (Message message: messages) {
+            size += message.getMessageSize();
+        }
+        return size;
+    }
 }

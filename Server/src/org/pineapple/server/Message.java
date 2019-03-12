@@ -60,4 +60,9 @@ public class Message {
         return isDeleted;
     }
 
+    public int getMessageSize() {
+        //TODO: return size of a message (octets) for list command
+        return 0;
+    }
+
 }
