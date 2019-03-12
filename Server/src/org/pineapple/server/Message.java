@@ -8,14 +8,16 @@ public class Message {
     private String date;
     private String messageId;
     private String message;
+    private Boolean isDeleted;
 
-    public Message(String sender, String receiver, String subject, String date, String messageId, String message) {
+    public Message(String sender, String receiver, String subject, String date, String messageId, String message, Boolean isDeleted) {
         this.sender = sender;
         this.receiver = receiver;
         this.subject = subject;
         this.date = date;
         this.messageId = messageId;
         this.message = message;
+        this.isDeleted = isDeleted;
     }
 
     public String buildMessage() {
@@ -52,6 +54,10 @@ public class Message {
 
     public String getMessage() {
         return message;
+    }
+
+    public Boolean getIsDeletec() {
+        return isDeleted;
     }
 
 }
