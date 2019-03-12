@@ -27,4 +27,31 @@ public class Message {
                 "/n" +
                 this.message +"/n";
     }
+
+    //GETTERS
+
+    public String getSender() {
+        return sender;
+    }
+
+    public String getReceiver() {
+        return receiver;
+    }
+
+    public String getSubject() {
+        return subject;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public String getMessageId() {
+        return messageId;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
 }
