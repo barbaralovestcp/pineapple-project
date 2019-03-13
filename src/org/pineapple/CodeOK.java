@@ -35,7 +35,7 @@ public class CodeOK extends Code implements ParametrizedToString {
 		}),
 		OK_RETRIEVE(parameter -> {
 			if (parameter == null)
-				throw new NullPointerException("OK_RETRIEVE needs a parameter: The message");
+				throw new NullPointerException("OK_RETRIEVE needs a parameter: The mail content");
 			
 			return parameter;
 		}),
@@ -48,12 +48,13 @@ public class CodeOK extends Code implements ParametrizedToString {
 			setToString(toString);
 		}
 		
+		@NotNull
 		@Contract(pure = true)
 		private ICodeEnum getToString() {
 			return toString;
 		}
 		
-		private void setToString(ICodeEnum toString) {
+		private void setToString(@NotNull ICodeEnum toString) {
 			this.toString = toString;
 		}
 		
