@@ -1,41 +1,35 @@
 package org.pineapple.server.stateMachine.test;
 
-import org.pineapple.server.stateMachine.Command;
-import org.pineapple.server.stateMachine.Context;
-
-import java.sql.SQLOutput;
+import org.pineapple.server.stateMachine.*;
 import java.util.Scanner;
 
 public class TestStateMachine {
 
     public static void main(String[] args) {
 
-        Context stateMachine = new Context(new StateA());
+        Context stateMachine = new Context(new StateServerListening());
 
         String msg = "";
-        //Command comm;
-        //String[] request;
         Scanner in = new Scanner(System.in);
 
+
         do {
-            System.out.println("Input a request : ");
+            System.out.println("Input a command : ");
             msg = in.nextLine();
 
-            //request = msg.split("\\s+");
-            //comm = Command.valueOf(request[0]);
+            if (InputStateMachine.IsValidPOP3Request(msg)) {
 
-            //ajouter type retour?
-            if (!msg.equals("quit")) {
-                stateMachine.handle(Command.APOP_VALID, msg);
+                InputStateMachine input = new InputStateMachine(msg);
+                stateMachine.handle(input.getCommand(), input.getArguments());
+
+            }
+            else {
+                System.out.println("Invalid POP3 Command\n");
             }
 
-        } while (!msg.equals("quit"));
+        } while (!msg.toUpperCase().equals("QUIT"));
 
         in.close();
-        ///....
-
-        //String[] request = msg.split("\\s+");
-        //Command comm = Command.valueOf(request[0]);
 
 
     }
