@@ -1,7 +1,12 @@
 package org.pineapple.client;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.io.*;
 import java.net.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Scanner;
 
 public class Client{
@@ -11,44 +16,41 @@ public class Client{
 	static boolean quitter = false;
 
 	private String adress = "127.0.0.1";
-	private String im = "rose.jpg";
-	private String fic = "avis-recette.txt";
+	private boolean connected = false;
+	private String name;
+	private OutputStream op;
 
-
-	public Client() {
+	public Client(String name) {
 		System.out.println("Connexion...");
 		try{
-			Socket con_serv = new Socket(InetAddress.getByName(adress),80);
+			Socket con_serv = new Socket(InetAddress.getByName(adress),110);
 			try {
-
-				System.out.println("Connected");
-
-				//flux de sortie
-				InputStream inp = con_serv.getInputStream();
+				this.setConnected(true);
 
 				//flux d'entrée
-				OutputStream op = con_serv.getOutputStream();
+				InputStream inp = con_serv.getInputStream();
+				//flux de sortie
+				this.op = con_serv.getOutputStream();
 
+				DataInputStream indata = new DataInputStream(inp);
 
-				DataInputStream indata = new DataInputStream(con_serv.getInputStream());
-				PrintWriter printWriter = new PrintWriter(op);
+				StringBuilder answer = new StringBuilder();
+				String line = indata.readLine();
+				if(line != null){
+					String stat_line[] = line.split(" ");
 
-				Scanner sc = new Scanner(System.in);
+					if (stat_line.length > 1) {
+						if (stat_line[1].equals("+OK")) {
+
+						}else if(stat_line[1].equals("-ERR")) {
+
+						}else {
+
+						}
+					}
+				}
 
 				printWelcome();
-
-				System.out.println("Press 0 to close connexion");
-				int i = sc.nextInt();
-				if (i == 0) {
-					quitter = true;
-					con_serv.close();
-				}
-
-				if(!quitter){
-					// receive a string from the server
-				}
-
-
 			}catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -66,53 +68,43 @@ public class Client{
 		System.out.println("--------");
 		System.out.println("Bienvenue !");
 		System.out.println("--------");
-		System.out.println("Serveur WEB : Par Valentin Berger, Léa Chemoul, Philippine Cluniat, Elie Ensuque");
+		System.out.println("Client POP3 : Par Valentin Berger, Léa Chemoul, Philippine Cluniat, Elie Ensuque");
 		System.out.println("--------");
 	}
 
 
-	private static boolean send(PrintStream out_data, File f) {
-		if (f == null)
-			throw new NullPointerException();
-
-		FileInputStream in = null;
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		byte[] raw = new byte[4096];
-		int size;
-
+	private boolean send(String message) {
+		PrintStream out_data = new PrintStream(this.op);
 		try {
-			in = new FileInputStream(f);
-
-			while ((size = in.read(raw)) >= 0)
-				baos.write(raw, 0, size);
-
-			baos.flush();
-			baos.close();
-
-			byte[] data = baos.toByteArray();
-
-			out_data.print("PUT "  + f.getName() + " HTTP/1.1\r\n");
-			out_data.print("Content-Length: " + data.length + "\r\n");
-			out_data.print("\r\n");
-			out_data.write(data, 0, data.length);
-			out_data.print("\r\n");
-
-
+			SimpleDateFormat sdf = new SimpleDateFormat("dd'/'MM'/'yyyy 'at' HH:mm:ss");
+			out_data.print("From : Client " + this.name + "\r\n");
+			out_data.print("To:  POP3 Server \r\n");
+			out_data.print("Date: " + sdf.format(new Date())  + "\r\n");
+			out_data.print("\r\n\r\n");
+			out_data.print(message + "\r\n");
 			out_data.flush();
-
 			return true;
-		} catch (IOException ex) {
+		} catch (Exception ex) {
 			ex.printStackTrace();
 			return false;
-		} finally {
-			if (in != null) {
-				try {
-					in.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
 		}
 	}
 
+	public void sendMessage(@NotNull Command command){
+		String message = command.toString();
+		this.send(message);
+	}
+
+	public void sendMessage(@NotNull Command command, @Nullable String param){
+		String message = command + " " + param;
+		this.send(message);
+	}
+
+    public boolean isConnected() {
+        return connected;
+    }
+
+    public void setConnected(boolean connected) {
+        this.connected = connected;
+    }
 }
