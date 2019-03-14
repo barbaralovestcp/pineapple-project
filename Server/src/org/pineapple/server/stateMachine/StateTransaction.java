@@ -1,43 +1,49 @@
 package org.pineapple.server.stateMachine;
 
+import org.pineapple.server.stateMachine.Exception.StateMachineException;
+
 public class StateTransaction implements State {
 
-    @Override
-    public void onStateEntry(Context context) { }
 
     @Override
-    public void handle(Context context, CommandPOP3 entry, String[] args) {
+    public void handle(Context context, CommandPOP3 command, String[] args) {
 
         String toSend = "";
-        switch (entry) {
+        State nextState = null;
+        switch (command) {
 
             case STAT:
 
                 //TODO : Fill message with STATS
+                toSend = "<Stats !>";
+                nextState = this;
                 break;
             case RETR:
 
                 //TODO : Retrieve mails
+                toSend = "<Retrieved Mail>";
+                nextState = this;
                 break;
             case QUIT:
 
                 boolean quitIsValid = true;
                 if (quitIsValid) {
-                    toSend = "ERR some deleted message not removed";
+                    toSend = "OK";
                 }
                 else {
-                    toSend = "OK";
+                    toSend = "ERR some deleted message not removed";
                 }
 
                 //TODO : End connection (?)
 
-                context.setState(new StateServerListening());
+                nextState = new StateServerListening();
                 break;
             default :
-                throw new StateMachineException("Unhandled POP3 entry for this state.");
+                throw new StateMachineException(this, command);
         }
 
         //TODO : Send message;
         System.out.println(toSend);
+        context.setState(nextState);
     }
 }

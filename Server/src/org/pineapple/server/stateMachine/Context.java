@@ -1,20 +1,24 @@
 package org.pineapple.server.stateMachine;
 
-import java.sql.SQLOutput;
+import org.pineapple.server.stateMachine.Exception.InvalidPOP3CommandException;
+import org.pineapple.server.stateMachine.Exception.StateMachineException;
 
 public class Context {
 
     private State currentState;
 
-    //TODO : Give an attribute to interact with the server : Send message. Will be used by State when processing.
+    //TODO : Give an attribute to interact with the server : Send message. Will be used by States when processing commands.
 
     public Context(State initialState) {
         currentState = initialState;
-        currentState.onStateEntry(this);
     }
 
     public Context() {
         this(new StateServerListening());
+
+        //We suppose a connection has already been made, so we immediately transition from Listening --> Authentification
+        //when creating Context. (Might change?) ServerListenind.handle() doesn't use any arguments.
+        handle(null, null);
     }
 
     /*
@@ -35,14 +39,27 @@ public class Context {
     public void handle(InputStateMachine input) {
         handle(input.getCommand(), input.getArguments());
     }
+
+    public void handle(String fullCommand) {
+
+        InputStateMachine input;
+        try {
+            input = new InputStateMachine(fullCommand);
+        } catch (InvalidPOP3CommandException err) {
+            throw err;
+        }
+
+        handle(input);
+    }
     public void handle(final CommandPOP3 entry, final String[] args) {
+
+        //currentState.handle(this, entry, args);
 
         try {
             currentState.handle(this, entry, args);
-            System.out.println("Successful transition (" + entry.toString() + "), new state : " + currentState.getClass().getSimpleName());
         }
         catch (StateMachineException err) {
-            System.out.println("ERR : Unhandled input (" + entry.toString() + ") on current state (" + currentState.getClass().getSimpleName()+")");
+            System.out.println("ERROR : " + err.getMessage() );
         }
     }
 
@@ -52,8 +69,9 @@ public class Context {
      * @param newState next state of the stateMachine
      */
     public void setState(State newState) {
+
+        System.out.println("Successful State Transition : " + currentState.getClass().getSimpleName() + " ---> " + newState.getClass().getSimpleName());
         currentState = newState;
-        currentState.onStateEntry(this);
     }
 
 
