@@ -70,6 +70,7 @@ public class Server extends Application implements Runnable {
 	private final String footContent =
 			"</body>" +
 					"</html>";
+	private int timeout;
 
 	public static void main(String[] args) {
 		launch(args);
@@ -130,11 +131,8 @@ public class Server extends Application implements Runnable {
 	public void run() {
 		try {
 			// Try to open the port 80, but as it is usually occupied, try to connect to 8080 if failed.
-			try {
-				soc = new ServerSocket(80);
-			} catch (SocketException ex) {
-				soc = new ServerSocket(8080);
-			}
+			int port = 110;
+			soc = new ServerSocket(port);
 			log("Server open on port " + soc.getLocalPort());
 
 			// Wait for "start"
