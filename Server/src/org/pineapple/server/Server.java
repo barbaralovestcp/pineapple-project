@@ -130,7 +130,6 @@ public class Server extends Application implements Runnable {
 	@Override
 	public void run() {
 		try {
-			// Try to open the port 80, but as it is usually occupied, try to connect to 8080 if failed.
 			int port = 110;
 			soc = new ServerSocket(port);
 			log("Server open on port " + soc.getLocalPort());

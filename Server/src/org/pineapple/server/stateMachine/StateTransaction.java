@@ -1,5 +1,6 @@
 package org.pineapple.server.stateMachine;
 
+import org.pineapple.CommandPOP3;
 import org.pineapple.server.stateMachine.Exception.StateMachineException;
 
 public class StateTransaction implements State {
