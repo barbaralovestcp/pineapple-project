@@ -1,8 +1,6 @@
 package org.pineapple.client;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.pineapple.server.Message;
+import org.pineapple.Message;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -20,8 +18,8 @@ public class MessageHandler {
             BufferedWriter bufferedWriter =
                     new BufferedWriter(fileWriter);
 
-            bufferedWriter.write(SEPARATOR);
             bufferedWriter.write(data);
+            bufferedWriter.write(SEPARATOR);
             bufferedWriter.close();
         } catch (FileNotFoundException ex) {
             System.out.println(
@@ -49,8 +47,11 @@ public class MessageHandler {
             Message message = new Message();
             boolean isMessageText = false;
             while ((line = bufferedReader.readLine()) != null) {
-                System.out.println(line);
-                if (isMessageText) {
+                if (line.contains(SEPARATOR)) {
+                    messages.add(message);
+                    message = new Message();
+                    isMessageText = false;
+                } else if (isMessageText) {
                     message.setMessage(message.getMessage() + line);
                 }
                 else if (line.toLowerCase().contains("from:")) {
@@ -68,12 +69,8 @@ public class MessageHandler {
                 else if (line.toLowerCase().contains("message-id:")) {
                     message.setMessageId(line.split(":")[1]);
                 }
-                else if (line.contains("\r\n\r\n")) {
+                else {
                     isMessageText = true;
-                }
-                else if (line.contains(SEPARATOR)) {
-                    messages.add(message);
-                    message = new Message();
                 }
             }
             bufferedReader.close();

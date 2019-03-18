@@ -1,4 +1,4 @@
-package org.pineapple.server.stateMachine;
+package org.pineapple;
 
 public enum CommandPOP3 {
     APOP,

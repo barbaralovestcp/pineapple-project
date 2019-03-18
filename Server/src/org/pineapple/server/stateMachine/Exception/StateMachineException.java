@@ -1,5 +1,6 @@
 package org.pineapple.server.stateMachine.Exception;
 
+import org.pineapple.CommandPOP3;
 import org.pineapple.server.stateMachine.*;
 
 public class StateMachineException extends RuntimeException {
