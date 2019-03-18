@@ -1,5 +1,6 @@
 package org.pineapple.server.stateMachine;
 
+import org.jetbrains.annotations.Nullable;
 import org.pineapple.CommandPOP3;
 import org.pineapple.server.stateMachine.Exception.InvalidPOP3CommandException;
 import org.pineapple.server.stateMachine.Exception.StateMachineException;
@@ -10,12 +11,16 @@ public class Context {
 
     private State currentState;
     private boolean toQuit;
+    
+    @Nullable
+    private String messageToSend;
 
     //TODO : Give an attribute to interact with the server : Send message. Will be used by States when processing commands.
 
     public Context(State initialState) {
         currentState = initialState;
         toQuit = false;
+        messageToSend = null;
     }
 
     public Context() {
@@ -89,5 +94,20 @@ public class Context {
     
     public void setToQuit(boolean toQuit) {
         this.toQuit = toQuit;
+    }
+    
+    @Nullable
+    public String getMessageToSend() {
+        return messageToSend;
+    }
+    @Nullable
+    public String popMessageToSend() {
+        String message = getMessageToSend();
+        setMessageToSend(null);
+        return message;
+    }
+    
+    public void setMessageToSend(@Nullable String messageToSend) {
+        this.messageToSend = messageToSend;
     }
 }

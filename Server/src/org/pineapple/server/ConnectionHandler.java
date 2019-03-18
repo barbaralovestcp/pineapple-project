@@ -4,6 +4,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.pineapple.CommandPOP3;
+import org.pineapple.Message;
 import org.pineapple.server.stateMachine.Context;
 import org.pineapple.server.stateMachine.InputStateMachine;
 
@@ -67,7 +68,12 @@ public class ConnectionHandler implements Runnable {
                 if (InputStateMachine.IsValidPOP3Request(content.toString())) {
                     context.handle(new InputStateMachine(content.toString()));
                     
-                    if (context.isToQuit()) {
+                    String messageToSend = context.popMessageToSend();
+                    if (messageToSend != null) {
+                    	tryLog("Sending message \"" + messageToSend.replace("\n", "\n\t") + "\"");
+                    	sendMessage(messageToSend);
+                    }
+                    else if (context.isToQuit()) {
                         tryLog("Connection closed with " + getClientName());
                         so_client.close();
                     }
@@ -85,14 +91,14 @@ public class ConnectionHandler implements Runnable {
 	/* CONNECTION HANDLER METHODS */
 
 	public void sendMessage(@NotNull String message){
-		// TODO send message logic
 		SimpleDateFormat sdf = new SimpleDateFormat("dd'/'MM'/'yyyy 'at' HH:mm:ss");
 		if(out_data != null) {
-			out_data.print("From : POP3 Server \r\n");
-			out_data.print("To: " + this.getClientName() + "\r\n");
-			out_data.print("Date: " + sdf.format(new Date())  + "\r\n");
-			out_data.print("\r\n\r\n");
-			out_data.print(message + "\r\n");
+			out_data.print(new Message()
+					.setSender("POP3 Server")
+					.setReceiver(this.getClientName())
+					.setDate(sdf.format(new Date()))
+					.setMessageId(Long.toString(new Date().getTime()))
+					.buildMessage());
 			out_data.flush();
 			tryLog("Message sent");
 		}

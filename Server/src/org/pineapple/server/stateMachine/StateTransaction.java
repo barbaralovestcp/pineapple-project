@@ -1,5 +1,7 @@
 package org.pineapple.server.stateMachine;
 
+import org.pineapple.CodeERR;
+import org.pineapple.CodeOK;
 import org.pineapple.CommandPOP3;
 import org.pineapple.server.stateMachine.Exception.StateMachineException;
 
@@ -15,24 +17,24 @@ public class StateTransaction implements State {
 
             case STAT:
 
-                //TODO : Fill message with STATS
-                toSend = "<Stats !>";
+                //TODO: Fill message with STATS
+                toSend = CodeOK.CodeEnum.OK_STAT.toString("<Stats !>");
                 nextState = this;
                 break;
             case RETR:
 
                 //TODO : Retrieve mails
-                toSend = "<Retrieved Mail>";
+                toSend = CodeOK.CodeEnum.OK_RETRIEVE.toString("<Retrieved Mail>");
                 nextState = this;
                 break;
             case QUIT:
 
                 boolean quitIsValid = true;
                 if (quitIsValid) {
-                    toSend = "OK";
+                    toSend = CodeOK.CodeEnum.OK.toString();
                 }
                 else {
-                    toSend = "ERR some deleted message not removed";
+                    toSend = CodeERR.CodeEnum.ERR_DEL_MESSAGE_NOT_REMOVED.toString();
                 }
                 context.setToQuit(true);
 
@@ -44,8 +46,7 @@ public class StateTransaction implements State {
                 throw new StateMachineException(this, command);
         }
 
-        //TODO : Send message;
-        System.out.println(toSend);
+        context.setMessageToSend(toSend);
         context.setState(nextState);
     }
 }

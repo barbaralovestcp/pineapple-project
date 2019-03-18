@@ -1,5 +1,7 @@
 package org.pineapple.server.stateMachine;
 
+import org.pineapple.CodeERR;
+import org.pineapple.CodeOK;
 import org.pineapple.CommandPOP3;
 import org.pineapple.server.stateMachine.Exception.StateMachineException;
 
@@ -18,18 +20,18 @@ public class StateAuthentification implements State {
                 boolean popIsValid = true;
                 if (popIsValid)
                 {
-                    toSend = "OK maildrop locked and ready";
+                    toSend = CodeOK.CodeEnum.OK_MAILDROP_READY.toString();
                     nextState = new StateTransaction();
                 }
                 else {
-                    toSend = "ERR Permission denied";
+                    toSend = CodeERR.CodeEnum.ERR_PERMISSION_DENIED.toString();
                     nextState = this;
                 }
 
                 break;
             case QUIT:
                 
-                toSend = "OK";
+                toSend = CodeOK.CodeEnum.OK.toString();
                 context.setToQuit(true);
                 
                 //TODO : End connection ?
@@ -40,8 +42,7 @@ public class StateAuthentification implements State {
                 throw new StateMachineException(this, command);
         }
         
-        //TODO : SEND MESSAGE
-        System.out.println(toSend);
+        context.setMessageToSend(toSend);
         context.setState(nextState);
 
     }

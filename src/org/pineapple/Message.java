@@ -23,7 +23,7 @@ public class Message {
     public String buildMessage() {
         return getInfos() +
                 "Message-ID: " + getMessageId() + "\r\n" +
-                "\r\n" +
+                "\r\n\r\n" +
                 getMessage() +"\r\n";
     }
 
