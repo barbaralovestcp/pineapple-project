@@ -10,7 +10,6 @@ public class TestStateMachine {
 
     public static void main(String[] args) {
 
-
         String msg = "";
         Scanner in = new Scanner(System.in);
 
