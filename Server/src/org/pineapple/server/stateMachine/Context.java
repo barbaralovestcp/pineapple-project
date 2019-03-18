@@ -73,6 +73,8 @@ public class Context {
         System.out.println("Successful State Transition : " + currentState.getClass().getSimpleName() + " ---> " + newState.getClass().getSimpleName());
         currentState = newState;
     }
-
-
+    
+    public State getCurrentState() {
+        return currentState;
+    }
 }
