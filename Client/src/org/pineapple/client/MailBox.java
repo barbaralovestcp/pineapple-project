@@ -134,7 +134,15 @@ public class MailBox extends Application {
             @Override
             public void handle(ActionEvent event) {
                 client.sendMessage(Command.STAT);
-                inboxMessages.add(new Message("test","test","test","test","test","test",false));
+                inboxMessages.add(new Message()
+                        .setSender("test")
+                        .setReceiver("test")
+                        .setSubject("test")
+                        .setDate("01/01/1970 00:00:00")
+                        .setMessageId("0")
+                        .setMessage("test")
+                        .setDeleted(false)
+                );
                 //TODO LIST server
                 // get messages
             }
