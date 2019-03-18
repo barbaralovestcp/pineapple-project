@@ -1,5 +1,6 @@
 package org.pineapple.server.stateMachine.test;
 
+import org.pineapple.CommandPOP3;
 import org.pineapple.server.stateMachine.*;
 import org.pineapple.server.stateMachine.Exception.InvalidPOP3CommandException;
 

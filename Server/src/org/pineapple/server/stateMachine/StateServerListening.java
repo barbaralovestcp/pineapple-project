@@ -1,5 +1,7 @@
 package org.pineapple.server.stateMachine;
 
+import org.pineapple.CommandPOP3;
+
 public class StateServerListening implements State {
 
     @Override

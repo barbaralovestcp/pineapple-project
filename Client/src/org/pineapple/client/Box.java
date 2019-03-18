@@ -1,7 +1,7 @@
 package org.pineapple.client;
 
 import javafx.collections.ObservableList;
-import org.pineapple.server.Message;
+import org.pineapple.Message;
 
 public class Box {
 
