@@ -1,4 +1,4 @@
-package org.pineapple.server;
+package org.pineapple;
 
 public class Message {
 
@@ -26,7 +26,7 @@ public class Message {
         this.subject = "Unknown";
         this.date = "Unknown";
         this.messageId = "Unknown";
-        this.message = "Unknown";
+        this.message = "";
         this.isDeleted = false;
     }
 

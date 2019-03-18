@@ -37,6 +37,7 @@ public class Client{
 				StringBuilder answer = new StringBuilder();
 				String line = indata.readLine();
 				if(line != null){
+					System.out.println(line);
 					String stat_line[] = line.split(" ");
 
 					if (stat_line.length > 1) {
@@ -77,8 +78,8 @@ public class Client{
 		PrintStream out_data = new PrintStream(this.op);
 		try {
 			SimpleDateFormat sdf = new SimpleDateFormat("dd'/'MM'/'yyyy 'at' HH:mm:ss");
-			out_data.print("From : Client " + this.name + "\r\n");
-			out_data.print("To:  POP3 Server \r\n");
+			out_data.print("From: Client " + this.name + "\r\n");
+			out_data.print("To: POP3 Server \r\n");
 			out_data.print("Date: " + sdf.format(new Date())  + "\r\n");
 			out_data.print("\r\n\r\n");
 			out_data.print(message + "\r\n");

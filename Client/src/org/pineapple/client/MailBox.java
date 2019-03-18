@@ -10,7 +10,6 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
-import javafx.scene.control.Separator;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -22,7 +21,7 @@ import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import org.pineapple.server.Message;
+import org.pineapple.Message;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -75,9 +74,15 @@ public class MailBox extends Application {
         connexionbtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                Client client = new Client(name);
-                primaryStage.close();
-                mailbox(client);
+                Thread t = new Thread() {
+                    public void run() {
+                        Client client = new Client(name);
+                        primaryStage.close();
+                        mailbox(client);
+                    }
+                };
+                t.start();
+                t.run();
             }
         });
 
