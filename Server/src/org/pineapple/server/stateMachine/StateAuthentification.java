@@ -28,18 +28,18 @@ public class StateAuthentification implements State {
 
                 break;
             case QUIT:
-
+                
                 toSend = "OK";
-
+                context.setToQuit(true);
+                
                 //TODO : End connection ?
                 nextState = new StateServerListening();
-
+                
                 break;
             default:
                 throw new StateMachineException(this, command);
         }
-
-
+        
         //TODO : SEND MESSAGE
         System.out.println(toSend);
         context.setState(nextState);

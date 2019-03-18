@@ -34,6 +34,7 @@ public class StateTransaction implements State {
                 else {
                     toSend = "ERR some deleted message not removed";
                 }
+                context.setToQuit(true);
 
                 //TODO : End connection (?)
 

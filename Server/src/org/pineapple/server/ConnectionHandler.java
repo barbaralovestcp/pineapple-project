@@ -3,8 +3,9 @@ package org.pineapple.server;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.pineapple.server.stateMachine.CommandPOP3;
+import org.pineapple.CommandPOP3;
 import org.pineapple.server.stateMachine.Context;
+import org.pineapple.server.stateMachine.InputStateMachine;
 
 import java.io.*;
 import java.net.Socket;
@@ -20,9 +21,11 @@ import java.util.function.Function;
  */
 public class ConnectionHandler implements Runnable {
 
+    @NotNull
 	private Socket so_client;
 	private InputStreamReader in_data;
 	private PrintStream out_data;
+	@NotNull
 	private Context context;
 
 	@Nullable
@@ -44,39 +47,30 @@ public class ConnectionHandler implements Runnable {
 
 	@Override
 	public void run() {
+	    // Transitioning from state "Listening" to "Authentication"
+	    context.handle(null, null);
+	    
 		if (in_data == null)
 			throw new NullPointerException();
-	
+	  
+		// Reading message from client
 		BufferedReader br = new BufferedReader(in_data);
-		boolean keepRunning = true;
-		String content = "";
+		StringBuilder content = new StringBuilder();
 		try {
 		    String line;
             while ((line = br.readLine()) != null)
-                content += line;
+                content.append(line);
             
-            String[] parts = content.split(" ");
-            
-            if (parts.length > 0) {
-                String command = parts[0];
+            if (content.length() > 0) {
+                String command = content.toString().split("\\s+")[0];
                 tryLog("Received command: " + command);
-                context.handle(command);
-                
-                if (command.equals(CommandPOP3.QUIT.name())) {
-                    tryLog("Connection closed with " + getClientName());
-                    so_client.close();
-                }
-                
-                try {
-                    while ((line = br.readLine()) != null) {
-                        if (line.equals("Connection: close")) {
-                            so_client.close();
-                            tryLog("Connection closed with " + getClientName());
-                            break;
-                        }
+                if (InputStateMachine.IsValidPOP3Request(content.toString())) {
+                    context.handle(new InputStateMachine(content.toString()));
+                    
+                    if (context.isToQuit()) {
+                        tryLog("Connection closed with " + getClientName());
+                        so_client.close();
                     }
-                } catch (SocketException ignored) {
-                    tryLog("Connection closed by " + getClientName());
                 }
             }
 		} catch (IOException e1) {
@@ -106,9 +100,6 @@ public class ConnectionHandler implements Runnable {
 
 	@Nullable
 	public byte[] getFileData(@NotNull File file) {
-		if (file == null)
-			throw new NullPointerException();
-
 		FileInputStream in = null;
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		byte[] raw = new byte[4096];
@@ -139,13 +130,14 @@ public class ConnectionHandler implements Runnable {
 	}
 
 	/* GETTERS & SETTERS */
-
+    
+    @NotNull
 	@Contract(pure = true)
 	public Socket getClient() {
 		return so_client;
 	}
 
-	public void setClient(Socket so_client) {
+	public void setClient(@NotNull Socket so_client) {
 		this.so_client = so_client;
 	}
 

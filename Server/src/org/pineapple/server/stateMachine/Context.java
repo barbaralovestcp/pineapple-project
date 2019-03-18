@@ -4,22 +4,22 @@ import org.pineapple.CommandPOP3;
 import org.pineapple.server.stateMachine.Exception.InvalidPOP3CommandException;
 import org.pineapple.server.stateMachine.Exception.StateMachineException;
 
+import java.net.Socket;
+
 public class Context {
 
     private State currentState;
+    private boolean toQuit;
 
     //TODO : Give an attribute to interact with the server : Send message. Will be used by States when processing commands.
 
     public Context(State initialState) {
         currentState = initialState;
+        toQuit = false;
     }
 
     public Context() {
         this(new StateServerListening());
-
-        //We suppose a connection has already been made, so we immediately transition from Listening --> Authentification
-        //when creating Context. (Might change?) ServerListenind.handle() doesn't use any arguments.
-        handle(null, null);
     }
 
     /*
@@ -77,5 +77,17 @@ public class Context {
     
     public State getCurrentState() {
         return currentState;
+    }
+    
+    public void setCurrentState(State currentState) {
+        this.currentState = currentState;
+    }
+    
+    public boolean isToQuit() {
+        return toQuit;
+    }
+    
+    public void setToQuit(boolean toQuit) {
+        this.toQuit = toQuit;
     }
 }
