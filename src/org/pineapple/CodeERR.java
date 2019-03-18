@@ -4,6 +4,17 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * <pre>
+ *     // Instantiate an "ERR_PERMISSION_DENIED" code:
+ *     CodeERR err1 = new CodeERR(CodeERR.CodeEnum.ERR_PERMISSION_DENIED);
+ *     send(err1.toString());
+ *
+ *     // Instantiate an "ERR_NO_MAILBOX" code:
+ *     CodeERR err2 = new CodeERR(CodeERR.CodeEnum.ERR_NO_MAILBOX);
+ *     send(err2.toString("mailbox_name"));
+ * </pre>
+ */
 public class CodeERR extends Code implements ParametrizedToString {
 	
 	public enum CodeEnum implements ICodeEnum {
@@ -63,7 +74,7 @@ public class CodeERR extends Code implements ParametrizedToString {
 	@Override
 	public String toString(@Nullable String parameter) {
 		String message = getCodeType().toString(parameter);
-		return "+OK" + (message.length() > 0 ? " " + message : "");
+		return "-ERR" + (message.length() > 0 ? " " + message : "");
 	}
 	
 	@NotNull

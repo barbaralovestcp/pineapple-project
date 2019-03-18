@@ -4,6 +4,17 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * <pre>
+ *     // Instantiate an "OK_MAILDROP_READY" code:
+ *     CodeOK ok1 = new CodeOK(CodeOK.CodeEnum.OK_MAILDROP_READY);
+ *     send(ok1.toString());
+ *
+ *     // Instantiate an "OK_SERVER_READY" code:
+ *     Code ok2 = new CodeOK(CodeOK.CodeEnum.OK_SERVER_READY);
+ *     send(ok2.toString("server_name"));
+ * </pre>
+ */
 public class CodeOK extends Code implements ParametrizedToString {
 	
 	public enum CodeEnum implements ICodeEnum {

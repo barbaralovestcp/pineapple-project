@@ -21,6 +21,9 @@ public abstract class Code {
 	public Code(@NotNull ICodeEnum codeType) {
 		setCodeType(codeType);
 	}
+	public Code(@NotNull Code code) {
+		setCodeType(code.getCodeType());
+	}
 	
 	/* GETTERS & SETTERS */
 	
