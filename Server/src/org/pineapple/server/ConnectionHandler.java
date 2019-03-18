@@ -40,6 +40,8 @@ public class ConnectionHandler implements Runnable {
 
     @Override
     public void run() {
+        sendMessage("+OK Server Ready");
+
         if (in_data == null)
             throw new NullPointerException();
 
@@ -75,17 +77,25 @@ public class ConnectionHandler implements Runnable {
 
     /* CONNECTION HANDLER METHODS */
 
-    public void sendMessage(@NotNull String message){
+    public void sendMail(@NotNull String message){
         //TODO send message logic
         SimpleDateFormat sdf = new SimpleDateFormat("dd'/'MM'/'yyyy 'at' HH:mm:ss");
         if(out_data != null){
-            out_data.print("From : POP3 Server \r\n");
+            out_data.print("From: POP3 Server \r\n");
             out_data.print("To: " + this.getClientName() + "\r\n");
             out_data.print("Date: " + sdf.format(new Date())  + "\r\n");
             out_data.print("\r\n\r\n");
             out_data.print(message + "\r\n");
             out_data.flush();
             tryLog("Message sent");
+        }
+    }
+
+    public void sendMessage(String message){
+        if(out_data != null){
+            out_data.print(message + "\r\n");
+            out_data.flush();
+            tryLog("Message sent" + message);
         }
     }
 

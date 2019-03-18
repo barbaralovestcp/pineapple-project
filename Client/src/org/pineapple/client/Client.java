@@ -25,8 +25,6 @@ public class Client{
 		try{
 			Socket con_serv = new Socket(InetAddress.getByName(adress),110);
 			try {
-				this.setConnected(true);
-
 				//flux d'entrée
 				InputStream inp = con_serv.getInputStream();
 				//flux de sortie
@@ -37,18 +35,15 @@ public class Client{
 				StringBuilder answer = new StringBuilder();
 				String line = indata.readLine();
 				if(line != null){
-					System.out.println(line);
-					String stat_line[] = line.split(" ");
+					System.out.println("Message " + line);
 
-					if (stat_line.length > 1) {
-						if (stat_line[1].equals("+OK")) {
-
-						}else if(stat_line[1].equals("-ERR")) {
-
-						}else {
-
-						}
+					if(line.contains("+OK")){
+						this.setConnected(true);
+					}else{
+						System.out.println("Error");
 					}
+				}else{
+					System.out.println("nothing");
 				}
 
 				printWelcome();
