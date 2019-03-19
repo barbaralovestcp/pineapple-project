@@ -4,6 +4,7 @@ import org.pineapple.Message;
 
 import java.util.ArrayList;
 
+
 public class MailBox {
     private String name;
     private String password;
