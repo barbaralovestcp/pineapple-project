@@ -8,19 +8,9 @@ public class Message {
     private String date;
     private String messageId;
     private String message;
-    private Boolean isDeleted;
-
-    public Message(String sender, String receiver, String subject, String date, String messageId, String message, Boolean isDeleted) {
-        this.sender = sender;
-        this.receiver = receiver;
-        this.subject = subject;
-        this.date = date;
-        this.messageId = messageId;
-        this.message = message;
-        this.isDeleted = isDeleted;
-    }
-
-    public Message(){
+    private boolean isDeleted;
+    
+    public Message() {
         this.sender = "Unknown";
         this.receiver = "Unknown";
         this.subject = "Unknown";
@@ -31,90 +21,88 @@ public class Message {
     }
 
     public String buildMessage() {
-        return "From: " + this.sender + "/n" +
-                "To: " + this.receiver + "/n" +
-                "Subject: " + this.subject + "/n" +
-                "Date: " + this.date + "/n" +
-                "Message-ID: " + this.messageId + "/n" +
-                "/n" +
-                this.message +"/n";
+        return getInfos() +
+                "Message-ID: " + getMessageId() + "\r\n" +
+                "\r\n\r\n" +
+                getMessage() +"\r\n";
     }
 
     //GETTERS
-
+    
     public String getSender() {
         return sender;
     }
-
+    
     public String getReceiver() {
         return receiver;
     }
-
+    
     public String getSubject() {
         return subject;
     }
-
+    
     public String getDate() {
         return date;
     }
-
+    
     public String getMessageId() {
         return messageId;
     }
-
+    
     public String getMessage() {
         return message;
     }
-
-    public Boolean getIsDeletec() {
+    
+    public boolean getIsDeleted() {
         return isDeleted;
     }
-
+    
     public String getInfos(){
-        return "From: " + this.sender + "/n" +
-                "To: " + this.receiver + "/n" +
-                "Subject: " + this.subject + "/n" +
-                "Date: " + this.date + "/n";
+        return "From: " + getSender() + "\r\n" +
+                "To: " + getReceiver() + "\r\n" +
+                "Subject: " + getSubject() + "\r\n" +
+                "Date: " + getDate() + "\r\n";
     }
 
     //SETTERS
 
-
-    public void setSender(String sender) {
+    public Message setSender(String sender) {
         this.sender = sender;
+        return this;
     }
 
-    public void setReceiver(String receiver) {
+    public Message setReceiver(String receiver) {
         this.receiver = receiver;
+        return this;
     }
 
-    public void setSubject(String subject) {
+    public Message setSubject(String subject) {
         this.subject = subject;
+        return this;
     }
 
-    public void setDate(String date) {
+    public Message setDate(String date) {
         this.date = date;
+        return this;
     }
 
-    public void setMessageId(String messageId) {
+    public Message setMessageId(String messageId) {
         this.messageId = messageId;
+        return this;
     }
 
-    public void setMessage(String message) {
+    public Message setMessage(String message) {
         this.message = message;
+        return this;
     }
 
-    public void setDeleted(Boolean deleted) {
+    public Message setDeleted(Boolean deleted) {
         isDeleted = deleted;
-    }
-
-    public int getMessageSize() {
-        //TODO: return size of a message (octets) for list command
-        return 0;
+        return this;
     }
 
     @Override
     public String toString() {
-        return this.getSubject();
+        return buildMessage();
     }
 }

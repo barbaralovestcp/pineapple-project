@@ -3,6 +3,10 @@ package org.pineapple.server;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.pineapple.CommandPOP3;
+import org.pineapple.Message;
+import org.pineapple.server.stateMachine.Context;
+import org.pineapple.server.stateMachine.InputStateMachine;
 import org.pineapple.CodeOK;
 
 import java.io.*;
@@ -19,145 +23,143 @@ import java.util.function.Function;
  */
 public class ConnectionHandler implements Runnable {
 
-    private Socket so_client;
-    private DataInputStream in_data;
-    private PrintStream out_data;
+    @NotNull
+	private Socket so_client;
+	private InputStreamReader in_data;
+	private PrintStream out_data;
+	@NotNull
+	private Context context;
 
-    @Nullable
-    private Function<String, Void> onLog;
+	@Nullable
+	private Function<String, Void> onLog;
 
-    public ConnectionHandler(@NotNull Socket so_client, @Nullable Function<String, Void> onLog) throws IOException {
-        setClient(so_client);
+	public ConnectionHandler(@NotNull Socket so_client, @Nullable Function<String, Void> onLog) throws IOException {
+		setClient(so_client);
 
-        in_data = new DataInputStream(so_client.getInputStream());
-        out_data = new PrintStream(so_client.getOutputStream());
-        setOnLog(onLog);
+		in_data = new InputStreamReader(so_client.getInputStream());
+		out_data = new PrintStream(so_client.getOutputStream());
+		context = new Context();
+		setOnLog(onLog);
 
-        tryLog("New connection: " + getClientName());
-    }
+		tryLog("New connection: " + getClientName());
+	}
+	public ConnectionHandler(@NotNull Socket so_client) throws IOException {
+		this(so_client, null);
+	}
 
-    public ConnectionHandler(@NotNull Socket so_client) throws IOException {
-        this(so_client, null);
-    }
-
-    @Override
-    public void run() {
-        sendMessage("+OK " + CodeOK.CodeEnum.OK_SERVER_READY.toString("Server"));
-
-        if (in_data == null)
-            throw new NullPointerException();
-
-        boolean keepRunning = true;
-        String line = "";
-        try {
-            line = in_data.readLine();
-            if (line != null) {
-                String[] parts = line.split(" ");
-
-                //TODO redirect to right process
-
-                try {
-                    while ((line = in_data.readLine()) != null) {
-                        if (line.equals("Connection: close")) {
-                            so_client.close();
-                            tryLog("Connection closed with " + getClientName());
-                            break;
-                        }
+	@Override
+	public void run() {
+	    // Transitioning from state "Listening" to "Authentication"
+	    context.handle(null, null);
+	    
+		if (in_data == null)
+			throw new NullPointerException();
+	  
+		// Reading message from client
+		BufferedReader br = new BufferedReader(in_data);
+		StringBuilder content = new StringBuilder();
+		try {
+		    String line;
+            while ((line = br.readLine()) != null)
+                content.append(line);
+            
+            if (content.length() > 0) {
+                String command = content.toString().split("\\s+")[0];
+                tryLog("Received command: " + command);
+                if (InputStateMachine.IsValidPOP3Request(content.toString())) {
+                    context.handle(new InputStateMachine(content.toString()));
+                    
+                    String messageToSend = context.popMessageToSend();
+                    if (messageToSend != null) {
+                    	tryLog("Sending message \"" + messageToSend.replace("\n", "\n\t") + "\"");
+                    	sendMessage(messageToSend);
                     }
-                } catch (SocketException ignored) {
-                    tryLog("Connection closed by " + getClientName());
+                    else if (context.isToQuit()) {
+                        tryLog("Connection closed with " + getClientName());
+                        so_client.close();
+                    }
                 }
             }
-        } catch (IOException e1) {
-            e1.printStackTrace();
-        }
-    }
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+	}
 
-    public String getClientName() {
-        return so_client.getInetAddress().getHostAddress() + ":" + so_client.getPort() + " (\"" + so_client.getInetAddress().getCanonicalHostName() + "\")";
-    }
+	public String getClientName() {
+		return so_client.getInetAddress().getHostAddress() + ":" + so_client.getPort() + " (\"" + so_client.getInetAddress().getCanonicalHostName() + "\")";
+	}
 
-    /* CONNECTION HANDLER METHODS */
+	/* CONNECTION HANDLER METHODS */
 
-    public void sendMail(@NotNull String message) {
-        //TODO send message logic
-        SimpleDateFormat sdf = new SimpleDateFormat("dd'/'MM'/'yyyy 'at' HH:mm:ss");
-        if (out_data != null) {
-            out_data.print("From: POP3 Server \r\n");
-            out_data.print("To: " + this.getClientName() + "\r\n");
-            out_data.print("Date: " + sdf.format(new Date()) + "\r\n");
-            out_data.print("\r\n\r\n");
-            out_data.print(message + "\r\n");
-            out_data.flush();
-            tryLog("Message sent");
-        }
-    }
+	public void sendMessage(@NotNull String message){
+		SimpleDateFormat sdf = new SimpleDateFormat("dd'/'MM'/'yyyy 'at' HH:mm:ss");
+		if(out_data != null) {
+			out_data.print(new Message()
+					.setSender("POP3 Server")
+					.setReceiver(this.getClientName())
+					.setDate(sdf.format(new Date()))
+					.setMessageId(Long.toString(new Date().getTime()))
+					.buildMessage());
+			out_data.flush();
+			tryLog("Message sent");
+		}
+	}
 
-    public void sendMessage(String message) {
-        if (out_data != null) {
-            out_data.print(message + "\r\n");
-            out_data.flush();
-            tryLog("Message sent " + message);
-        }
-    }
+ 	@Nullable
+	public byte[] getFileData(@NotNull File file) {
+		FileInputStream in = null;
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		byte[] raw = new byte[4096];
+		int size;
 
-    @Nullable
-    public byte[] getFileData(@NotNull File file) {
-        if (file == null)
-            throw new NullPointerException();
+		try {
+			in = new FileInputStream(file);
 
-        FileInputStream in = null;
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        byte[] raw = new byte[4096];
-        int size;
+			while ((size = in.read(raw)) >= 0)
+				baos.write(raw, 0, size);
 
-        try {
-            in = new FileInputStream(file);
+			baos.flush();
+			baos.close();
 
-            while ((size = in.read(raw)) >= 0)
-                baos.write(raw, 0, size);
+			return baos.toByteArray();
+		} catch (IOException ex) {
+			ex.printStackTrace();
+			return null;
+		} finally {
+			if (in != null) {
+				try {
+					in.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
 
-            baos.flush();
-            baos.close();
+	/* GETTERS & SETTERS */
+    
+    @NotNull
+	@Contract(pure = true)
+	public Socket getClient() {
+		return so_client;
+	}
 
-            return baos.toByteArray();
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            return null;
-        } finally {
-            if (in != null) {
-                try {
-                    in.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
+	public void setClient(@NotNull Socket so_client) {
+		this.so_client = so_client;
+	}
 
-    /* GETTERS & SETTERS */
+	@Nullable
+	@Contract(pure = true)
+	public Function<String, Void> getOnLog() {
+		return onLog;
+	}
 
-    @Contract(pure = true)
-    public Socket getClient() {
-        return so_client;
-    }
+	public void setOnLog(@Nullable Function<String, Void> onLog) {
+		this.onLog = onLog;
+	}
 
-    public void setClient(Socket so_client) {
-        this.so_client = so_client;
-    }
-
-    @Nullable
-    @Contract(pure = true)
-    public Function<String, Void> getOnLog() {
-        return onLog;
-    }
-
-    public void setOnLog(@Nullable Function<String, Void> onLog) {
-        this.onLog = onLog;
-    }
-
-    public void tryLog(String message) {
-        if (getOnLog() != null)
-            getOnLog().apply(message);
-    }
+	public void tryLog(String message) {
+		if (getOnLog() != null)
+			getOnLog().apply(message);
+	}
 }
