@@ -53,6 +53,10 @@ public class Message {
         return message;
     }
     
+    public int getMessageSize() {
+        return this.buildMessage().getBytes().length;
+    }
+    
     public boolean getIsDeleted() {
         return isDeleted;
     }
