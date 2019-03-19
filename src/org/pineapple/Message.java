@@ -1,5 +1,7 @@
 package org.pineapple;
 
+import org.jetbrains.annotations.NotNull;
+
 public class Message {
 
     private String sender;
@@ -25,6 +27,53 @@ public class Message {
                 "Message-ID: " + getMessageId() + "\r\n" +
                 "\r\n" +
                 getMessage() +"\r\n";
+    }
+    
+    /**
+     * Parse a message from string.
+     * @param rawMessage The message to parse.
+     * @return Return the representation of the string as a message.
+     */
+    public static Message parse(@NotNull String rawMessage) {
+        String[] lines = rawMessage.split("\\r\\n");
+        
+        if (lines.length == 1)
+            lines = rawMessage.split("\\n");
+        
+        Message message = new Message();
+        
+        for (String line : lines) {
+            // Split the line according to ':'
+            String[] parts = line.split("\\s*:\\s*");
+            
+            // If the line could not be split, then it is the body
+            if (parts.length == 1)
+                message.setMessage(message.getMessage() + line + ((message.getMessage() + line).length() > 0 ? "\r\n" : ""));
+            else {
+                if (parts[0].toLowerCase().equals("from"))
+                    message.setSender(parts[1]);
+                else if (parts[0].toLowerCase().equals("to"))
+                    message.setReceiver(parts[1]);
+                else if (parts[0].toLowerCase().equals("date")) {
+                    String[] dates = new String[parts.length - 1];
+                    System.arraycopy(parts, 1, dates, 0, parts.length - 1);
+                    message.setDate(String.join(":", dates));
+                }
+                else if (parts[0].toLowerCase().equals("message-id"))
+                    message.setMessageId(parts[1]);
+                else if (parts[0].toLowerCase().equals("subject"))
+                    message.setSubject(parts[1]);
+                // If it does not match any conditions above, then it's the body where there is one or multiple ':'.
+                else
+                    message.setMessage(message.getMessage() + line + "\r\n");
+            }
+        }
+        
+        // Delete the last "\r\n"
+        if (message.getMessage().contains("\r\n"))
+            message.setMessage(message.getMessage().replaceFirst("\\r\\n$", ""));
+        
+        return message;
     }
 
     //GETTERS
