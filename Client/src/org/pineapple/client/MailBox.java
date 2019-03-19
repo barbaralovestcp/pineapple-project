@@ -23,6 +23,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import org.pineapple.Message;
 
+import java.awt.*;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -33,6 +34,7 @@ import java.util.HashMap;
 public class MailBox extends Application {
 
     private String name = "client";
+    private Client client;
     private HashMap<Integer, Message> messagesList = new HashMap<>();
 
     //Style
@@ -42,7 +44,6 @@ public class MailBox extends Application {
             new Stop(0, primary), new Stop(1, secondary));
     private Background background = new Background(new BackgroundFill(secondary, CornerRadii.EMPTY, Insets.EMPTY));
 
-    //View elements
     private Button refresh = new Button();
     private Button sortBySender = new Button();
     private Button sortBySubject = new Button();
@@ -51,6 +52,7 @@ public class MailBox extends Application {
     private HBox toolbar = new HBox();
     private TextArea messageBody = new TextArea();
     private TextArea messageInfo = new TextArea();
+    private TextArea messageState = new TextArea();
     private VBox viewInfo = new VBox();
     private VBox viewMessage = new VBox();
     private Box inbox;
@@ -62,6 +64,7 @@ public class MailBox extends Application {
     @Override
     public void start(Stage primaryStage) {
         primaryStage.setTitle("Mail Box");
+        openMailbox(primaryStage);
 
         //MAIN TITLE
         Text title = new Text(0, 0, "\uD83C\uDF4D Bienvenue " + this.name);
@@ -69,20 +72,16 @@ public class MailBox extends Application {
         title.setFill(Color.WHITE);
 
         //MAIN BUTTON ENTER
+        //View elements
         Button connexionbtn = new Button();
         this.initButtonStyle(connexionbtn, "Enter");
         connexionbtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                Thread t = new Thread() {
-                    public void run() {
-                        Client client = new Client(name);
-                        primaryStage.close();
-                        mailbox(client);
-                    }
-                };
-                t.start();
-                t.run();
+                if (client.isConnected()) {
+                    primaryStage.close();
+                    initMailbox();
+                }
             }
         });
 
@@ -113,7 +112,19 @@ public class MailBox extends Application {
         primaryStage.show();
     }
 
-    private void mailbox(Client client) {
+    private void openMailbox(Stage stage) {
+        EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                try {
+                    client = new Client(name);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    private void initMailbox() {
         Stage mailview = new Stage();
 
         ArrayList<Message> inboxList = this.getMessages();
@@ -162,11 +173,11 @@ public class MailBox extends Application {
         viewMessage.getChildren().addAll(messageInfo);
         viewInfo.getChildren().addAll(viewMessage, messageBody);
 
-        //Message mailbox view
+        //Message openMailbox view
         mailboxView.setOnMouseClicked(e -> {
             Box currentMailbox = mailboxView.getSelectionModel()
                     .getSelectedItem();
-            if(currentMailbox != null){
+            if (currentMailbox != null) {
                 int index = messageView.getSelectionModel()
                         .getSelectedIndex();
                 messageView.getSelectionModel().clearSelection(index);
@@ -175,10 +186,10 @@ public class MailBox extends Application {
             }
         });
         mailboxView.setOnMouseClicked(e -> {
-            //change current mailbox
+            //change current openMailbox
             Box currentMailbox = mailboxView.getSelectionModel()
                     .getSelectedItem();
-            if(currentMailbox != null){
+            if (currentMailbox != null) {
                 ObservableList<Message> obsMessages = currentMailbox
                         .getMessages();
                 messageView.setItems(obsMessages);
@@ -189,7 +200,7 @@ public class MailBox extends Application {
             Message currentMessage = messageView.getSelectionModel()
                     .getSelectedItem();
             if (currentMessage != null) {
-                messageInfo.setText(currentMessage.getSubject());
+                messageInfo.setText(currentMessage.getInfos());
                 messageBody.setText(currentMessage.getMessage());
             }
         });

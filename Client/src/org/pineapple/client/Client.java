@@ -2,6 +2,8 @@ package org.pineapple.client;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.pineapple.Code;
+import org.pineapple.CodeOK;
 
 import java.io.*;
 import java.net.*;
@@ -15,6 +17,8 @@ public class Client{
 	static String path;
 	static boolean quitter = false;
 
+	private String state = "";
+
 	private String adress = "127.0.0.1";
 	private boolean connected = false;
 	private String name;
@@ -25,8 +29,6 @@ public class Client{
 		try{
 			Socket con_serv = new Socket(InetAddress.getByName(adress),110);
 			try {
-				this.setConnected(true);
-
 				//flux d'entrée
 				InputStream inp = con_serv.getInputStream();
 				//flux de sortie
@@ -37,18 +39,20 @@ public class Client{
 				StringBuilder answer = new StringBuilder();
 				String line = indata.readLine();
 				if(line != null){
-					System.out.println(line);
-					String stat_line[] = line.split(" ");
+					System.out.println("Message " + line);
 
-					if (stat_line.length > 1) {
-						if (stat_line[1].equals("+OK")) {
-
-						}else if(stat_line[1].equals("-ERR")) {
-
-						}else {
+					if(line.contains("+OK")){
+						if(line.contains(CodeOK.CodeEnum.OK_SERVER_READY.toString(""))){
+							this.setConnected(true);
+						}else if(line.contains(CodeOK.CodeEnum.OK_STAT.toString(""))){
 
 						}
+					}else if(line.contains("-ERR")){
+
 					}
+
+				}else{
+					System.out.println("nothing");
 				}
 
 				printWelcome();

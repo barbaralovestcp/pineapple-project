@@ -7,6 +7,7 @@ import org.pineapple.CommandPOP3;
 import org.pineapple.Message;
 import org.pineapple.server.stateMachine.Context;
 import org.pineapple.server.stateMachine.InputStateMachine;
+import org.pineapple.CodeOK;
 
 import java.io.*;
 import java.net.Socket;
@@ -104,7 +105,7 @@ public class ConnectionHandler implements Runnable {
 		}
 	}
 
-	@Nullable
+ 	@Nullable
 	public byte[] getFileData(@NotNull File file) {
 		FileInputStream in = null;
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
