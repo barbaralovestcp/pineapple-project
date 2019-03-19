@@ -1,6 +1,7 @@
 package org.pineapple.server;
 
 import org.pineapple.Message;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.ArrayList;
 
@@ -14,30 +15,31 @@ public class MailBox {
         this.password = password;
         this.messages = messages;
     }
-
+    
    //GETTERS
-
+    
     public String getName() {
         return name;
     }
-
+    
     public String getPassword() {
         return password;
     }
-
+    
     public ArrayList<Message> getMessages() {
         return messages;
     }
-
+    
     public int getMessagesNumber() {
         return messages.size();
     }
-
+    
     public int getTotalSize() {
-        int size = 0;
+        /*int size = 0;
         for (Message message: messages) {
             size += message.getMessageSize();
         }
-        return size;
+        return size;*/
+        throw new NotImplementedException();
     }
 }
