@@ -2,6 +2,8 @@ package org.pineapple;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 public class Message {
 
     private String sender;
@@ -153,7 +155,28 @@ public class Message {
         isDeleted = deleted;
         return this;
     }
-
+    
+    /* OVERRIDES */
+    
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Message)) return false;
+        Message message1 = (Message) o;
+        return getIsDeleted() == message1.getIsDeleted() &&
+                Objects.equals(getSender(), message1.getSender()) &&
+                Objects.equals(getReceiver(), message1.getReceiver()) &&
+                Objects.equals(getSubject(), message1.getSubject()) &&
+                Objects.equals(getDate(), message1.getDate()) &&
+                Objects.equals(getMessageId(), message1.getMessageId()) &&
+                Objects.equals(getMessage(), message1.getMessage());
+    }
+    
+    @Override
+    public int hashCode() {
+        return Objects.hash(getSender(), getReceiver(), getSubject(), getDate(), getMessageId(), getMessage(), getIsDeleted());
+    }
+    
     @Override
     public String toString() {
         return buildMessage();

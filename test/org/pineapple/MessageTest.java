@@ -33,6 +33,7 @@ class MessageTest {
 						"\r\n" +
 						"J'ai un Dell Inspiron 7500 dont le son ne marche pas du tout. Silence complet.");
 		
-		assertEquals(message, Message.parse(raw));
+		Message parsed = Message.parse(raw);
+		assertEquals(message, parsed);
 	}
 }
