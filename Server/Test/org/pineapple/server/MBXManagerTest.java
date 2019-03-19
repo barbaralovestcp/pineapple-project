@@ -85,4 +85,9 @@ class MBXManagerTest {
 						"******\r\n",
 				MBXManager.convertMessagesToString(messages));
 	}
+	
+	@Test
+	void read() {
+		mbxManager.read();
+	}
 }

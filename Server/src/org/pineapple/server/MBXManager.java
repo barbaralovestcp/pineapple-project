@@ -8,6 +8,7 @@ import org.pineapple.Message;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -97,8 +98,8 @@ public class MBXManager {
 			br = new BufferedReader(fr);
 			
 			String line;
-			for ((line = br.readLine()) != null)
-				content.append(line);
+			while ((line = br.readLine()) != null)
+				content.append(line).append("\r\n");
 			
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -138,9 +139,70 @@ public class MBXManager {
 	 * @throws MalformedMessageException Throw when cannot parsed the file.
 	 */
 	@NotNull
-	public ArrayList<Message> read() throws MalformedMessageException {
+	public ArrayList<Message> read() {
 		String raw = readRaw();
-		return null;
+		
+		// Split according to the line "******" that seperate two messages
+		String[] emails = raw.split(Message.SEPARATOR_REGEX);
+		ArrayList<Message> messages = new ArrayList<>(emails.length);
+		
+		for (String email : emails)
+			if (!email.trim().replaceAll("\\r\\n", "").isEmpty())
+				messages.add(Message.parse(email));
+		
+		return messages;
+	}
+	
+	/**
+	 * Write the given list of messages in the list.
+	 * @param newMessages The list of messages to write in the file associated to the user.
+	 * @param overwrite If `true`, delete the old messages to save only the new ones in `newMessages`. If `false`,
+	 *                  append the new messages in the file. By default, the value is `false`.
+	 */
+	public void write(@NotNull List<Message> newMessages, boolean overwrite) {
+		// Get the old messages
+		ArrayList<Message> oldMessages;
+		if (!overwrite)
+			oldMessages = read();
+		else
+			oldMessages = new ArrayList<>();
+		
+		// Create the list containing the old and the new messages
+		ArrayList<Message> messages = new ArrayList<>();
+		messages.addAll(oldMessages);
+		messages.addAll(newMessages);
+		
+		// Compute the representation as string, with "******" as a separator
+		StringBuilder content = new StringBuilder();
+		
+		for (Message m : messages)
+			content.append(m.buildMessage()).append(Message.SEPARATOR).append("\r\n");
+		
+		// Write it in the file
+		writeRaw(content.toString());
+	}
+	
+	/**
+	 * Write the given list of messages in the list by appending them (the old messages are conserved in the file).
+	 * @param newMessages The list of messages to write in the file associated to the user.
+	 */
+	public void write(@NotNull List<Message> newMessages) {
+		write(newMessages, false);
+	}
+	
+	/**
+	 * Delete the given messages from the file. Keep the others in the file.
+	 * <b>Example:</b>
+	 * <pre>
+	 *     mbx.delete(m1, m2);
+	 *     mbx.delete(m3);
+	 * </pre>
+	 * @param messages The list of messages to delete.
+	 */
+	public void delete(@NotNull Message... messages) {
+		ArrayList<Message> oldMessages = read();
+		oldMessages.removeAll(Arrays.asList(messages));
+		write(oldMessages, true);
 	}
 	
 	/* GETTER & SETTER */
