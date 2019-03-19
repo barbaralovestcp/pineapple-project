@@ -49,7 +49,6 @@ public class Server extends Application implements Runnable {
 
 	private BorderPane root;
 	private ToolBar tb_buttons;
-	private Button bt_start;
 	private Button bt_pause_resume;
 	private Button bt_stop;
 	private Button bt_clear;
@@ -85,18 +84,13 @@ public class Server extends Application implements Runnable {
 		connections = new ArrayList();
 		root = new BorderPane();
 		tb_buttons = new ToolBar();
-		bt_start = new Button("Start");
 		bt_pause_resume = new Button("Pause");
 		bt_stop = new Button("Stop");
 		bt_clear = new Button("Clear");
 		loggerView = new WebView();
 		loggerEngine = loggerView.getEngine();
 
-		bt_start.setOnMouseClicked(event -> {
-			if (getState() == State.INITIALIZED) {
-				startServer();
-			}
-		});
+
 
 		bt_pause_resume.setOnMouseClicked(event -> {
 			if (getState() == State.STARTED)
@@ -115,7 +109,7 @@ public class Server extends Application implements Runnable {
 			loggerEngine.loadContent("");
 		});
 
-		tb_buttons.getItems().addAll(bt_start, bt_pause_resume, bt_stop, new Separator(Orientation.VERTICAL), bt_clear);
+		tb_buttons.getItems().addAll(bt_pause_resume, bt_stop, new Separator(Orientation.VERTICAL), bt_clear);
 		root.setTop(tb_buttons);
 		root.setCenter(loggerView);
 
@@ -133,6 +127,9 @@ public class Server extends Application implements Runnable {
 			int port = 110;
 			soc = new ServerSocket(port);
 			log("Server open on port " + soc.getLocalPort());
+			if (getState() == State.INITIALIZED) {
+				startServer();
+			}
 
 			// Wait for "start"
 			while (getState() == State.INITIALIZED);
@@ -266,7 +263,6 @@ public class Server extends Application implements Runnable {
 	public void initServer() {
 		if (getState() != State.STOPPED) {
 			setState(State.INITIALIZED);
-			bt_start.setDisable(false);
 			bt_pause_resume.setDisable(true);
 			bt_pause_resume.setText("Pause");
 			bt_stop.setDisable(true);
@@ -277,7 +273,6 @@ public class Server extends Application implements Runnable {
 	public void startServer() {
 		if (getState() != State.STOPPED) {
 			setState(State.STARTED);
-			bt_start.setDisable(true);
 			bt_pause_resume.setDisable(false);
 			bt_pause_resume.setText("Pause");
 			bt_stop.setDisable(false);
@@ -288,7 +283,6 @@ public class Server extends Application implements Runnable {
 	public void pauseServer() {
 		if (getState() != State.INITIALIZED && getState() != State.STOPPED) {
 			setState(State.PAUSED);
-			bt_start.setDisable(true);
 			bt_pause_resume.setDisable(false);
 			bt_pause_resume.setText("Resume");
 			bt_stop.setDisable(false);
@@ -300,7 +294,6 @@ public class Server extends Application implements Runnable {
 	public void resumeServer() {
 		if (getState() != State.INITIALIZED && getState() != State.STOPPED) {
 			setState(State.STARTED);
-			bt_start.setDisable(true);
 			bt_pause_resume.setDisable(false);
 			bt_pause_resume.setText("Pause");
 			bt_stop.setDisable(false);
@@ -310,7 +303,6 @@ public class Server extends Application implements Runnable {
 
 	public void stopServer() {
 		setState(State.STOPPED);
-		bt_start.setDisable(true);
 		bt_stop.setDisable(true);
 		bt_pause_resume.setDisable(true);
 		log("Server is stopping...");
