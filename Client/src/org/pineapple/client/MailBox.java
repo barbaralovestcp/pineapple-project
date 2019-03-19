@@ -44,8 +44,6 @@ public class MailBox extends Application {
             new Stop(0, primary), new Stop(1, secondary));
     private Background background = new Background(new BackgroundFill(secondary, CornerRadii.EMPTY, Insets.EMPTY));
 
-    //View elements
-    private Button connexionbtn = new Button();
     private Button refresh = new Button();
     private Button sortBySender = new Button();
     private Button sortBySubject = new Button();
@@ -54,6 +52,7 @@ public class MailBox extends Application {
     private HBox toolbar = new HBox();
     private TextArea messageBody = new TextArea();
     private TextArea messageInfo = new TextArea();
+    private TextArea messageState = new TextArea();
     private VBox viewInfo = new VBox();
     private VBox viewMessage = new VBox();
     private Box inbox;
@@ -73,7 +72,8 @@ public class MailBox extends Application {
         title.setFill(Color.WHITE);
 
         //MAIN BUTTON ENTER
-        connexionbtn = new Button();
+        //View elements
+        Button connexionbtn = new Button();
         this.initButtonStyle(connexionbtn, "Enter");
         connexionbtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -145,6 +145,7 @@ public class MailBox extends Application {
             @Override
             public void handle(ActionEvent event) {
                 client.sendMessage(Command.STAT);
+                client.sendMessage(Command.RETR);
                 inboxMessages.add(new Message("test", "test", "test", "test", "test", "test", false));
                 //TODO LIST server
                 // get messages

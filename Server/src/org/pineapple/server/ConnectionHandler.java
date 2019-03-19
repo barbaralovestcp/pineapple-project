@@ -3,6 +3,7 @@ package org.pineapple.server;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.pineapple.CodeOK;
 
 import java.io.*;
 import java.net.Socket;
@@ -34,13 +35,14 @@ public class ConnectionHandler implements Runnable {
 
         tryLog("New connection: " + getClientName());
     }
+
     public ConnectionHandler(@NotNull Socket so_client) throws IOException {
         this(so_client, null);
     }
 
     @Override
     public void run() {
-        sendMessage("+OK Server Ready");
+        sendMessage("+OK " + CodeOK.CodeEnum.OK_SERVER_READY.toString("Server"));
 
         if (in_data == null)
             throw new NullPointerException();
@@ -49,7 +51,7 @@ public class ConnectionHandler implements Runnable {
         String line = "";
         try {
             line = in_data.readLine();
-            if(line != null){
+            if (line != null) {
                 String[] parts = line.split(" ");
 
                 //TODO redirect to right process
@@ -77,13 +79,13 @@ public class ConnectionHandler implements Runnable {
 
     /* CONNECTION HANDLER METHODS */
 
-    public void sendMail(@NotNull String message){
+    public void sendMail(@NotNull String message) {
         //TODO send message logic
         SimpleDateFormat sdf = new SimpleDateFormat("dd'/'MM'/'yyyy 'at' HH:mm:ss");
-        if(out_data != null){
+        if (out_data != null) {
             out_data.print("From: POP3 Server \r\n");
             out_data.print("To: " + this.getClientName() + "\r\n");
-            out_data.print("Date: " + sdf.format(new Date())  + "\r\n");
+            out_data.print("Date: " + sdf.format(new Date()) + "\r\n");
             out_data.print("\r\n\r\n");
             out_data.print(message + "\r\n");
             out_data.flush();
@@ -91,11 +93,11 @@ public class ConnectionHandler implements Runnable {
         }
     }
 
-    public void sendMessage(String message){
-        if(out_data != null){
+    public void sendMessage(String message) {
+        if (out_data != null) {
             out_data.print(message + "\r\n");
             out_data.flush();
-            tryLog("Message sent" + message);
+            tryLog("Message sent " + message);
         }
     }
 
