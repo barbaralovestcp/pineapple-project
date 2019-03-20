@@ -1,5 +1,6 @@
 package org.pineapple.server;
 
+import jdk.internal.util.xml.impl.Input;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -57,32 +58,48 @@ public class ConnectionHandler implements Runnable {
 	  
 		// Reading message from client
 		BufferedReader br = new BufferedReader(in_data);
-		StringBuilder content = new StringBuilder();
-		try {
-		    String line;
-            while ((line = br.readLine()) != null)
-                content.append(line);
-            
-            if (content.length() > 0) {
-                String command = content.toString().split("\\s+")[0];
-                tryLog("Received command: " + command);
-                if (InputStateMachine.IsValidPOP3Request(content.toString())) {
-                    context.handle(new InputStateMachine(content.toString()));
-                    
-                    String messageToSend = context.popMessageToSend();
-                    if (messageToSend != null) {
-                    	tryLog("Sending message \"" + messageToSend.replace("\n", "\n\t") + "\"");
-                    	sendMessage(messageToSend);
-                    }
-                    else if (context.isToQuit()) {
-                        tryLog("Connection closed with " + getClientName());
-                        so_client.close();
-                    }
-                }
-            }
-		} catch (IOException e1) {
-			e1.printStackTrace();
+
+		while ( !context.isToQuit() ) {
+			StringBuilder content = new StringBuilder();
+			try {
+				String line;
+
+				//TODO : Sanitize the first ever readLine input (full of giberrish)
+				line = br.readLine(); //Read single line, looping block the line
+				System.out.println("Received client request : " + line);
+				content.append(line);
+
+				if (content.length() > 0) {
+
+					//Check if client message is an existing command
+					if (InputStateMachine.IsValidPOP3Request(content.toString())) {
+						InputStateMachine input = new InputStateMachine(content.toString());
+						tryLog("Received command: " + input.getCommand());
+						context.handle(new InputStateMachine(content.toString()));
+
+						String messageToSend = context.popMessageToSend();
+						//If there's a message to send, send it
+						if (messageToSend != null && !messageToSend.equals("")) {
+							tryLog("Sending message \"" + messageToSend.replace("\n", "\n\t") + "\"");
+							sendMessage(messageToSend);
+						}
+						//Quit if to quit.
+						else if (context.isToQuit()) {
+							tryLog("Connection closed with " + getClientName());
+							so_client.close();
+						}
+					}
+					else {
+						System.out.println("Invalid POP3 Request !");
+					}
+				}
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
 		}
+
+
+		System.out.println("DEBUG : THREAD IS ENDING");
 	}
 
 	public String getClientName() {
