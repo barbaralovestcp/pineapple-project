@@ -2,17 +2,22 @@ package org.pineapple.client;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.pineapple.Code;
 import org.pineapple.CodeOK;
+import org.pineapple.CommandMessage;
+import org.pineapple.CommandPOP3;
 
 import java.io.*;
-import java.net.*;
+import java.net.InetAddress;
+import java.net.Socket;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.Scanner;
+import java.util.Observable;
 
-public class Client{
+public class Client extends Observable {
 
+    static String ERR = "-ERR";
+    static String OK = "+OK";
 	static byte data [];
 	static String path;
 	static boolean quitter = false;
@@ -28,6 +33,8 @@ public class Client{
 		System.out.println("Connexion...");
 		try{
 			Socket con_serv = new Socket(InetAddress.getByName(adress),110);
+			printWelcome();
+
 			try {
 				//flux d'entrée
 				InputStream inp = con_serv.getInputStream();
@@ -41,21 +48,15 @@ public class Client{
 				if(line != null){
 					System.out.println("Message " + line);
 
-					if(line.contains("+OK")){
-						if(line.contains(CodeOK.CodeEnum.OK_SERVER_READY.toString(""))){
-							this.setConnected(true);
-						}else if(line.contains(CodeOK.CodeEnum.OK_STAT.toString(""))){
+					this.handleMessage(line);
 
-						}
-					}else if(line.contains("-ERR")){
-
-					}
+					setChanged();
+                    notifyObservers();
 
 				}else{
 					System.out.println("nothing");
 				}
 
-				printWelcome();
 			}catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -77,15 +78,9 @@ public class Client{
 		System.out.println("--------");
 	}
 
-
 	private boolean send(String message) {
 		PrintStream out_data = new PrintStream(this.op);
 		try {
-			SimpleDateFormat sdf = new SimpleDateFormat("dd'/'MM'/'yyyy 'at' HH:mm:ss");
-			out_data.print("From: Client " + this.name + "\r\n");
-			out_data.print("To: POP3 Server \r\n");
-			out_data.print("Date: " + sdf.format(new Date())  + "\r\n");
-			out_data.print("\r\n\r\n");
 			out_data.print(message + "\r\n");
 			out_data.flush();
 			return true;
@@ -95,12 +90,12 @@ public class Client{
 		}
 	}
 
-	public void sendMessage(@NotNull Command command){
+	public void sendMessage(@NotNull CommandPOP3 command){
 		String message = command.toString();
 		this.send(message);
 	}
 
-	public void sendMessage(@NotNull Command command, @Nullable String param){
+	public void sendMessage(@NotNull CommandPOP3 command, @Nullable String param){
 		String message = command + " " + param;
 		this.send(message);
 	}
@@ -112,4 +107,41 @@ public class Client{
     public void setConnected(boolean connected) {
         this.connected = connected;
     }
+
+    private void handleMessage(@NotNull String message){
+		CommandMessage commandMessage = new CommandMessage();
+		try{
+			commandMessage.parseMessage(message);
+			if(commandMessage.isOKMessage()){
+				this.handleOKServerMessage(commandMessage);
+			}else if(commandMessage.isERRMessage()){
+				this.handleERRServerMessage(commandMessage);
+			}
+		}catch (Exception ex){
+			System.out.println("Wrong format of message");
+		}
+	}
+
+    public void handleOKServerMessage(@NotNull CommandMessage commandMessage){
+        if(commandMessage.getCodeOK() == CodeOK.CodeEnum.OK_RETRIEVE){
+        	//TODO add new message in message.txt
+        }else if(commandMessage.getCodeOK() == CodeOK.CodeEnum.OK_STAT){
+			int number = Integer.parseInt(commandMessage.getParameters().get(0));
+			this.askAllMessages(number);
+        }else if(commandMessage.getCodeOK() == CodeOK.CodeEnum.OK_MAILDROP_READY){
+            this.setConnected(true);
+        }else if(commandMessage.getCodeOK() == CodeOK.CodeEnum.OK_SERVER_READY){
+			System.out.println("TCP connection established");
+        }
+    }
+
+	public void handleERRServerMessage(@NotNull CommandMessage commandMessage){
+		System.out.println(commandMessage.getCodeERR().toString());
+	}
+
+    private void askAllMessages(int number){
+		for (int i = 1; i < number; i++) {
+			this.sendMessage(CommandPOP3.RETR,String.valueOf(i));
+		}
+	}
 }

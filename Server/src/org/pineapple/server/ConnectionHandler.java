@@ -1,18 +1,14 @@
 package org.pineapple.server;
 
-import jdk.internal.util.xml.impl.Input;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.pineapple.CommandPOP3;
 import org.pineapple.Message;
 import org.pineapple.server.stateMachine.Context;
 import org.pineapple.server.stateMachine.InputStateMachine;
-import org.pineapple.CodeOK;
 
 import java.io.*;
 import java.net.Socket;
-import java.net.SocketException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.function.Function;
@@ -109,14 +105,24 @@ public class ConnectionHandler implements Runnable {
 	/* CONNECTION HANDLER METHODS */
 
 	public void sendMessage(@NotNull String message){
+		if(out_data != null) {
+			out_data.print(message);
+			out_data.flush();
+			tryLog("Command sent");
+		}
+	}
+
+	//Send a message of the mailbox
+	public void sendMailBoxMessage( @NotNull String command, @NotNull String message){
 		SimpleDateFormat sdf = new SimpleDateFormat("dd'/'MM'/'yyyy 'at' HH:mm:ss");
 		if(out_data != null) {
+			out_data.print(command + "\r\n");
 			out_data.print(new Message()
-					.setSender("POP3 Server")
-					.setReceiver(this.getClientName())
-					.setDate(sdf.format(new Date()))
-					.setMessageId(Long.toString(new Date().getTime()))
-					.buildMessage());
+						.setSender("POP3 Server")
+						.setReceiver(this.getClientName())
+						.setDate(sdf.format(new Date()))
+						.setMessageId(Long.toString(new Date().getTime()))
+						.buildMessage());
 			out_data.flush();
 			tryLog("Message sent");
 		}

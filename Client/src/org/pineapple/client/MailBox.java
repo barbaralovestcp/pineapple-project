@@ -21,21 +21,20 @@ import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import org.pineapple.CommandPOP3;
 import org.pineapple.Message;
 
 import java.awt.*;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
+import java.util.*;
 
-public class MailBox extends Application {
+public class MailBox extends Application implements Observer {
 
     private String name = "client";
     private Client client;
     private HashMap<Integer, Message> messagesList = new HashMap<>();
+    private MessageHandler messageHandler = new MessageHandler();
 
     //Style
     private Color primary = Color.rgb(138, 43, 226);
@@ -44,6 +43,8 @@ public class MailBox extends Application {
             new Stop(0, primary), new Stop(1, secondary));
     private Background background = new Background(new BackgroundFill(secondary, CornerRadii.EMPTY, Insets.EMPTY));
 
+    //View elements
+    private Stage primaryStage;
     private Button refresh = new Button();
     private Button sortBySender = new Button();
     private Button sortBySubject = new Button();
@@ -63,8 +64,9 @@ public class MailBox extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+        this.primaryStage = primaryStage;
         primaryStage.setTitle("Mail Box");
-        openMailbox(primaryStage);
+        openMailbox(primaryStage, this);
 
         //MAIN TITLE
         Text title = new Text(0, 0, "\uD83C\uDF4D Bienvenue " + this.name);
@@ -72,16 +74,12 @@ public class MailBox extends Application {
         title.setFill(Color.WHITE);
 
         //MAIN BUTTON ENTER
-        //View elements
         Button connexionbtn = new Button();
         this.initButtonStyle(connexionbtn, "Enter");
         connexionbtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                if (client.isConnected()) {
-                    primaryStage.close();
-                    initMailbox();
-                }
+                client.sendMessage(CommandPOP3.APOP);
             }
         });
 
@@ -112,11 +110,12 @@ public class MailBox extends Application {
         primaryStage.show();
     }
 
-    private void openMailbox(Stage stage) {
+    private void openMailbox(Stage stage, MailBox that) {
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
                     client = new Client(name);
+                    client.addObserver(that);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -144,16 +143,7 @@ public class MailBox extends Application {
         refresh.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                client.sendMessage(Command.STAT);
-                inboxMessages.add(new Message()
-                        .setSender("test")
-                        .setReceiver("test")
-                        .setSubject("test")
-                        .setDate("01/01/1970 00:00:00")
-                        .setMessageId("0")
-                        .setMessage("test")
-                        .setDeleted(false)
-                );
+                client.sendMessage(CommandPOP3.STAT);
                 //TODO LIST server
                 // get messages
             }
@@ -218,7 +208,6 @@ public class MailBox extends Application {
 
     private ArrayList<Message> getMessages() {
         ArrayList<Message> inboxList;
-        MessageHandler messageHandler = new MessageHandler();
         inboxList = messageHandler.getMessagesFromFileBox();
         return inboxList;
     }
@@ -284,5 +273,21 @@ public class MailBox extends Application {
                         });
             }
         });
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
+        //Check connexion
+        if (client != null && client.isConnected()) {
+            this.primaryStage.close();
+            this.initMailbox();
+        }
+
+        //Get Mailbox messages
+        ArrayList<Message> newMessages = this.getMessages();
+        ObservableList<Message> newInboxMessages = FXCollections
+                .observableArrayList(newMessages);
+
+        inbox = new Box("Inbox", newInboxMessages);;
     }
 }
