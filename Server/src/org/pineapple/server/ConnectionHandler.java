@@ -29,6 +29,7 @@ public class ConnectionHandler implements Runnable {
 	private PrintStream out_data;
 	@NotNull
 	private Context context;
+	private String messToLog;
 
 	@Nullable
 	private Function<String, Void> onLog;
@@ -51,6 +52,7 @@ public class ConnectionHandler implements Runnable {
 	public void run() {
 	    // Transitioning from state "Listening" to "Authentication"
 	    context.handle(null, null);
+	    this.messToLog = context.getStateToLog();
 	    
 		if (in_data == null)
 			throw new NullPointerException();
@@ -68,7 +70,7 @@ public class ConnectionHandler implements Runnable {
                 tryLog("Received command: " + command);
                 if (InputStateMachine.IsValidPOP3Request(content.toString())) {
                     context.handle(new InputStateMachine(content.toString()));
-                    
+                    this.messToLog = context.getStateToLog();
                     String messageToSend = context.popMessageToSend();
                     if (messageToSend != null) {
                     	tryLog("Sending message \"" + messageToSend.replace("\n", "\n\t") + "\"");
