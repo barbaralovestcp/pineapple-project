@@ -19,7 +19,7 @@ class MBXManagerTest {
 	
 	@BeforeEach
 	void setup() {
-		mbxManager = new MBXManager("Test");
+		mbxManager = new MBXManager("Test", "test", false);
 		message = new Message()
 				.setDate("Tue, 9 Sep 2008 09:33:17 +0200") // Epoch: 1220952797
 				.setSender("Stephane Bortzmeyer <stephane@sources.org>")

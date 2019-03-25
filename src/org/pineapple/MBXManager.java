@@ -9,6 +9,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+// TODO: Add encryption/decryption of the file using encrypted password.
+
 /**
  * MBXManager is a class that manage the ".mbx" files, that contains a mailbox associated to one user.
  */
@@ -38,6 +40,7 @@ public class MBXManager {
 	 */
 	public MBXManager(@NotNull String username, @NotNull String password, boolean passwordEncrypted) {
 		setUsername(username);
+		setPassword(password, passwordEncrypted);
 		file = new File(getFilePath());
 		try {
 			createFile();
@@ -108,7 +111,8 @@ public class MBXManager {
 	 */
 	@NotNull
 	private String readRaw() {
-		return FUtils.readRaw(file);
+		String encrypted = FUtils.readRaw(file);
+		return MD5.decrypt(getPassword(), encrypted);
 	}
 	
 	/**
@@ -117,6 +121,7 @@ public class MBXManager {
 	 */
 	@NotNull
 	private void writeRaw(@NotNull String content) {
+		String encrypted = MD5.encrypt(getPassword(), content);
 		FUtils.writeRaw(file, content);
 	}
 	

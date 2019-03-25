@@ -7,10 +7,13 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
+import java.util.Base64;
 
 public class MD5 {
 	
@@ -48,13 +51,12 @@ public class MD5 {
 	public static String encrypt(@NotNull byte[] key, @NotNull String content) {
 		// TODO: See https://stackoverflow.com/questions/23561104/how-to-encrypt-and-decrypt-string-with-my-passphrase-in-java-pc-not-mobile-plat/32583766
 		try {
+			key = Arrays.copyOf(key, 16);
 			Key k = new SecretKeySpec(key, "AES");
-			Cipher cipher = Cipher.getInstance("AES");
+			Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
 			cipher.init(Cipher.ENCRYPT_MODE, k);
 			
-			byte[] encrypted = cipher.doFinal(content.getBytes());
-			
-			return new String(encrypted);
+			return Base64.getEncoder().encodeToString(cipher.doFinal(content.getBytes(StandardCharsets.UTF_8)));
 		} catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
 			e.printStackTrace();
 		}
@@ -70,7 +72,7 @@ public class MD5 {
 	 */
 	@NotNull
 	public static String encrypt(@NotNull String key, @NotNull String content) {
-		return encrypt(key.getBytes(), content);
+		return encrypt(key.getBytes(StandardCharsets.UTF_8), content);
 	}
 	
 	/**
@@ -82,11 +84,12 @@ public class MD5 {
 	@NotNull
 	public static String decrypt(@NotNull byte[] key, @NotNull String encrypted) {
 		try {
+			key = Arrays.copyOf(key, 16);
 			Key k = new SecretKeySpec(key, "AES");
-			Cipher cipher = Cipher.getInstance("AES");
+			Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
 			cipher.init(Cipher.DECRYPT_MODE, k);
 			
-			byte[] content = cipher.doFinal(encrypted.getBytes());
+			byte[] content = cipher.doFinal(Base64.getDecoder().decode(encrypted.trim().getBytes()));
 			
 			return new String(content);
 		} catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
@@ -104,6 +107,6 @@ public class MD5 {
 	 */
 	@NotNull
 	public static String decrypt(@NotNull String key, @NotNull String encrypted) {
-		return decrypt(key.getBytes(), encrypted);
+		return decrypt(key.getBytes(StandardCharsets.UTF_8), encrypted);
 	}
 }
