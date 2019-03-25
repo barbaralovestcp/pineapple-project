@@ -69,6 +69,14 @@ public class MBXManager {
 	}
 	
 	/**
+	 * Return the number of bytes of the file.
+	 * @return The number of bytes of the file associated to the user mailbox.
+	 */
+	public long getFileSize() {
+		return file.length();
+	}
+	
+	/**
 	 * Convert a list of messages to their string representation using the POP3 standards.
 	 * @param messages The list of messages. The list can be empty.
 	 * @return Return the representation of the messages as string.
