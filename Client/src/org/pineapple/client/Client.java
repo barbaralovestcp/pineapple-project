@@ -2,32 +2,21 @@ package org.pineapple.client;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.pineapple.CodeOK;
-import org.pineapple.CommandMessage;
-import org.pineapple.CommandPOP3;
+import org.pineapple.*;
+import org.pineapple.MailBox;
 
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.Observable;
 
 public class Client extends Observable {
-
-    static String ERR = "-ERR";
-    static String OK = "+OK";
-	static byte data [];
-	static String path;
-	static boolean quitter = false;
-
-	private String state = "";
 
 	private String adress = "127.0.0.1";
 	private boolean connected = false;
 	private String name;
 	private OutputStream op;
+	private org.pineapple.MailBox messageHandler = new org.pineapple.MailBox("client", "");
 
 	public Client(String name) {
 		System.out.println("Connexion...");
@@ -124,7 +113,7 @@ public class Client extends Observable {
 
     public void handleOKServerMessage(@NotNull CommandMessage commandMessage){
         if(commandMessage.getCodeOK() == CodeOK.CodeEnum.OK_RETRIEVE){
-        	//TODO add new message in message.txt
+        	this.messageHandler.addMessages(Message.parse(commandMessage.getParameters().get(0)));
         }else if(commandMessage.getCodeOK() == CodeOK.CodeEnum.OK_STAT){
 			int number = Integer.parseInt(commandMessage.getParameters().get(0));
 			this.askAllMessages(number);
@@ -143,5 +132,9 @@ public class Client extends Observable {
 		for (int i = 1; i < number; i++) {
 			this.sendMessage(CommandPOP3.RETR,String.valueOf(i));
 		}
+	}
+
+	public MailBox getMessageHandler() {
+		return messageHandler;
 	}
 }

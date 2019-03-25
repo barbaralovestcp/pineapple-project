@@ -21,6 +21,7 @@ import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import org.pineapple.CommandPOP3;
 import org.pineapple.Message;
 
@@ -34,7 +35,6 @@ public class MailBox extends Application implements Observer {
     private String name = "client";
     private Client client;
     private HashMap<Integer, Message> messagesList = new HashMap<>();
-    private org.pineapple.MailBox messageHandler = new org.pineapple.MailBox("client", "");
 
     //Style
     private Color primary = Color.rgb(138, 43, 226);
@@ -46,8 +46,6 @@ public class MailBox extends Application implements Observer {
     //View elements
     private Stage primaryStage;
     private Button refresh = new Button();
-    private Button sortBySender = new Button();
-    private Button sortBySubject = new Button();
     private ListView<Message> messageView = new ListView<>();
     private ListView<Box> mailboxView = new ListView<>();
     private HBox toolbar = new HBox();
@@ -86,7 +84,7 @@ public class MailBox extends Application implements Observer {
         //Main image
         Image image = null;
         try {
-            image = new Image(new FileInputStream("./Client/data/mail.png"));
+            image = new Image(new FileInputStream("./data/mail.png"));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -144,16 +142,11 @@ public class MailBox extends Application implements Observer {
             @Override
             public void handle(ActionEvent event) {
                 client.sendMessage(CommandPOP3.STAT);
-                //TODO LIST server
-                // get messages
             }
         });
 
-        this.initSortButtons();
-
         toolbar.setSpacing(25);
-        toolbar.getChildren().addAll(refresh,
-                sortBySender, sortBySubject);
+        toolbar.getChildren().addAll(refresh);
         messageInfo.setPrefHeight(100);
         messageInfo.setPrefWidth(350);
         messageInfo.setEditable(false);
@@ -203,11 +196,18 @@ public class MailBox extends Application implements Observer {
         Scene scene = new Scene(borderPane, 800, 500, primary);
         mailview.setTitle("Mail Box");
         mailview.setScene(scene);
+       scene.getWindow().addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, this::closeWindowEvent);
+
         mailview.show();
     }
 
+    private void closeWindowEvent(WindowEvent event){
+        this.client.sendMessage(CommandPOP3.QUIT);
+//        event.consume();
+    }
+
     private ArrayList<Message> getMessages() {
-        return messageHandler.getMessages();
+        return this.client.getMessageHandler().getMessages();
     }
 
     public void remove(int m) {
@@ -239,39 +239,6 @@ public class MailBox extends Application implements Observer {
         });
     }
 
-    private void initSortButtons() {
-        sortBySender.setText("Sort By Sender");
-        sortBySender.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                Box currentMailbox = mailboxView.getSelectionModel()
-                        .getSelectedItem();
-                Collections.sort(currentMailbox.getMessages(),
-                        new Comparator<Message>() {
-                            @Override
-                            public int compare(Message m1, Message m2) {
-                                return m1.getSender().compareTo(m2.getSender());
-                            }
-                        });
-            }
-        });
-        sortBySubject.setText("Sort By Subject");
-        sortBySubject.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                Box currentMailbox = mailboxView.getSelectionModel()
-                        .getSelectedItem();
-                Collections.sort(currentMailbox.getMessages(),
-                        new Comparator<Message>() {
-                            @Override
-                            public int compare(Message m1, Message m2) {
-                                return m1.getSubject().compareTo(m2
-                                        .getSubject());
-                            }
-                        });
-            }
-        });
-    }
 
     @Override
     public void update(Observable o, Object arg) {
