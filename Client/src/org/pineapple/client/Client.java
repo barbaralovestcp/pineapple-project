@@ -8,6 +8,7 @@ import org.pineapple.MailBox;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.util.Observable;
 
 public class Client extends Observable {
@@ -35,10 +36,12 @@ public class Client extends Observable {
 				//flux de sortie
 				this.op = con_serv.getOutputStream();
 
-				DataInputStream indata = new DataInputStream(inp);
+				InputStreamReader indata = new InputStreamReader(inp, StandardCharsets.ISO_8859_1);
+				BufferedReader br = new BufferedReader(indata);
 
-				String line = indata.readLine();
-				if(line != null){
+				String line = br.readLine();
+
+                if(line != null){
 					System.out.println("Message du serveur : " + line);
 
 					this.handleMessage(line);
