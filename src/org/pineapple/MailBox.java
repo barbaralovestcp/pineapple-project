@@ -15,7 +15,7 @@ public class MailBox {
     public MailBox(String name, String password) {
         this.name = name;
         this.password = password;
-        this.fileManager = new MBXManager(name);
+        this.fileManager = new MBXManager(name, password, false);
     }
     
    //GETTERS

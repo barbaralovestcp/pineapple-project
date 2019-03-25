@@ -9,13 +9,28 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+// TODO: Add encryption/decryption of the file using encrypted password.
+
 /**
  * MBXManager is a class that manage the ".mbx" files, that contains a mailbox associated to one user.
  */
 public class MBXManager {
 	
+	/**
+	 * The user's name, also used as a filename.
+	 */
 	@NotNull
 	private String username;
+	
+	/**
+	 * The encrypted password (using MD5 algorithm).
+	 */
+	@NotNull
+	private String password;
+	
+	/**
+	 * The file to the user's mailbox file.
+	 */
 	@NotNull
 	private File file;
 	
@@ -23,8 +38,9 @@ public class MBXManager {
 	 * Constructor that try to create the file.
 	 * @param username The username associated to the user.
 	 */
-	public MBXManager(@NotNull String username) {
+	public MBXManager(@NotNull String username, @NotNull String password, boolean passwordEncrypted) {
 		setUsername(username);
+		setPassword(password, passwordEncrypted);
 		file = new File(getFilePath());
 		try {
 			createFile();
@@ -95,7 +111,8 @@ public class MBXManager {
 	 */
 	@NotNull
 	private String readRaw() {
-		return FUtils.readRaw(file);
+		String encrypted = FUtils.readRaw(file);
+		return MD5.decrypt(getPassword(), encrypted);
 	}
 	
 	/**
@@ -104,6 +121,7 @@ public class MBXManager {
 	 */
 	@NotNull
 	private void writeRaw(@NotNull String content) {
+		String encrypted = MD5.encrypt(getPassword(), content);
 		FUtils.writeRaw(file, content);
 	}
 	
@@ -188,6 +206,36 @@ public class MBXManager {
 	
 	public void setUsername(@NotNull String username) {
 		this.username = username;
+	}
+	
+	/**
+	 * Return the encrypted password.
+	 * @return The encrypted password.
+	 */
+	@NotNull
+	public String getPassword() {
+		return password;
+	}
+	
+	/**
+	 * Set the encrypted password
+	 * @param password Encrypted password
+	 */
+	public void setPassword(@NotNull String password) {
+		this.password = password;
+	}
+	
+	/**
+	 * Set the password to the new value. Encrypt the password using MD5 algorithm if `isPasswordEncrypted` is false.
+	 * @param password The password to set. It can be encrypted or not.
+	 * @param isPasswordEncrypted If `true`, set the password to the new value. Otherwise, encrypt the password using
+	 *                            MD5 algorithm and set the password to the computed value.
+	 */
+	public void setPassword(@NotNull String password, boolean isPasswordEncrypted) {
+		if (isPasswordEncrypted)
+			setPassword(password);
+		else
+			setPassword(MD5.hash(password));
 	}
 	
 	@NotNull
