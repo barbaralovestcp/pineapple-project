@@ -34,7 +34,7 @@ public class MailBox extends Application implements Observer {
     private String name = "client";
     private Client client;
     private HashMap<Integer, Message> messagesList = new HashMap<>();
-    private MessageHandler messageHandler = new MessageHandler();
+    private org.pineapple.MailBox messageHandler = new org.pineapple.MailBox("client", "");
 
     //Style
     private Color primary = Color.rgb(138, 43, 226);
@@ -207,9 +207,7 @@ public class MailBox extends Application implements Observer {
     }
 
     private ArrayList<Message> getMessages() {
-        ArrayList<Message> inboxList;
-        inboxList = messageHandler.getMessagesFromFileBox();
-        return inboxList;
+        return messageHandler.getMessages();
     }
 
     public void remove(int m) {
