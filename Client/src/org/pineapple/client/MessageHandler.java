@@ -5,6 +5,7 @@ import org.pineapple.Message;
 import java.io.*;
 import java.util.ArrayList;
 
+@Deprecated
 public class MessageHandler {
 
     private static String FILEPATH = "./Client/data/messages.txt";

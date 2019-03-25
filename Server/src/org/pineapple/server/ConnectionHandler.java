@@ -3,15 +3,12 @@ package org.pineapple.server;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.pineapple.CommandPOP3;
 import org.pineapple.Message;
 import org.pineapple.server.stateMachine.Context;
 import org.pineapple.server.stateMachine.InputStateMachine;
-import org.pineapple.CodeOK;
 
 import java.io.*;
 import java.net.Socket;
-import java.net.SocketException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.function.Function;
@@ -59,33 +56,50 @@ public class ConnectionHandler implements Runnable {
 	  
 		// Reading message from client
 		BufferedReader br = new BufferedReader(in_data);
-		StringBuilder content = new StringBuilder();
-		try {
-		    String line;
-            while ((line = br.readLine()) != null)
-                content.append(line);
-            
-            if (content.length() > 0) {
-                String command = content.toString().split("\\s+")[0];
-                tryLog("Received command: " + command);
-                if (InputStateMachine.IsValidPOP3Request(content.toString())) {
-                    context.handle(new InputStateMachine(content.toString()));
-                    this.messToLog = context.getStateToLog();
-					tryLog(messToLog);
-					String messageToSend = context.popMessageToSend();
-                    if (messageToSend != null) {
-                    	tryLog("Sending message \"" + messageToSend.replace("\n", "\n\t") + "\"");
-                    	sendMessage(messageToSend);
-                    }
-                    else if (context.isToQuit()) {
-                        tryLog("Connection closed with " + getClientName());
-                        so_client.close();
-                    }
-                }
-            }
-		} catch (IOException e1) {
-			e1.printStackTrace();
+
+		while ( !context.isToQuit() ) {
+			StringBuilder content = new StringBuilder();
+			try {
+				String line;
+
+				//TODO : Sanitize the first ever readLine input (full of giberrish)
+				line = br.readLine(); //Read single line, looping block the line
+				System.out.println("Received client request : " + line);
+				content.append(line);
+
+				if (content.length() > 0) {
+
+					//Check if client message is an existing command
+					if (InputStateMachine.IsValidPOP3Request(content.toString())) {
+						InputStateMachine input = new InputStateMachine(content.toString());
+						tryLog("Received command: " + input.getCommand());
+						context.handle(new InputStateMachine(content.toString()));
+						this.messToLog = context.getStateToLog();
+						tryLog(messToLog);
+
+						String messageToSend = context.popMessageToSend();
+						//If there's a message to send, send it
+						if (messageToSend != null && !messageToSend.equals("")) {
+							tryLog("Sending message \"" + messageToSend.replace("\n", "\n\t") + "\"");
+							sendMessage(messageToSend);
+						}
+						//Quit if to quit.
+						else if (context.isToQuit()) {
+							tryLog("Connection closed with " + getClientName());
+							so_client.close();
+						}
+					}
+					else {
+						System.out.println("Invalid POP3 Request !");
+					}
+				}
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
 		}
+
+
+		System.out.println("DEBUG : THREAD IS ENDING");
 	}
 
 	public String getClientName() {
@@ -95,14 +109,24 @@ public class ConnectionHandler implements Runnable {
 	/* CONNECTION HANDLER METHODS */
 
 	public void sendMessage(@NotNull String message){
+		if(out_data != null) {
+			out_data.print(message);
+			out_data.flush();
+			tryLog("Command sent");
+		}
+	}
+
+	//Send a message of the mailbox
+	public void sendMailBoxMessage( @NotNull String command, @NotNull String message){
 		SimpleDateFormat sdf = new SimpleDateFormat("dd'/'MM'/'yyyy 'at' HH:mm:ss");
 		if(out_data != null) {
+			out_data.print(command + "\r\n");
 			out_data.print(new Message()
-					.setSender("POP3 Server")
-					.setReceiver(this.getClientName())
-					.setDate(sdf.format(new Date()))
-					.setMessageId(Long.toString(new Date().getTime()))
-					.buildMessage());
+						.setSender("POP3 Server")
+						.setReceiver(this.getClientName())
+						.setDate(sdf.format(new Date()))
+						.setMessageId(Long.toString(new Date().getTime()))
+						.buildMessage());
 			out_data.flush();
 			tryLog("Message sent");
 		}
