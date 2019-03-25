@@ -94,7 +94,7 @@ public class CodeOK extends Code implements ParametrizedToString {
 	@Override
 	public String toString(@Nullable String parameter) {
 		String message = getCodeType().toString(parameter);
-		return "+OK" + (message.length() > 0 ? " " + message : "");
+		return "+OK" + (message.length() > 0 ? " " + message : "" + "\r\n");
 	}
 	
 	@NotNull

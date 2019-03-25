@@ -18,12 +18,15 @@ public class CommandMessage {
 
     public void parseMessage(@NotNull String message) throws BadAttributeValueExpException {
         if (message.contains(OK)) {
+            System.out.println("+OK message received");
             parseOkMessage(message);
         } else if (message.contains(ERR)) {
+            System.out.println("-ERR message received");
             parseErrMessage(message);
         } else {
             throw new BadAttributeValueExpException(message);
         }
+        System.out.println(this.toString());
     }
 
     private void parseOkMessage(@NotNull String message) {

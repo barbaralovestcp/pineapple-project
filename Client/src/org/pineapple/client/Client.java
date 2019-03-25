@@ -12,16 +12,21 @@ import java.util.Observable;
 
 public class Client extends Observable {
 
-	private String adress = "127.0.0.1";
+	private String address = "127.0.0.1";
+	private String password = "none";
 	private boolean connected = false;
-	private String name;
+	private String name = "Client";
 	private OutputStream op;
-	private org.pineapple.MailBox messageHandler = new org.pineapple.MailBox("client", "");
+	private org.pineapple.MailBox messageHandler = new org.pineapple.MailBox(name, password);
 
 	public Client(String name) {
+		this.name = name;
 		System.out.println("Connexion...");
+	}
+
+	public void connect(){
 		try{
-			Socket con_serv = new Socket(InetAddress.getByName(adress),110);
+			Socket con_serv = new Socket(InetAddress.getByName(address),110);
 			printWelcome();
 
 			try {
@@ -32,15 +37,14 @@ public class Client extends Observable {
 
 				DataInputStream indata = new DataInputStream(inp);
 
-				StringBuilder answer = new StringBuilder();
 				String line = indata.readLine();
 				if(line != null){
-					System.out.println("Message " + line);
+					System.out.println("Message du serveur : " + line);
 
 					this.handleMessage(line);
 
 					setChanged();
-                    notifyObservers();
+					notifyObservers();
 
 				}else{
 					System.out.println("nothing");
@@ -57,7 +61,6 @@ public class Client extends Observable {
 		}
 	}
 
-
 	private static void printWelcome()
 	{
 		System.out.println("--------");
@@ -72,6 +75,7 @@ public class Client extends Observable {
 		try {
 			out_data.print(message + "\r\n");
 			out_data.flush();
+			System.out.println("Sending : " + message);
 			return true;
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -89,6 +93,10 @@ public class Client extends Observable {
 		this.send(message);
 	}
 
+	public void sendAPOP(){
+		this.sendMessage(CommandPOP3.APOP, this.name + " " + this.password);
+	}
+
     public boolean isConnected() {
         return connected;
     }
@@ -102,8 +110,10 @@ public class Client extends Observable {
 		try{
 			commandMessage.parseMessage(message);
 			if(commandMessage.isOKMessage()){
+				System.out.println("handling ok message");
 				this.handleOKServerMessage(commandMessage);
 			}else if(commandMessage.isERRMessage()){
+				System.out.println("handling err message");
 				this.handleERRServerMessage(commandMessage);
 			}
 		}catch (Exception ex){

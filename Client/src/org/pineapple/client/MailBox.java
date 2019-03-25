@@ -35,6 +35,7 @@ public class MailBox extends Application implements Observer {
     private String name = "client";
     private Client client;
     private HashMap<Integer, Message> messagesList = new HashMap<>();
+    private boolean isMailboxOpened = false;
 
     //Style
     private Color primary = Color.rgb(138, 43, 226);
@@ -77,7 +78,7 @@ public class MailBox extends Application implements Observer {
         connexionbtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                client.sendMessage(CommandPOP3.APOP);
+                client.sendAPOP();
             }
         });
 
@@ -109,10 +110,11 @@ public class MailBox extends Application implements Observer {
     }
 
     private void openMailbox(Stage stage, MailBox that) {
+        client = new Client(name);
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    client = new Client(name);
+                    client.connect();
                     client.addObserver(that);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -243,9 +245,10 @@ public class MailBox extends Application implements Observer {
     @Override
     public void update(Observable o, Object arg) {
         //Check connexion
-        if (client != null && client.isConnected()) {
+        if (client != null && !this.isMailboxOpened && client.isConnected()) {
             this.primaryStage.close();
             this.initMailbox();
+            this.isMailboxOpened = true;
         }
 
         //Get Mailbox messages
@@ -253,6 +256,6 @@ public class MailBox extends Application implements Observer {
         ObservableList<Message> newInboxMessages = FXCollections
                 .observableArrayList(newMessages);
 
-        inbox = new Box("Inbox", newInboxMessages);;
+        inbox = new Box("Inbox", newInboxMessages);
     }
 }
