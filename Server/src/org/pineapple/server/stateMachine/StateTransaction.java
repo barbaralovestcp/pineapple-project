@@ -18,23 +18,23 @@ public class StateTransaction implements State {
             case STAT:
 
                 //TODO: Fill message with STATS
-                toSend = CodeOK.CodeEnum.OK_STAT.toString("<Stats !>");
+                toSend = new CodeOK(CodeOK.CodeEnum.OK_STAT).toString("<Stats !>");
                 nextState = this;
                 break;
             case RETR:
 
                 //TODO : Retrieve mails
-                toSend = CodeOK.CodeEnum.OK_RETRIEVE.toString("<Retrieved Mail>");
+                toSend = new CodeOK(CodeOK.CodeEnum.OK_RETRIEVE).toString("<Retrieved Mail>");
                 nextState = this;
                 break;
             case QUIT:
 
                 boolean quitIsValid = true;
                 if (quitIsValid) {
-                    toSend = CodeOK.CodeEnum.OK.toString();
+                    toSend = new CodeOK(CodeOK.CodeEnum.OK).toString();
                 }
                 else {
-                    toSend = CodeERR.CodeEnum.ERR_DEL_MESSAGE_NOT_REMOVED.toString();
+                    toSend = new CodeERR(CodeERR.CodeEnum.ERR_DEL_MESSAGE_NOT_REMOVED).toString();
                 }
                 context.setToQuit(true);
 
