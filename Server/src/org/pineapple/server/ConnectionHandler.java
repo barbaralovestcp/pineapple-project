@@ -26,6 +26,7 @@ public class ConnectionHandler implements Runnable {
 	private PrintStream out_data;
 	@NotNull
 	private Context context;
+	private String messToLog;
 
 	@Nullable
 	private Function<String, Void> onLog;
@@ -48,7 +49,8 @@ public class ConnectionHandler implements Runnable {
 	public void run() {
 	    // Transitioning from state "Listening" to "Authentication"
 	    context.handle(null, null);
-	    
+	    this.messToLog = context.getStateToLog();
+	    tryLog(messToLog);
 		if (in_data == null)
 			throw new NullPointerException();
 	  
@@ -72,6 +74,8 @@ public class ConnectionHandler implements Runnable {
 						InputStateMachine input = new InputStateMachine(content.toString());
 						tryLog("Received command: " + input.getCommand());
 						context.handle(new InputStateMachine(content.toString()));
+						this.messToLog = context.getStateToLog();
+						tryLog(messToLog);
 
 						String messageToSend = context.popMessageToSend();
 						//If there's a message to send, send it
