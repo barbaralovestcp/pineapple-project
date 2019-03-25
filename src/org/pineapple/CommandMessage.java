@@ -31,6 +31,7 @@ public class CommandMessage {
 
     private void parseOkMessage(@NotNull String message) {
         for (CodeOK.CodeEnum code : CodeOK.CodeEnum.values()) {
+            System.out.println(code);
             if (message.contains(code.toString(""))) {
                 message = message.replace(code.toString(""), "");
                 message = message.replace(OK, "");
