@@ -1,8 +1,6 @@
-package org.pineapple.server;
+package org.pineapple;
 
 import org.jetbrains.annotations.NotNull;
-import org.pineapple.Message;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.ArrayList;
 import java.util.Arrays;

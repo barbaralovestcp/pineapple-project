@@ -1,10 +1,7 @@
-package org.pineapple.server;
+package org.pineapple;
 
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.pineapple.MalformedMessageException;
-import org.pineapple.Message;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -97,35 +94,7 @@ public class MBXManager {
 	 */
 	@NotNull
 	private String readRaw() {
-		FileReader fr = null;
-		BufferedReader br = null;
-		
-		StringBuilder content = new StringBuilder();
-		try {
-			fr = new FileReader(file);
-			br = new BufferedReader(fr);
-			
-			String line;
-			while ((line = br.readLine()) != null)
-				content.append(line).append("\r\n");
-			
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			if (br != null) {
-				try {
-					br.close();
-				} catch (IOException ignored) {}
-			}
-			
-			if (fr != null) {
-				try {
-					fr.close();
-				} catch (IOException ignored) {}
-			}
-		}
-		
-		return content.toString();
+		return FUtils.readRaw(file);
 	}
 	
 	/**
@@ -134,17 +103,12 @@ public class MBXManager {
 	 */
 	@NotNull
 	private void writeRaw(@NotNull String content) {
-		try (PrintStream out = new PrintStream(new FileOutputStream(file, false))) {
-			out.print(content);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
+		FUtils.writeRaw(file, content);
 	}
 	
 	/**
 	 * Read the messages in the file.
 	 * @return The messages
-	 * @throws MalformedMessageException Throw when cannot parsed the file.
 	 */
 	@NotNull
 	public ArrayList<Message> read() {
