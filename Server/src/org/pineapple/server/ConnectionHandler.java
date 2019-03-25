@@ -50,14 +50,21 @@ public class ConnectionHandler implements Runnable {
 	@Override
 	public void run() {
 	    // Transitioning from state "Listening" to "Authentication"
-	    context.handle(null, null);
-	    this.messToLog = context.getStateToLog();
-	    tryLog(messToLog);
 		if (in_data == null)
 			throw new NullPointerException();
 	  
 		// Reading message from client
 		BufferedReader br = new BufferedReader(in_data);
+
+		context.handle(null, null);
+		this.messToLog = context.getStateToLog();
+		tryLog(messToLog);
+		String messageToSend = context.popMessageToSend();
+		//If there's a message to send, send it
+		if (messageToSend != null && !messageToSend.equals("")) {
+			tryLog("Sending message \"" + messageToSend.replace("\n", "\n\t") + "\"");
+			sendMessage(messageToSend);
+		}
 
 		while ( !context.isToQuit() ) {
 			StringBuilder content = new StringBuilder();
@@ -81,7 +88,7 @@ public class ConnectionHandler implements Runnable {
 						this.messToLog = context.getStateToLog();
 						tryLog(messToLog);
 
-						String messageToSend = context.popMessageToSend();
+						messageToSend = context.popMessageToSend();
 						//If there's a message to send, send it
 						if (messageToSend != null && !messageToSend.equals("")) {
 							tryLog("Sending message \"" + messageToSend.replace("\n", "\n\t") + "\"");
