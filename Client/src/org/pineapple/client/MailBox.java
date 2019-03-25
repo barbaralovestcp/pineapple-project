@@ -83,20 +83,20 @@ public class MailBox extends Application implements Observer {
         });
 
         //Main image
-        Image image = null;
-        try {
-            image = new Image(new FileInputStream("./data/mail.png"));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        ImageView view = new ImageView();
-        view.setImage(image);
+//        Image image = null;
+//        try {
+//            image = new Image(new FileInputStream("./data/mail.png"));
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        }
+//
+//        ImageView view = new ImageView();
+//        view.setImage(image);
 
         //GRIDLAYOUT
         GridPane homegridpane = new GridPane();
         homegridpane.add(title, 0, 0);
-        homegridpane.add(view, 0, 1);
+//        homegridpane.add(view, 0, 1);
         homegridpane.add(connexionbtn, 0, 2);
         homegridpane.setAlignment(Pos.CENTER);
 
