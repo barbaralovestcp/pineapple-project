@@ -1,44 +1,64 @@
 package org.pineapple.server;
 
+import org.jetbrains.annotations.NotNull;
 import org.pineapple.Message;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.ArrayList;
-
+import java.util.Arrays;
+import java.util.List;
 
 public class MailBox {
+    
     private String name;
     private String password;
-    private ArrayList<Message> messages;
+    private MBXManager fileManager;
 
-    public MailBox(String name, String password, ArrayList<Message> messages) {
+    public MailBox(String name, String password) {
         this.name = name;
         this.password = password;
-        this.messages = messages;
+        this.fileManager = new MBXManager(name);
     }
-
+    
    //GETTERS
-
+    
     public String getName() {
         return name;
     }
-
+    
     public String getPassword() {
         return password;
     }
-
+    
     public ArrayList<Message> getMessages() {
-        return messages;
+        return fileManager.read();
     }
-
+    
+    /**
+     * Add the messages to the mailbox file.
+     * @param messages The list of messages to append to the file.
+     */
+    public void addMessages(@NotNull Message... messages) {
+        fileManager.write(Arrays.asList(messages));
+    }
+    
+    /**
+     * Set the messages to the mailbox. If the file contains old messages, they will be deleted.
+     * @param messages The messages to set in the mailbox. Warning: It will delete the old messages.
+     */
+    public void setMessages(@NotNull List<Message> messages) {
+        fileManager.write(messages, true);
+    }
+    
     public int getMessagesNumber() {
-        return messages.size();
+        return getMessages().size();
     }
-
-    public int getTotalSize() {
-        int size = 0;
-        for (Message message: messages) {
-            size += message.getMessageSize();
-        }
-        return size;
+    
+    /**
+     * Get the file size in Bytes.
+     * @return The file size (Bytes).
+     */
+    public long getTotalSize() {
+        return fileManager.getFileSize();
     }
 }
