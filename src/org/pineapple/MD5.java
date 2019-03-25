@@ -27,9 +27,9 @@ public class MD5 {
 			
 			byte[] data = md.digest();
 			
-			StringBuffer sb = new StringBuffer();
-			for (int i = 0; i < data.length; i++)
-				sb.append(Integer.toString((data[i] & 0xff) + 0x100, 16).substring(1));
+			StringBuilder sb = new StringBuilder();
+			for (byte datum : data)
+				sb.append(Integer.toString((datum & 0xff) + 0x100, 16).substring(1));
 			
 			return sb.toString();
 		} catch (NoSuchAlgorithmException e) {
@@ -39,23 +39,71 @@ public class MD5 {
 	}
 	
 	/**
-	 * Encrypt the string `content` by using the md5 string `key`.
+	 * Encrypt the string `content` by using the md5 hash string `key`.
 	 * @param key The MD5 hash to encrypt `content`.
 	 * @param content The string to encrypt using `key`.
 	 * @return The encrypted string.
 	 */
-	public static String encrypt(@NotNull String key, @NotNull String content) {
+	@NotNull
+	public static String encrypt(@NotNull byte[] key, @NotNull String content) {
 		// TODO: See https://stackoverflow.com/questions/23561104/how-to-encrypt-and-decrypt-string-with-my-passphrase-in-java-pc-not-mobile-plat/32583766
 		try {
+			Key k = new SecretKeySpec(key, "AES");
 			Cipher cipher = Cipher.getInstance("AES");
-			Key k = new SecretKeySpec(key.getBytes(), "AES");
 			cipher.init(Cipher.ENCRYPT_MODE, k);
 			
 			byte[] encrypted = cipher.doFinal(content.getBytes());
+			
+			return new String(encrypted);
 		} catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
 			e.printStackTrace();
 		}
 		
 		return "";
+	}
+	
+	/**
+	 * Encrypt the string `content` by using the md5 hash string `key`.
+	 * @param key The MD5 hash to encrypt `content`.
+	 * @param content The string to encrypt using `key`.
+	 * @return The encrypted string.
+	 */
+	@NotNull
+	public static String encrypt(@NotNull String key, @NotNull String content) {
+		return encrypt(key.getBytes(), content);
+	}
+	
+	/**
+	 * Decrypt the string `encrypted` by using the md5 hash string `key`.
+	 * @param key The MD5 hash to encrypt `content`.
+	 * @param encrypted The encrypted string to decrypt.
+	 * @return The decrypted string.
+	 */
+	@NotNull
+	public static String decrypt(@NotNull byte[] key, @NotNull String encrypted) {
+		try {
+			Key k = new SecretKeySpec(key, "AES");
+			Cipher cipher = Cipher.getInstance("AES");
+			cipher.init(Cipher.DECRYPT_MODE, k);
+			
+			byte[] content = cipher.doFinal(encrypted.getBytes());
+			
+			return new String(content);
+		} catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
+			e.printStackTrace();
+		}
+		
+		return "";
+	}
+	
+	/**
+	 * Decrypt the string `encrypted` by using the md5 hash string `key`.
+	 * @param key The MD5 hash to encrypt `content`.
+	 * @param encrypted The encrypted string to decrypt.
+	 * @return The decrypted string.
+	 */
+	@NotNull
+	public static String decrypt(@NotNull String key, @NotNull String encrypted) {
+		return decrypt(key.getBytes(), encrypted);
 	}
 }
