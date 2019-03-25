@@ -7,7 +7,7 @@ import java.util.Objects;
 public class Message {
     
     public static final String SEPARATOR = "******";
-    public static final String SEPARATOR_REGEX = "^\\*{6}\\s*$";
+    public static final String SEPARATOR_REGEX = "(?m)^\\*{6}\\s*$";
 
     private String sender;
     private String receiver;
