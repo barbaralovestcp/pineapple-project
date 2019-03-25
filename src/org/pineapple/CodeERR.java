@@ -74,7 +74,7 @@ public class CodeERR extends Code implements ParametrizedToString {
 	@Override
 	public String toString(@Nullable String parameter) {
 		String message = getCodeType().toString(parameter);
-		return "-ERR" + (message.length() > 0 ? " " + message : "");
+		return "-ERR" + (message.length() > 0 ? " " + message : ""  + "\r\n");
 	}
 	
 	@NotNull
