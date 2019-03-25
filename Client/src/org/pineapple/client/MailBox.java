@@ -1,6 +1,7 @@
 package org.pineapple.client;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -32,7 +33,7 @@ import java.util.*;
 
 public class MailBox extends Application implements Observer {
 
-    private String name = "client";
+    private String name = "lea";
     private Client client;
     private HashMap<Integer, Message> messagesList = new HashMap<>();
     private boolean isMailboxOpened = false;
@@ -107,15 +108,16 @@ public class MailBox extends Application implements Observer {
         Scene scene = new Scene(root, 500, 500, gradient);
         primaryStage.setScene(scene);
         primaryStage.show();
+        this.initMailbox();
     }
 
     private void openMailbox(Stage stage, MailBox that) {
         client = new Client(name);
+        client.addObserver(that);
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
                     client.connect();
-                    client.addObserver(that);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -204,6 +206,7 @@ public class MailBox extends Application implements Observer {
     }
 
     private void closeWindowEvent(WindowEvent event){
+        System.out.println("QUIT connexion");
         this.client.sendMessage(CommandPOP3.QUIT);
 //        event.consume();
     }
@@ -244,13 +247,6 @@ public class MailBox extends Application implements Observer {
 
     @Override
     public void update(Observable o, Object arg) {
-        //Check connexion
-        if (client != null && !this.isMailboxOpened && client.isConnected()) {
-            this.primaryStage.close();
-            this.initMailbox();
-            this.isMailboxOpened = true;
-        }
-
         //Get Mailbox messages
         ArrayList<Message> newMessages = this.getMessages();
         ObservableList<Message> newInboxMessages = FXCollections

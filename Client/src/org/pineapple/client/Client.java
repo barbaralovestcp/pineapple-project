@@ -14,14 +14,15 @@ import java.util.Observable;
 public class Client extends Observable {
 
 	private String address = "127.0.0.1";
-	private String password = "none";
+	private String password = "mdp";
 	private boolean connected = false;
-	private String name = "Client";
+	private String name;
 	private OutputStream op;
-	private org.pineapple.MailBox messageHandler = new org.pineapple.MailBox(name, password);
+	private org.pineapple.MailBox messageHandler;
 
 	public Client(String name) {
 		this.name = name;
+		this.messageHandler = new org.pineapple.MailBox(name, password);
 		System.out.println("Connexion...");
 	}
 
@@ -39,18 +40,30 @@ public class Client extends Observable {
 				InputStreamReader indata = new InputStreamReader(inp, StandardCharsets.ISO_8859_1);
 				BufferedReader br = new BufferedReader(indata);
 
-				String line = br.readLine();
+				StringBuilder content = new StringBuilder();
 
-                if(line != null){
-					System.out.println("Message du serveur : " + line);
+				boolean isMessage = false;
+				while(true){
+					String line = br.readLine();
 
-					this.handleMessage(line);
+					if(line != null){
+						System.out.println("Message du serveur : " + line);
+						if(line.contains("From:")){
+							isMessage = true;
+							if(content.length() > 0 && content.toString().contains("From:")){
+								this.messageHandler.addMessages(Message.parse(content.toString()));
+								content.append(line.replace("+OK",""));
+							}else{
+								content.append(line.replace("+OK",""));
+							}
+						}else if(!isMessage){
+							this.handleMessage(line);
+						}
 
-					setChanged();
-					notifyObservers();
+						setChanged();
+						notifyObservers();
 
-				}else{
-					System.out.println("nothing");
+					}
 				}
 
 			}catch (IOException e) {
@@ -110,17 +123,29 @@ public class Client extends Observable {
 
     private void handleMessage(@NotNull String message){
 		CommandMessage commandMessage = new CommandMessage();
-		try{
-			commandMessage.parseMessage(message);
-			if(commandMessage.isOKMessage()){
-				System.out.println("handling ok message");
-				this.handleOKServerMessage(commandMessage);
-			}else if(commandMessage.isERRMessage()){
-				System.out.println("handling err message");
-				this.handleERRServerMessage(commandMessage);
-			}
-		}catch (Exception ex){
-			System.out.println("Wrong format of message");
+//		try{
+//			commandMessage.parseMessage(message);
+//			if(commandMessage.isOKMessage()){
+//				System.out.println("handling ok message");
+//				this.handleOKServerMessage(commandMessage);
+//			}else if(commandMessage.isERRMessage()){
+//				System.out.println("handling err message");
+//				this.handleERRServerMessage(commandMessage);
+//			}
+//		}catch (Exception ex){
+//			System.out.println("Wrong format of message");
+//		}
+		if(message.contains("+OK Server POP3 server ready")){
+
+		}else if(message.contains("+OK maildrop locked and ready")){
+			this.setConnected(true);
+		}else if(message.contains(":")){
+
+		} else if(message.contains("+OK")){
+			String[] parts = message.split(" ");
+			int number = Integer.parseInt(parts[1]);
+			this.askAllMessages(number);
+//			this.sendMessage(CommandPOP3.RETR, "1");
 		}
 	}
 
