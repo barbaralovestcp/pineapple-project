@@ -117,9 +117,9 @@ public class Client extends Observable {
         }else if(commandMessage.getCodeOK() == CodeOK.CodeEnum.OK_STAT){
 			int number = Integer.parseInt(commandMessage.getParameters().get(0));
 			this.askAllMessages(number);
-        }else if(commandMessage.getCodeOK() == CodeOK.CodeEnum.OK_MAILDROP_READY){
+        }else if(commandMessage.getCodeOK().equals( new CodeOK(CodeOK.CodeEnum.OK_MAILDROP_READY))){
             this.setConnected(true);
-        }else if(commandMessage.getCodeOK() == CodeOK.CodeEnum.OK_SERVER_READY){
+        }else if(commandMessage.getCodeOK().equals( new CodeOK(CodeOK.CodeEnum.OK_SERVER_READY))){
 			System.out.println("TCP connection established");
         }
     }

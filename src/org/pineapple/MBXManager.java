@@ -30,7 +30,7 @@ public class MBXManager {
 			createFile();
 		} catch (IOException e) {
 			e.printStackTrace();
-			System.out.println("Filepath: " + file.getAbsolutePath());
+			System.out.println("Filepath : " + file.getAbsolutePath());
 		}
 	}
 	

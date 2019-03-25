@@ -29,7 +29,7 @@ public class CodeOK extends Code implements ParametrizedToString {
 		OK_VALID_MAILBOX(parameter -> {
 			if (parameter == null)
 				throw new NullPointerException("OK_VALID_MAILBOX needs a parameter: Name of the mailbox.");
-			
+
 			return parameter + " is a valid mailbox";
 		}),
 		OK_SCAN_LISTING(parameter -> {
