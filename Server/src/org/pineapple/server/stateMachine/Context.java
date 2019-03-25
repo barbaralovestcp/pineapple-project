@@ -2,6 +2,7 @@ package org.pineapple.server.stateMachine;
 
 import org.jetbrains.annotations.Nullable;
 import org.pineapple.CommandPOP3;
+import org.pineapple.MailBox;
 import org.pineapple.server.stateMachine.Exception.InvalidPOP3CommandException;
 import org.pineapple.server.stateMachine.Exception.StateMachineException;
 
@@ -13,7 +14,9 @@ public class Context {
     private State currentState;
     private String stateToLog;
     private boolean toQuit;
-    
+
+    private MailBox mailBox;
+
     @Nullable
     private String messageToSend;
 
@@ -91,11 +94,16 @@ public class Context {
         this.currentState = currentState;
     }
 
+    public MailBox getMailBox() { return this.mailBox; }
+
+    public void setMailBox(MailBox mailbox) { this.mailBox = mailbox; }
+
+
     public String getStateToLog() {
         return this.stateToLog;
     }
     public void setStateToLog(String mess) {this.stateToLog = mess;}
-    
+
     public boolean isToQuit() {
         return toQuit;
     }

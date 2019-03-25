@@ -33,7 +33,18 @@ public class Message {
                 "\r\n" +
                 getMessage() +"\r\n";
     }
-    
+
+    public static Message getTestMessage() {
+
+        return parse("From: Stephane Bortzmeyer <stephane@sources.org>" + "\n" +
+        "To: ubuntu-fr@lists.ubuntu.com"  + "\n" +
+        "Subject: [Son] Silence complet sur mon ESS ES1978 Maestro 2E"  + "\n" +
+        "Date: Tue, 9 Sep 2008 09:33:17 +0200" + "\n" +
+        "Message-ID: <20080909073317.GA23390@sources.org>" + "\n" +
+                "\n" +
+        "Le son, avec Linux, c'est vraiment pénible." + "\n" +
+        "J'ai un Dell Inspiron 7500 dont le son ne marche pas du tout. Silence complet.)" + "\n");
+    }
     /**
      * Parse a message from string.
      * @param rawMessage The message to parse.

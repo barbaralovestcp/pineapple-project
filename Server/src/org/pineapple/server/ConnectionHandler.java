@@ -3,6 +3,7 @@ package org.pineapple.server;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.pineapple.MailBox;
 import org.pineapple.Message;
 import org.pineapple.server.stateMachine.Context;
 import org.pineapple.server.stateMachine.InputStateMachine;
@@ -102,7 +103,6 @@ public class ConnectionHandler implements Runnable {
 		}
 
 
-		System.out.println("DEBUG : THREAD IS ENDING");
 	}
 
 	public String getClientName() {
