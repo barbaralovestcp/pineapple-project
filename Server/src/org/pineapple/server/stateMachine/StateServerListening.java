@@ -10,7 +10,7 @@ public class StateServerListening implements State {
 
         String toSend =  new CodeOK(CodeOK.CodeEnum.OK_SERVER_READY).toString("Server");
 
-        // TODO : Establish connection ?
+        System.out.println("toSend = " + toSend);
 
         context.setMessageToSend(toSend);
         context.setState(new StateAuthentification());
