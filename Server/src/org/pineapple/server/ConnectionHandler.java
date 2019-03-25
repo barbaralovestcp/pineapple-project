@@ -9,6 +9,7 @@ import org.pineapple.server.stateMachine.InputStateMachine;
 
 import java.io.*;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.function.Function;
@@ -26,6 +27,7 @@ public class ConnectionHandler implements Runnable {
 	private PrintStream out_data;
 	@NotNull
 	private Context context;
+	private String messToLog;
 
 	@Nullable
 	private Function<String, Void> onLog;
@@ -33,7 +35,7 @@ public class ConnectionHandler implements Runnable {
 	public ConnectionHandler(@NotNull Socket so_client, @Nullable Function<String, Void> onLog) throws IOException {
 		setClient(so_client);
 
-		in_data = new InputStreamReader(so_client.getInputStream());
+		in_data = new InputStreamReader(so_client.getInputStream(), StandardCharsets.ISO_8859_1);
 		out_data = new PrintStream(so_client.getOutputStream());
 		context = new Context();
 		setOnLog(onLog);
@@ -48,7 +50,8 @@ public class ConnectionHandler implements Runnable {
 	public void run() {
 	    // Transitioning from state "Listening" to "Authentication"
 	    context.handle(null, null);
-	    
+	    this.messToLog = context.getStateToLog();
+	    tryLog(messToLog);
 		if (in_data == null)
 			throw new NullPointerException();
 	  
@@ -62,6 +65,8 @@ public class ConnectionHandler implements Runnable {
 
 				//TODO : Sanitize the first ever readLine input (full of giberrish)
 				line = br.readLine(); //Read single line, looping block the line
+				String[] parts = line.split("[\u0003\u0001]");
+				line = parts[parts.length-1];
 				System.out.println("Received client request : " + line);
 				content.append(line);
 
@@ -72,6 +77,8 @@ public class ConnectionHandler implements Runnable {
 						InputStateMachine input = new InputStateMachine(content.toString());
 						tryLog("Received command: " + input.getCommand());
 						context.handle(new InputStateMachine(content.toString()));
+						this.messToLog = context.getStateToLog();
+						tryLog(messToLog);
 
 						String messageToSend = context.popMessageToSend();
 						//If there's a message to send, send it
