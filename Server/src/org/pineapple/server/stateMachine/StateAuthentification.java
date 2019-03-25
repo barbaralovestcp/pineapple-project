@@ -20,18 +20,18 @@ public class StateAuthentification implements State {
                 boolean popIsValid = true;
                 if (popIsValid)
                 {
-                    toSend = CodeOK.CodeEnum.OK_MAILDROP_READY.toString();
+                    toSend = new CodeOK(CodeOK.CodeEnum.OK_MAILDROP_READY).toString();
                     nextState = new StateTransaction();
                 }
                 else {
-                    toSend = CodeERR.CodeEnum.ERR_PERMISSION_DENIED.toString();
+                    toSend = new CodeERR(CodeERR.CodeEnum.ERR_PERMISSION_DENIED).toString();
                     nextState = this;
                 }
 
                 break;
             case QUIT:
                 
-                toSend = CodeOK.CodeEnum.OK.toString();
+                toSend = new CodeOK(CodeOK.CodeEnum.OK).toString();
                 context.setToQuit(true);
                 
                 //TODO : End connection ?

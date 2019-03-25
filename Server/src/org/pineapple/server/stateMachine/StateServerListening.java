@@ -8,7 +8,7 @@ public class StateServerListening implements State {
     @Override
     public void handle(Context context, CommandPOP3 command, String[] args) {
 
-        String toSend = CodeOK.CodeEnum.OK_SERVER_READY.toString("Server");
+        String toSend =  new CodeOK(CodeOK.CodeEnum.OK_SERVER_READY).toString("Server");
 
         // TODO : Establish connection ?
 
