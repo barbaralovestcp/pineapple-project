@@ -1,10 +1,11 @@
 package org.pineapple.server;
-import javafx.geometry.Orientation;
-import javafx.scene.control.Separator;
+
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.geometry.Orientation;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Separator;
 import javafx.scene.control.ToolBar;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.web.WebEngine;
@@ -12,12 +13,18 @@ import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.pineapple.server.stateMachine.Context;
 
-import java.io.*;
-import java.net.*;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.SocketException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Observer;
 
 public class Server extends Application implements Runnable {
 
@@ -152,6 +159,7 @@ public class Server extends Application implements Runnable {
 
 					Thread t = /*createThread(com_cli, message.toString())*/new Thread(new ConnectionHandler(com_cli, s -> {
 						log(s);
+
 						return null;
 					}));
 					t.start();

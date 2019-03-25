@@ -6,6 +6,7 @@ import org.pineapple.server.stateMachine.Exception.InvalidPOP3CommandException;
 import org.pineapple.server.stateMachine.Exception.StateMachineException;
 
 import java.net.Socket;
+import java.util.Observable;
 
 public class Context {
 
@@ -78,7 +79,7 @@ public class Context {
     public void setState(State newState) {
         String mess = "Successful State Transition : " + currentState.getClass().getSimpleName() + " ---> " + newState.getClass().getSimpleName();
         System.out.println(mess);
-        this.stateToLog = mess;
+        this.setStateToLog(mess);
         currentState = newState;
     }
     
@@ -93,6 +94,7 @@ public class Context {
     public String getStateToLog() {
         return this.stateToLog;
     }
+    public void setStateToLog(String mess) {this.stateToLog = mess;}
     
     public boolean isToQuit() {
         return toQuit;

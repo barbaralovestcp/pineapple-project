@@ -53,7 +53,7 @@ public class ConnectionHandler implements Runnable {
 	    // Transitioning from state "Listening" to "Authentication"
 	    context.handle(null, null);
 	    this.messToLog = context.getStateToLog();
-	    
+	    tryLog(messToLog);
 		if (in_data == null)
 			throw new NullPointerException();
 	  
@@ -71,7 +71,8 @@ public class ConnectionHandler implements Runnable {
                 if (InputStateMachine.IsValidPOP3Request(content.toString())) {
                     context.handle(new InputStateMachine(content.toString()));
                     this.messToLog = context.getStateToLog();
-                    String messageToSend = context.popMessageToSend();
+					tryLog(messToLog);
+					String messageToSend = context.popMessageToSend();
                     if (messageToSend != null) {
                     	tryLog("Sending message \"" + messageToSend.replace("\n", "\n\t") + "\"");
                     	sendMessage(messageToSend);
