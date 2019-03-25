@@ -9,6 +9,7 @@ import org.pineapple.server.stateMachine.InputStateMachine;
 
 import java.io.*;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.function.Function;
@@ -34,7 +35,7 @@ public class ConnectionHandler implements Runnable {
 	public ConnectionHandler(@NotNull Socket so_client, @Nullable Function<String, Void> onLog) throws IOException {
 		setClient(so_client);
 
-		in_data = new InputStreamReader(so_client.getInputStream());
+		in_data = new InputStreamReader(so_client.getInputStream(), StandardCharsets.ISO_8859_1);
 		out_data = new PrintStream(so_client.getOutputStream());
 		context = new Context();
 		setOnLog(onLog);
@@ -64,6 +65,8 @@ public class ConnectionHandler implements Runnable {
 
 				//TODO : Sanitize the first ever readLine input (full of giberrish)
 				line = br.readLine(); //Read single line, looping block the line
+				String[] parts = line.split("[\u0003\u0001]");
+				line = parts[parts.length-1];
 				System.out.println("Received client request : " + line);
 				content.append(line);
 
