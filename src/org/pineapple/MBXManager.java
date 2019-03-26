@@ -122,7 +122,7 @@ public class MBXManager {
 	@NotNull
 	private void writeRaw(@NotNull String content) {
 		String encrypted = MD5.encrypt(getPassword(), content);
-		FUtils.writeRaw(file, content);
+		FUtils.writeRaw(file, encrypted);
 	}
 	
 	/**
@@ -131,7 +131,12 @@ public class MBXManager {
 	 */
 	@NotNull
 	public ArrayList<Message> read() {
-		String raw = readRaw();
+		String raw;
+		try {
+			raw = readRaw();
+		} catch (IllegalArgumentException e) {
+			throw new UserException("User \"" + getUsername() + "\" does not exist.", e);
+		}
 		
 		// Split according to the line "******" that seperate two messages
 		String[] emails = raw.split(Message.SEPARATOR_REGEX);
