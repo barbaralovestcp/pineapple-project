@@ -1,6 +1,7 @@
 package org.pineapple.server.stateMachine;
 
 import org.pineapple.*;
+import org.pineapple.server.stateMachine.Exception.InvalidPOP3ArgumentsException;
 import org.pineapple.server.stateMachine.Exception.StateMachineException;
 
 import java.util.ArrayList;
@@ -23,28 +24,25 @@ public class StateTransaction implements State {
                 break;
             case RETR:
 
-
-                //TODO : Add Error missing arguments
                 if (args.length < 2) {
-                    System.out.println("Missing RETR arguments !");
-                    throw new StateMachineException(this, command);
+                    //System.out.println("Missing RETR arguments !");
+                    throw new InvalidPOP3ArgumentsException(command, "Missing arguments! Arguments expected : Message number");
                 }
 
                 int indexMessage = 0;
                 try {
                     indexMessage = Integer.parseInt(args[1]);
                 } catch (NumberFormatException err) {
-                    System.out.println("RETR argument is not a number !");
-                    throw new StateMachineException(this, command);
+                    //System.out.println("RETR argument is not a valid number !");
+                    throw new InvalidPOP3ArgumentsException(command, "Invalid arguments! Argument is not a valid number.");
                 }
 
-                //TODO : Retrieve mails
                 //prepare string
                 ArrayList<Message> messages = mailbox.getMessages();
 
                 if (indexMessage > messages.size() || indexMessage <= 0) {
-                    System.out.println("RETR : There's no " + indexMessage + "th message !");
-                    throw new StateMachineException(this, command);
+                    //System.out.println("RETR : There's no " + indexMessage + "th message !");
+                    throw new InvalidPOP3ArgumentsException(command, "Invalid arguments! There's no " + indexMessage + "th message.");
                 }
 
                 //Get all messages
@@ -67,8 +65,6 @@ public class StateTransaction implements State {
                     toSend = new CodeERR(CodeERR.CodeEnum.ERR_DEL_MESSAGE_NOT_REMOVED).toString();
                 }
                 context.setToQuit(true);
-
-                //TODO : End connection (?)
 
                 nextState = new StateServerListening();
                 break;

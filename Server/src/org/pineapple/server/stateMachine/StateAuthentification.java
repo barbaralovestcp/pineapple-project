@@ -1,6 +1,7 @@
 package org.pineapple.server.stateMachine;
 
 import org.pineapple.*;
+import org.pineapple.server.stateMachine.Exception.InvalidPOP3ArgumentsException;
 import org.pineapple.server.stateMachine.Exception.StateMachineException;
 
 public class StateAuthentification implements State {
@@ -16,14 +17,14 @@ public class StateAuthentification implements State {
 
                 //TODO : Verify if APOP is Valid
                 if (args.length < 3 ) {
-                    System.out.println("Missing APOP arguments !");
-                    throw new StateMachineException(this, command);
+                    //System.out.println("Missing APOP arguments ! (Username, password)");
+                    throw new InvalidPOP3ArgumentsException(command, "Missing arguments! Arguments expected : Username, password");
                 }
 
                 MailBox mailbox = new MailBox(args[1], args[2]);
-                mailbox.addMessages(Message.getTestMessage());
-                mailbox.addMessages(Message.getTestMessage());
-                System.out.println("USER : " + mailbox.getName() + " PASS : " + mailbox.getPassword());
+                //mailbox.addMessages(Message.getTestMessage());
+                //mailbox.addMessages(Message.getTestMessage());
+                System.out.println("[INFO] USER : " + mailbox.getName() + ", PASS : " + mailbox.getPassword());
                 context.setMailBox(mailbox);
                 boolean popIsValid = true;
                 if (popIsValid)
@@ -42,7 +43,6 @@ public class StateAuthentification implements State {
                 toSend = new CodeOK(CodeOK.CodeEnum.OK).toString();
                 context.setToQuit(true);
 
-                //TODO : End connection ?
                 nextState = new StateServerListening();
                 
                 break;
