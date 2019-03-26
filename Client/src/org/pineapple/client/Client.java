@@ -109,8 +109,8 @@ public class Client extends Observable {
 		this.send(message);
 	}
 
-	public void sendAPOP(){
-		this.sendMessage(CommandPOP3.APOP, this.name + " " + this.password);
+	public void sendAPOP(String name, String password){
+		this.sendMessage(CommandPOP3.APOP, name + " " + password);
 	}
 
     public boolean isConnected() {

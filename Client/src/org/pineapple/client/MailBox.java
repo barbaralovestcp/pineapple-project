@@ -12,6 +12,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -69,17 +70,20 @@ public class MailBox extends Application implements Observer {
         openMailbox(primaryStage, this);
 
         //MAIN TITLE
-        Text title = new Text(0, 0, "\uD83C\uDF4D Bienvenue " + this.name);
+        Text title = new Text(0, 0, "\uD83C\uDF4D Bienvenue ");
         title.setStyle("-fx-font: 30 arial;");
         title.setFill(Color.WHITE);
 
         //MAIN BUTTON ENTER
+
+        javafx.scene.control.TextField login = new javafx.scene.control.TextField("login");
+        javafx.scene.control.TextField password = new TextField("password");
         Button connexionbtn = new Button();
         this.initButtonStyle(connexionbtn, "Enter");
         connexionbtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                client.sendAPOP();
+                client.sendAPOP(login.getText(), password.getText());
             }
         });
 
@@ -98,11 +102,14 @@ public class MailBox extends Application implements Observer {
         GridPane homegridpane = new GridPane();
         homegridpane.add(title, 0, 0);
 //        homegridpane.add(view, 0, 1);
-        homegridpane.add(connexionbtn, 0, 2);
+        homegridpane.add(login, 0, 1);
+        homegridpane.add(password, 0, 2);
+        homegridpane.add(connexionbtn, 0, 4);
         homegridpane.setAlignment(Pos.CENTER);
 
         //INIT WINDOW
         StackPane root = new StackPane();
+
         root.setBackground(Background.EMPTY);
         root.getChildren().add(homegridpane);
         Scene scene = new Scene(root, 500, 500, gradient);
@@ -142,12 +149,7 @@ public class MailBox extends Application implements Observer {
 
         mailboxView.setItems(obsMailboxes);
         this.initButtonStyle(refresh, "Refresh");
-        refresh.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                client.sendMessage(CommandPOP3.STAT);
-            }
-        });
+        refresh.setOnAction(event -> client.sendMessage(CommandPOP3.STAT));
 
         toolbar.setSpacing(25);
         toolbar.getChildren().addAll(refresh);
