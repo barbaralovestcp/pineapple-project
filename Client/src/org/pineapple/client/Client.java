@@ -13,7 +13,7 @@ import java.util.Observable;
 
 public class Client extends Observable {
 
-	private String address = "192.168.43.12";
+	private String address = "127.0.0.1";
 	private String password = "mdp";
 	private boolean connected = false;
 	private String name;
