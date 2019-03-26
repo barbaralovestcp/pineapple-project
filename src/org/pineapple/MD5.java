@@ -56,7 +56,7 @@ public class MD5 {
 			Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
 			cipher.init(Cipher.ENCRYPT_MODE, k);
 			
-			return Base64.getEncoder().encodeToString(cipher.doFinal(content.getBytes(StandardCharsets.UTF_8)));
+			return Base64.getMimeEncoder().encodeToString(cipher.doFinal(content.getBytes()));
 		} catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
 			e.printStackTrace();
 		}
@@ -89,7 +89,7 @@ public class MD5 {
 			Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
 			cipher.init(Cipher.DECRYPT_MODE, k);
 			
-			byte[] content = cipher.doFinal(Base64.getDecoder().decode(encrypted.trim().getBytes()));
+			byte[] content = cipher.doFinal(Base64.getMimeDecoder().decode(encrypted.trim().getBytes()));
 			
 			return new String(content);
 		} catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
