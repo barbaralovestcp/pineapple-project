@@ -37,7 +37,7 @@ public class MailBox extends Application implements Observer {
     private String name = "lea";
     private Client client;
     private HashMap<Integer, Message> messagesList = new HashMap<>();
-    private boolean isMailboxOpened = false;
+    private boolean isInitMailbox = false;
 
     //Style
     private Color primary = Color.rgb(138, 43, 226);
@@ -115,7 +115,7 @@ public class MailBox extends Application implements Observer {
         Scene scene = new Scene(root, 500, 500, gradient);
         primaryStage.setScene(scene);
         primaryStage.show();
-        this.initMailbox();
+//        this.initMailbox();
     }
 
     private void openMailbox(Stage stage, MailBox that) {
@@ -202,7 +202,7 @@ public class MailBox extends Application implements Observer {
         Scene scene = new Scene(borderPane, 800, 500, primary);
         mailview.setTitle("Mail Box");
         mailview.setScene(scene);
-       scene.getWindow().addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, this::closeWindowEvent);
+        scene.getWindow().addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, this::closeWindowEvent);
 
         mailview.show();
     }
@@ -249,6 +249,16 @@ public class MailBox extends Application implements Observer {
 
     @Override
     public void update(Observable o, Object arg) {
+        if(!isInitMailbox && client.isConnected()){
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    primaryStage.close();
+                    initMailbox();
+                    isInitMailbox = true;
+                }
+            });
+        }
         //Get Mailbox messages
         ArrayList<Message> newMessages = this.getMessages();
         ObservableList<Message> newInboxMessages = FXCollections
