@@ -13,7 +13,7 @@ import java.util.Observable;
 
 public class Client extends Observable {
 
-	private String address = "127.0.0.1";
+	private String address = "192.168.43.12";
 	private String password = "mdp";
 	private boolean connected = false;
 	private String name;
@@ -47,16 +47,17 @@ public class Client extends Observable {
 					String line = br.readLine();
 
 					if(line != null){
-						System.out.println("Message du serveur : " + line);
+						System.out.println(line);
+						content.append(line.replace("+OK", ""));
 						if(line.contains("From:")){
 							isMessage = true;
-							if(content.length() > 0 && content.toString().contains("From:")){
+						}else if(isMessage){
+							if(content.length() > 0 && content.toString().contains("*")){
 								this.messageHandler.addMessages(Message.parse(content.toString()));
-								content.append(line.replace("+OK",""));
-							}else{
-								content.append(line.replace("+OK",""));
+								isMessage = false;
 							}
-						}else if(!isMessage){
+						} else if(!isMessage){
+							content = new StringBuilder();
 							this.handleMessage(line);
 						}
 
@@ -167,7 +168,7 @@ public class Client extends Observable {
 	}
 
     private void askAllMessages(int number){
-		for (int i = 1; i < number; i++) {
+		for (int i = 1; i <= number; i++) {
 			this.sendMessage(CommandPOP3.RETR,String.valueOf(i));
 		}
 	}
