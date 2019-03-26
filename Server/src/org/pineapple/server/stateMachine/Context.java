@@ -3,6 +3,7 @@ package org.pineapple.server.stateMachine;
 import org.jetbrains.annotations.Nullable;
 import org.pineapple.CommandPOP3;
 import org.pineapple.MailBox;
+import org.pineapple.server.stateMachine.Exception.InvalidPOP3ArgumentsException;
 import org.pineapple.server.stateMachine.Exception.InvalidPOP3CommandException;
 import org.pineapple.server.stateMachine.Exception.StateMachineException;
 
@@ -64,14 +65,14 @@ public class Context {
     }
     public void handle(final CommandPOP3 entry, final String[] args) {
 
-        //currentState.handle(this, entry, args);
 
         try {
             currentState.handle(this, entry, args);
         }
-        catch (StateMachineException err) {
+        catch (StateMachineException | InvalidPOP3ArgumentsException err) {
             System.out.println("ERROR : " + err.getMessage() );
         }
+
     }
 
     /**
