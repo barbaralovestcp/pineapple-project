@@ -9,6 +9,7 @@ import org.pineapple.server.stateMachine.Context;
 import org.pineapple.server.stateMachine.InputStateMachine;
 
 import java.io.*;
+import java.math.BigInteger;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
@@ -120,7 +121,8 @@ public class ConnectionHandler implements Runnable {
 
 	public void sendMessage(@NotNull String message){
 		if(out_data != null) {
-			out_data.print(message);
+			out_data.print(message.replaceAll("\\r(?!\\n)", "\r\n"));
+			System.out.println(String.format("%040x", new BigInteger(1, message.getBytes(StandardCharsets.ISO_8859_1))));
 			out_data.flush();
 			tryLog("Command sent");
 		}
