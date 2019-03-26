@@ -14,32 +14,32 @@ public class EncryptUtil {
 	
 	@Test
 	public void encryptTestFile() throws IOException {
-		encryptFile(new File("Server/res/Test.txt"), new File("Server/res/Test.mbx"), "test", false);
+		encryptFile(new File("res/Test.txt"), new File("res/Test.mbx"), "test", false);
 	}
 	
 	@Test
 	public void encryptLeaFile() throws IOException {
-		encryptFile(new File("Server/res/lea.txt"), new File("Server/res/lea.mbx"), "lea", false);
+		encryptFile(new File("res/lea.txt"), new File("res/lea.mbx"), "lea", false);
 	}
 	
 	@Test
 	public void encryptPhilippineFile() throws IOException {
-		encryptFile(new File("Server/res/philippine.txt"), new File("Server/res/philippine.mbx"), "philippine", false);
+		encryptFile(new File("res/philippine.txt"), new File("res/philippine.mbx"), "philippine", false);
 	}
 	
 	@Test
 	public void encryptElieFile() throws IOException {
-		encryptFile(new File("Server/res/elie.txt"), new File("Server/res/elie.mbx"), "elie", false);
+		encryptFile(new File("res/elie.txt"), new File("res/elie.mbx"), "elie", false);
 	}
 	
 	@Test
 	public void encryptValentinFile() throws IOException {
-		encryptFile(new File("Server/res/valentin.txt"), new File("Server/res/valentin.mbx"), "valentin", false);
+		encryptFile(new File("res/valentin.txt"), new File("res/valentin.mbx"), "valentin", false);
 	}
 	
 	public void encryptFile(@NotNull File f_txt, @NotNull File f_mbx, @NotNull String password, boolean isPasswordHashed) throws IOException {
 		if (!f_txt.exists())
-			throw new IOException("File doesn't exist.");
+			throw new IOException("File doesn't exist: " + f_txt.getAbsolutePath());
 		
 		if (!isPasswordHashed)
 			password = MD5.hash(password);
@@ -55,5 +55,21 @@ public class EncryptUtil {
 		
 		// Decrypt the encrypted content and compare it to the old one.
 		assertEquals(content, MD5.decrypt(password, FUtils.readRaw(f_mbx)));
+	}
+	
+	@Test
+	public void addUsers() {
+		UserManager.put("elie", "elie", false);
+		UserManager.put("lea", "lea", false);
+		UserManager.put("philippine", "philippine", false);
+		UserManager.put("valentin", "valentin", false);
+		
+		assertTrue(UserManager.checkPassword("elie", "elie", false));
+		assertTrue(UserManager.checkPassword("lea", "lea", false));
+		assertTrue(UserManager.checkPassword("philippine", "philippine", false));
+		assertTrue(UserManager.checkPassword("valentin", "valentin", false));
+		assertFalse(UserManager.checkPassword("valentin", "lea", false));
+		assertFalse(UserManager.checkPassword("philippine", "elie", false));
+		assertFalse(UserManager.checkPassword("ceciestuntest", "blabla", false));
 	}
 }
