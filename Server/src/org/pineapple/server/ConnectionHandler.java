@@ -8,6 +8,7 @@ import org.pineapple.Message;
 import org.pineapple.server.stateMachine.Context;
 import org.pineapple.server.stateMachine.InputStateMachine;
 
+import javax.net.ssl.SSLSocket;
 import java.io.*;
 import java.math.BigInteger;
 import java.net.Socket;
@@ -24,7 +25,7 @@ import java.util.function.Function;
 public class ConnectionHandler implements Runnable {
 
     @NotNull
-	private Socket so_client;
+	private SSLSocket so_client;
 	private InputStreamReader in_data;
 	private PrintStream out_data;
 	@NotNull
@@ -34,7 +35,7 @@ public class ConnectionHandler implements Runnable {
 	@Nullable
 	private Function<String, Void> onLog;
 
-	public ConnectionHandler(@NotNull Socket so_client, @Nullable Function<String, Void> onLog) throws IOException {
+	public ConnectionHandler(@NotNull SSLSocket so_client, @Nullable Function<String, Void> onLog) throws IOException {
 		setClient(so_client);
 
 		in_data = new InputStreamReader(so_client.getInputStream(), StandardCharsets.ISO_8859_1);
@@ -44,7 +45,7 @@ public class ConnectionHandler implements Runnable {
 
 		tryLog("New connection: " + getClientName());
 	}
-	public ConnectionHandler(@NotNull Socket so_client) throws IOException {
+	public ConnectionHandler(@NotNull SSLSocket so_client) throws IOException {
 		this(so_client, null);
 	}
 
@@ -179,11 +180,11 @@ public class ConnectionHandler implements Runnable {
     
     @NotNull
 	@Contract(pure = true)
-	public Socket getClient() {
+	public SSLSocket getClient() {
 		return so_client;
 	}
 
-	public void setClient(@NotNull Socket so_client) {
+	public void setClient(@NotNull SSLSocket so_client) {
 		this.so_client = so_client;
 	}
 

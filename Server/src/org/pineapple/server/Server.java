@@ -15,6 +15,9 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.pineapple.server.stateMachine.Context;
 
+import javax.net.ssl.SSLServerSocket;
+import javax.net.ssl.SSLServerSocketFactory;
+import javax.net.ssl.SSLSocket;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -51,7 +54,7 @@ public class Server extends Application implements Runnable {
 	private State state;
 	private Thread th_route;
 
-	private ServerSocket soc;
+	private SSLServerSocket soc;
 	private ArrayList<Thread> connections;
 
 	private BorderPane root;
@@ -132,7 +135,7 @@ public class Server extends Application implements Runnable {
 	public void run() {
 		try {
 			int port = 110;
-			soc = new ServerSocket(port);
+			soc = (SSLServerSocket) SSLServerSocketFactory.getDefault().createServerSocket(port);
 			log("Server open on port " + soc.getLocalPort());
 			if (getState() == State.INITIALIZED) {
 				startServer();
@@ -155,7 +158,7 @@ public class Server extends Application implements Runnable {
 
 				try {
 					// Accept a connection (it will block this thread until a connection arrived)
-					Socket com_cli = soc.accept();
+					SSLSocket com_cli = (SSLSocket) soc.accept();
 
 					Thread t = /*createThread(com_cli, message.toString())*/new Thread(new ConnectionHandler(com_cli, s -> {
 						log(s);
