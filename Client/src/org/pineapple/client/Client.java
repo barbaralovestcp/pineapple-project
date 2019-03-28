@@ -30,48 +30,42 @@ public class Client extends Observable {
 		try{
 			Socket con_serv = new Socket(InetAddress.getByName(address),110);
 			printWelcome();
+			
+			//flux d'entrée
+			InputStream inp = con_serv.getInputStream();
+			//flux de sortie
+			this.op = con_serv.getOutputStream();
 
-			try {
-				//flux d'entrée
-				InputStream inp = con_serv.getInputStream();
-				//flux de sortie
-				this.op = con_serv.getOutputStream();
+			InputStreamReader indata = new InputStreamReader(inp, StandardCharsets.ISO_8859_1);
+			BufferedReader br = new BufferedReader(indata);
 
-				InputStreamReader indata = new InputStreamReader(inp, StandardCharsets.ISO_8859_1);
-				BufferedReader br = new BufferedReader(indata);
+			StringBuilder content = new StringBuilder();
 
-				StringBuilder content = new StringBuilder();
+			boolean isMessage = false;
+			while(true){
+				String line = br.readLine();
 
-				boolean isMessage = false;
-				while(true){
-					String line = br.readLine();
-
-					if(line != null){
-						System.out.println(line);
-						content.append(line.replace("+OK", ""));
-						if(line.contains("From:")){
-							isMessage = true;
-						}else if(isMessage){
-							if(content.length() > 0 && content.toString().contains("*")){
-								this.messageHandler.addMessages(Message.parse(content.toString()));
-								isMessage = false;
-							}
-						} else if(!isMessage){
-							content = new StringBuilder();
-							this.handleMessage(line);
+				if(line != null){
+					System.out.println(line);
+					content.append(line.replace("+OK", ""));
+					if(line.contains("From:")){
+						isMessage = true;
+					}else if(isMessage){
+						if(content.length() > 0 && content.toString().contains("*")){
+							this.messageHandler.addMessages(Message.parse(content.toString()));
+							isMessage = false;
 						}
-
-						setChanged();
-						notifyObservers();
-
+					} else if(!isMessage){
+						content = new StringBuilder();
+						this.handleMessage(line);
 					}
+
+					setChanged();
+					notifyObservers();
+
 				}
-
-			}catch (IOException e) {
-				e.printStackTrace();
 			}
-
-		}catch(java.net.ConnectException ce){
+		} catch(java.net.ConnectException ce) {
 			System.out.println("La connexion a échouée.\n");
 		} catch (IOException e) {
 			e.printStackTrace();
