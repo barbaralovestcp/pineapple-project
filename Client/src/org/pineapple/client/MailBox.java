@@ -9,12 +9,14 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.*;
 import javafx.scene.control.Button;
-import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -24,6 +26,7 @@ import javafx.scene.paint.Stop;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import org.jetbrains.annotations.Nullable;
 import org.pineapple.CommandPOP3;
 import org.pineapple.Message;
 
@@ -75,17 +78,25 @@ public class MailBox extends Application implements Observer {
         title.setFill(Color.WHITE);
 
         //MAIN BUTTON ENTER
-
-        javafx.scene.control.TextField login = new javafx.scene.control.TextField("login");
-        javafx.scene.control.TextField password = new TextField("password");
+        
+        TextField login = new javafx.scene.control.TextField("login");
+        PasswordField password = new PasswordField();
+        
+        // Declare the action to do when the button is clicked
+        EventHandler<ActionEvent> enterAction = event -> client.sendAPOP(login.getText(), password.getText());
+        
+        // Declare the action to do when <ENTER> is pressed on `login` or `password` field.
+        EventHandler<KeyEvent> enterEvent = event -> {
+            if (event.getCode().equals(KeyCode.ENTER))
+                enterAction.handle(null);
+        };
+        
+        login.setOnKeyPressed(enterEvent);
+        password.setOnKeyPressed(enterEvent);
+        
         Button connexionbtn = new Button();
         this.initButtonStyle(connexionbtn, "Enter");
-        connexionbtn.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                client.sendAPOP(login.getText(), password.getText());
-            }
-        });
+        connexionbtn.setOnAction(enterAction);
 
         //Main image
 //        Image image = null;
