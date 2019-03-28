@@ -5,6 +5,8 @@ import org.jetbrains.annotations.Nullable;
 import org.pineapple.*;
 import org.pineapple.MailBox;
 
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
@@ -28,7 +30,7 @@ public class Client extends Observable {
 
 	public void connect(){
 		try{
-			Socket con_serv = new Socket(InetAddress.getByName(address),110);
+			SSLSocket con_serv = (SSLSocket) SSLSocketFactory.getDefault().createSocket(InetAddress.getByName(address),110);
 			printWelcome();
 
 			try {
