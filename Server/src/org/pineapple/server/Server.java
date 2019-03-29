@@ -13,23 +13,24 @@ import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.pineapple.server.stateMachine.Context;
+import org.pineapple.InvalidCipherSuiteException;
+import sun.security.ssl.SSLContextImpl;
 
+import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSocket;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.net.ServerSocket;
-import java.net.Socket;
 import java.net.SocketException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
-import java.util.Observer;
 
-public class Server extends Application implements Runnable {
+public class Server extends Application implements Runnable{
 
 	public enum State {
 		INITIALIZED,
@@ -134,8 +135,11 @@ public class Server extends Application implements Runnable {
 	@Override
 	public void run() {
 		try {
-			int port = 110;
+			//Port > 1024 pour POP3s et pas 995 comme dans la norme
+			int port = 1095 ;
 			soc = (SSLServerSocket) SSLServerSocketFactory.getDefault().createServerSocket(port);
+			String[] cipherSuiteStringArray = setCipherSuite();
+
 			log("Server open on port " + soc.getLocalPort());
 			if (getState() == State.INITIALIZED) {
 				startServer();
@@ -159,6 +163,7 @@ public class Server extends Application implements Runnable {
 				try {
 					// Accept a connection (it will block this thread until a connection arrived)
 					SSLSocket com_cli = (SSLSocket) soc.accept();
+					soc.setEnabledCipherSuites(cipherSuiteStringArray);
 
 					Thread t = /*createThread(com_cli, message.toString())*/new Thread(new ConnectionHandler(com_cli, s -> {
 						log(s);
@@ -176,11 +181,38 @@ public class Server extends Application implements Runnable {
 					}
 				}
 			}
-		} catch (IOException e) {
+		} catch (IOException | InvalidCipherSuiteException e) {
 			e.printStackTrace();
 		}
 
 		stopServer();
+	}
+
+	@NotNull
+	private String[] setCipherSuite() throws InvalidCipherSuiteException {
+		// SET ANONYMOUS CIPHER SUITES
+		ArrayList<String> cipherSuite = new ArrayList<>();
+		//TODO find why there is no anonymous cipher suites allowed in getSupportedCipherSuites
+		String[] authCipherSuites = soc.getSupportedCipherSuites();
+		for (int i = 0; i < authCipherSuites.length; i++) {
+			if(authCipherSuites[i].toLowerCase().contains("anon")){
+				cipherSuite.add(authCipherSuites[i]);
+			}
+		}
+		Object[] cipherSuiteObjectArray = cipherSuite.toArray();
+		String[] cipherSuiteStringArray = new String[cipherSuiteObjectArray.length];
+		for(int i = 0 ; i < cipherSuiteStringArray.length ; i ++){
+			cipherSuiteStringArray[i] = cipherSuiteObjectArray[i].toString();
+		}
+
+		if(cipherSuiteStringArray.length == 0) {
+			throw new InvalidCipherSuiteException("The size of the cipher suite cannot be 0.");
+		}
+
+		soc.setEnabledCipherSuites(cipherSuiteStringArray);
+		System.out.println(Arrays.toString(soc.getEnabledCipherSuites()));
+
+		return cipherSuiteStringArray;
 	}
 
 
@@ -213,7 +245,7 @@ public class Server extends Application implements Runnable {
 	 * @param message The message that the client gave
 	 * @return Return a thread that contain a runnable to manage the client. You have to start it.
 	 */
-	protected Thread createThread(@NotNull Socket com_cli, @NotNull final String message) {
+	protected Thread createThread(@NotNull SSLSocket com_cli, @NotNull final String message) {
 		return new Thread(() -> {
 			log("New connection: " + com_cli.getInetAddress().getHostName() + " port " + com_cli.getPort());
 

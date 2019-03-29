@@ -2,15 +2,16 @@ package org.pineapple.client;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.pineapple.*;
 import org.pineapple.MailBox;
+import org.pineapple.*;
 
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import java.io.*;
 import java.net.InetAddress;
-import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Observable;
 
 public class Client extends Observable {
@@ -30,7 +31,11 @@ public class Client extends Observable {
 
 	public void connect(){
 		try{
-			SSLSocket con_serv = (SSLSocket) SSLSocketFactory.getDefault().createSocket(InetAddress.getByName(address),110);
+			SSLSocketFactory factory = (SSLSocketFactory)SSLSocketFactory.getDefault();
+			//Port > 1024 pour POP3s et pas 995 comme dans la norme
+			SSLSocket con_serv = (SSLSocket) factory.createSocket(InetAddress.getByName(address),1095 );
+
+			setCipherSuite(con_serv);
 			printWelcome();
 
 			try {
@@ -75,9 +80,31 @@ public class Client extends Observable {
 
 		}catch(java.net.ConnectException ce){
 			System.out.println("La connexion a échouée.\n");
-		} catch (IOException e) {
+		} catch (IOException | InvalidCipherSuiteException e) {
 			e.printStackTrace();
 		}
+	}
+
+	private void setCipherSuite(SSLSocket con_serv) throws InvalidCipherSuiteException {
+		ArrayList<String> cipherSuite = new ArrayList<>();
+		String[] authCipherSuites = con_serv.getSupportedCipherSuites();
+		for (int i = 0; i < authCipherSuites.length; i++) {
+			if(authCipherSuites[i].toLowerCase().contains("anon")){
+				cipherSuite.add(authCipherSuites[i]);
+			}
+		}
+		Object[] cipherSuiteObjectArray = cipherSuite.toArray();
+		String[] cipherSuiteStringArray = new String[cipherSuiteObjectArray.length];
+		for(int i = 0 ; i < cipherSuiteStringArray.length ; i ++){
+			cipherSuiteStringArray[i] = cipherSuiteObjectArray[i].toString();
+		}
+
+		if(cipherSuiteStringArray.length == 0) {
+			throw new InvalidCipherSuiteException("The size of the cipher suite cannot be 0.");
+		}
+
+		con_serv.setEnabledCipherSuites(cipherSuiteStringArray);
+		System.out.println(Arrays.toString(con_serv.getSupportedCipherSuites()));
 	}
 
 	private static void printWelcome()
