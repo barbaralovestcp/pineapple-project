@@ -35,7 +35,7 @@ public class Client extends Observable {
 			//Port > 1024 pour POP3s et pas 995 comme dans la norme
 			SSLSocket con_serv = (SSLSocket) factory.createSocket(InetAddress.getByName(address),1095 );
 
-			setCipherSuite(con_serv);
+			MD5.setCipherSuite(con_serv);
 			printWelcome();
 
 			try {
@@ -83,28 +83,6 @@ public class Client extends Observable {
 		} catch (IOException | InvalidCipherSuiteException e) {
 			e.printStackTrace();
 		}
-	}
-
-	private void setCipherSuite(SSLSocket con_serv) throws InvalidCipherSuiteException {
-		ArrayList<String> cipherSuite = new ArrayList<>();
-		String[] authCipherSuites = con_serv.getSupportedCipherSuites();
-		for (int i = 0; i < authCipherSuites.length; i++) {
-			if(authCipherSuites[i].toLowerCase().contains("anon")){
-				cipherSuite.add(authCipherSuites[i]);
-			}
-		}
-		Object[] cipherSuiteObjectArray = cipherSuite.toArray();
-		String[] cipherSuiteStringArray = new String[cipherSuiteObjectArray.length];
-		for(int i = 0 ; i < cipherSuiteStringArray.length ; i ++){
-			cipherSuiteStringArray[i] = cipherSuiteObjectArray[i].toString();
-		}
-
-		if(cipherSuiteStringArray.length == 0) {
-			throw new InvalidCipherSuiteException("The size of the cipher suite cannot be 0.");
-		}
-
-		con_serv.setEnabledCipherSuites(cipherSuiteStringArray);
-		System.out.println(Arrays.toString(con_serv.getSupportedCipherSuites()));
 	}
 
 	private static void printWelcome()

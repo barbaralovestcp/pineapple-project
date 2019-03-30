@@ -7,13 +7,19 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
+import javax.net.ssl.SSLServerSocket;
+import javax.net.ssl.SSLSocket;
+import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.function.Function;
+import java.util.function.IntFunction;
 
 public class MD5 {
 	
@@ -108,5 +114,86 @@ public class MD5 {
 	@NotNull
 	public static String decrypt(@NotNull String key, @NotNull String encrypted) {
 		return decrypt(key.getBytes(StandardCharsets.UTF_8), encrypted);
+	}
+	
+	@NotNull
+	private static String[] setCipherSuiteOnObject(@NotNull Object socket, @NotNull String cipherNameContains) throws InvalidCipherSuiteException, ClassCastException {
+		if (!(socket instanceof SSLSocket) && !(socket instanceof SSLServerSocket))
+			throw new ClassCastException("Only 'SSLSocket' and 'SSLServerSocket' are authorized.");
+		
+		ArrayList<String> cipherSuite = new ArrayList<>();
+		String[] authCipherSuites = null;
+		
+		if (socket instanceof SSLSocket)
+			authCipherSuites = ((SSLSocket) socket).getSupportedCipherSuites();
+		else
+			authCipherSuites = ((SSLServerSocket) socket).getSupportedCipherSuites();
+		
+		for (String authCipherSuite : authCipherSuites)
+			if (authCipherSuite.toLowerCase().contains(cipherNameContains.toLowerCase()))
+				cipherSuite.add(authCipherSuite);
+		
+		if(cipherSuite.size() == 0)
+			throw new InvalidCipherSuiteException("The size of the cipher suite cannot be 0.");
+		
+		String[] cipherSuiteStringArray = Arrays.stream(cipherSuite.toArray()).map(o -> (String) o).toArray(String[]::new);
+		
+		if (socket instanceof SSLSocket)
+			((SSLSocket) socket).setEnabledCipherSuites(cipherSuiteStringArray);
+		else
+			((SSLServerSocket) socket).setEnabledCipherSuites(cipherSuiteStringArray);
+		
+		return cipherSuiteStringArray;
+	}
+	@NotNull
+	private static String[] setCipherSuiteOnObject(@NotNull Object socket) throws InvalidCipherSuiteException, ClassCastException {
+		return setCipherSuiteOnObject(socket, "TLS_RSA_WITH_AES_256_CBC_SHA");
+	}
+	
+	/**
+	 * Set a cipher suite for the given SSL Socket `socket`.
+	 * @param socket The socket to set the cipher suite. It is necessary to generate the list of supported ciphers.
+	 * @param cipherNameContains Optional parameter. If given, only the cipher that contains the string
+	 *                           `cipherNameContains` will be added in the cipher suite for `socket`. By default, the
+	 *                           cipher "TLS_RSA_WITH_AES_256_CBC_SHA" is chosen.
+	 * @return Return the cipher list given to `socket`.
+	 * @throws InvalidCipherSuiteException Thrown if no cipher has been found.
+	 */
+	@NotNull
+	public static String[] setCipherSuite(@NotNull SSLSocket socket, @NotNull String cipherNameContains) throws InvalidCipherSuiteException {
+		return setCipherSuiteOnObject(socket, cipherNameContains);
+	}
+	/**
+	 * Set a cipher suite for the given SSL Socket `socket`.
+	 * @param socket The socket to set the cipher suite. It is necessary to generate the list of supported ciphers.
+	 * @param cipherNameContains Optional parameter. If given, only the cipher that contains the string
+	 *                           `cipherNameContains` will be added in the cipher suite for `socket`. By default, the
+	 *                           cipher "TLS_RSA_WITH_AES_256_CBC_SHA" is chosen.
+	 * @return Return the cipher list given to `socket`.
+	 * @throws InvalidCipherSuiteException Thrown if no cipher has been found.
+	 */
+	@NotNull
+	public static String[] setCipherSuite(@NotNull SSLServerSocket socket, @NotNull String cipherNameContains) throws InvalidCipherSuiteException {
+		return setCipherSuiteOnObject(socket, cipherNameContains);
+	}
+	/**
+	 * Set a cipher suite for the given SSL Socket `socket`. By default, the cipher "TLS_RSA_WITH_AES_256_CBC_SHA" is
+	 * chosen.
+	 * @param socket The socket to set the cipher suite. It is necessary to generate the list of supported ciphers.
+	 * @throws InvalidCipherSuiteException Thrown if no cipher has been found.
+	 */
+	@NotNull
+	public static String[] setCipherSuite(@NotNull SSLSocket socket) throws InvalidCipherSuiteException {
+		return setCipherSuiteOnObject(socket);
+	}
+	/**
+	 * Set a cipher suite for the given SSL Socket `socket`. By default, the cipher "TLS_RSA_WITH_AES_256_CBC_SHA" is
+	 * chosen.
+	 * @param socket The socket to set the cipher suite. It is necessary to generate the list of supported ciphers.
+	 * @throws InvalidCipherSuiteException Thrown if no cipher has been found.
+	 */
+	@NotNull
+	public static String[] setCipherSuite(@NotNull SSLServerSocket socket) throws InvalidCipherSuiteException {
+		return setCipherSuiteOnObject(socket);
 	}
 }

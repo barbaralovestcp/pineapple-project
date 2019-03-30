@@ -3,10 +3,13 @@ package org.pineapple;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
 import javax.swing.plaf.FontUIResource;
 import java.io.File;
 import java.io.IOError;
 import java.io.IOException;
+import java.net.Socket;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -71,5 +74,13 @@ public class EncryptUtil {
 		assertFalse(UserManager.checkPassword("valentin", "lea", false));
 		assertFalse(UserManager.checkPassword("philippine", "elie", false));
 		assertFalse(UserManager.checkPassword("ceciestuntest", "blabla", false));
+	}
+	
+	@Test
+	public void printSupportedCiphers() throws IOException {
+		String[] ciphers = ((SSLSocket) SSLSocketFactory.getDefault().createSocket()).getSupportedCipherSuites();
+		
+		for (String cipher : ciphers)
+			System.out.println(cipher);
 	}
 }

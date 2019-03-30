@@ -14,6 +14,7 @@ import javafx.stage.Stage;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.pineapple.InvalidCipherSuiteException;
+import org.pineapple.MD5;
 import sun.security.ssl.SSLContextImpl;
 
 import javax.net.ssl.SSLContext;
@@ -138,7 +139,7 @@ public class Server extends Application implements Runnable{
 			//Port > 1024 pour POP3s et pas 995 comme dans la norme
 			int port = 1095 ;
 			soc = (SSLServerSocket) SSLServerSocketFactory.getDefault().createServerSocket(port);
-			String[] cipherSuiteStringArray = setCipherSuite();
+			String[] cipherSuiteStringArray = MD5.setCipherSuite(soc);
 
 			log("Server open on port " + soc.getLocalPort());
 			if (getState() == State.INITIALIZED) {
@@ -186,33 +187,6 @@ public class Server extends Application implements Runnable{
 		}
 
 		stopServer();
-	}
-
-	@NotNull
-	private String[] setCipherSuite() throws InvalidCipherSuiteException {
-		// SET ANONYMOUS CIPHER SUITES
-		ArrayList<String> cipherSuite = new ArrayList<>();
-		//TODO find why there is no anonymous cipher suites allowed in getSupportedCipherSuites
-		String[] authCipherSuites = soc.getSupportedCipherSuites();
-		for (int i = 0; i < authCipherSuites.length; i++) {
-			if(authCipherSuites[i].toLowerCase().contains("anon")){
-				cipherSuite.add(authCipherSuites[i]);
-			}
-		}
-		Object[] cipherSuiteObjectArray = cipherSuite.toArray();
-		String[] cipherSuiteStringArray = new String[cipherSuiteObjectArray.length];
-		for(int i = 0 ; i < cipherSuiteStringArray.length ; i ++){
-			cipherSuiteStringArray[i] = cipherSuiteObjectArray[i].toString();
-		}
-
-		if(cipherSuiteStringArray.length == 0) {
-			throw new InvalidCipherSuiteException("The size of the cipher suite cannot be 0.");
-		}
-
-		soc.setEnabledCipherSuites(cipherSuiteStringArray);
-		System.out.println(Arrays.toString(soc.getEnabledCipherSuites()));
-
-		return cipherSuiteStringArray;
 	}
 
 
