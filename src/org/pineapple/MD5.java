@@ -116,6 +116,16 @@ public class MD5 {
 		return decrypt(key.getBytes(StandardCharsets.UTF_8), encrypted);
 	}
 	
+	/**
+	 * Set a cipher suite for the given SSL (Server) Socket `socket`.
+	 * @param socket The socket to set the cipher suite. It is either of type `SSLSocket` or `SSLServerSocket`.
+	 * @param cipherNameContains Optional parameter. If given, only the cipher that contains the string
+	 *                           `cipherNameContains` will be added in the cipher suite for `socket`. By default, the
+	 *                           cipher "TLS_RSA_WITH_AES_256_CBC_SHA" is chosen.
+	 * @return Return the cipher list given to `socket`.
+	 * @throws InvalidCipherSuiteException Thrown if no cipher has been found.
+	 * @throws ClassCastException Thrown if `socket` is not of type `SSLSocket` or `SSLServerSocket`
+	 */
 	@NotNull
 	private static String[] setCipherSuiteOnObject(@NotNull Object socket, @NotNull String cipherNameContains) throws InvalidCipherSuiteException, ClassCastException {
 		if (!(socket instanceof SSLSocket) && !(socket instanceof SSLServerSocket))
@@ -145,6 +155,14 @@ public class MD5 {
 		
 		return cipherSuiteStringArray;
 	}
+	/**
+	 * Set a cipher suite for the given SSL (Server) Socket `socket`. By default, the cipher
+	 * "TLS_RSA_WITH_AES_256_CBC_SHA" is chosen.
+	 * @param socket The socket to set the cipher suite. It is either of type `SSLSocket` or `SSLServerSocket`.
+	 * @return Return the cipher list given to `socket`.
+	 * @throws InvalidCipherSuiteException Thrown if no cipher has been found.
+	 * @throws ClassCastException Thrown if `socket` is not of type `SSLSocket` or `SSLServerSocket`
+	 */
 	@NotNull
 	private static String[] setCipherSuiteOnObject(@NotNull Object socket) throws InvalidCipherSuiteException, ClassCastException {
 		return setCipherSuiteOnObject(socket, "TLS_RSA_WITH_AES_256_CBC_SHA");
