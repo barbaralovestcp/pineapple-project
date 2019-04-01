@@ -3,7 +3,7 @@ package org.pineapple.stateMachine.test;
 import org.pineapple.CommandPOP3;
 import org.pineapple.server.StateServerListening;
 import org.pineapple.stateMachine.*;
-import org.pineapple.stateMachine.Exception.InvalidPOP3CommandException;
+import org.pineapple.stateMachine.Exception.InvalidCommandException;
 
 import java.util.Scanner;
 
@@ -24,21 +24,21 @@ public class TestStateMachine {
 
             try {
 
-                stateMachine.handle(msg);
+                //stateMachine.handle(msg);
                 /* ALTERNATIVE IMPLEMENTATION
-                InputStateMachine input = new InputStateMachine(msg);
+                InputStateMachinePOP3 input = new InputStateMachinePOP3(msg);
                 stateMachine.handle(input.getCommand(), input.getArguments()); */
             }
-            catch (InvalidPOP3CommandException err){
+            catch (InvalidCommandException err){
                 System.out.println(err.getMessage());
             }
             /*
 
             //ALTERNATIVE VALID IMPLEMENTATION
 
-            if (InputStateMachine.IsValidPOP3Request(msg)) {
+            if (InputStateMachinePOP3.IsValidPOP3Request(msg)) {
 
-                InputStateMachine input = new InputStateMachine(msg);
+                InputStateMachinePOP3 input = new InputStateMachinePOP3(msg);
                 stateMachine.handle(input.getCommand(), input.getArguments());
 
             }

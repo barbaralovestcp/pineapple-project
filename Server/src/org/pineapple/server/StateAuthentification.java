@@ -2,24 +2,28 @@ package org.pineapple.server;
 
 import org.pineapple.*;
 import org.pineapple.stateMachine.Context;
-import org.pineapple.stateMachine.Exception.InvalidPOP3ArgumentsException;
+import org.pineapple.stateMachine.Exception.InvalidCommandArgumentsException;
 import org.pineapple.stateMachine.Exception.StateMachineException;
-import org.pineapple.stateMachine.State;
+import org.pineapple.stateMachine.IInputStateMachine;
+import org.pineapple.stateMachine.IState;
 
-public class StateAuthentification implements State {
+public class StateAuthentification implements IState {
 
 
     @Override
-    public void handle(Context context, CommandPOP3 command, String[] args) {
+    public void handle(Context context, IInputStateMachine input) {
+
+        CommandPOP3 command = ((InputStateMachinePOP3)input).getCommand();
+        String[] args = input.getArguments();
 
         String toSend;
-        State nextState = null;
+        IState nextState = null;
         switch (command) {
             case APOP:
 
                 if (args.length < 3 ) {
                     //System.out.println("Missing APOP arguments ! (Username, password)");
-                    throw new InvalidPOP3ArgumentsException(command, "Missing arguments! Arguments expected : Username, password");
+                    throw new InvalidCommandArgumentsException(command, "Missing arguments! Arguments expected : Username, password");
                 }
                 
                 if (UserManager.checkPassword(args[1], args[2], false)) {

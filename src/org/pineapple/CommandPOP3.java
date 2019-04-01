@@ -1,6 +1,6 @@
 package org.pineapple;
 
-public enum CommandPOP3 {
+public enum CommandPOP3 implements ICommand{
     APOP,
     STAT,
     RETR,

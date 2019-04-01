@@ -5,7 +5,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.pineapple.Message;
 import org.pineapple.stateMachine.Context;
-import org.pineapple.stateMachine.InputStateMachine;
 
 import java.io.*;
 import java.math.BigInteger;
@@ -56,7 +55,7 @@ public class ConnectionHandler implements Runnable {
 		// Reading message from client
 		BufferedReader br = new BufferedReader(in_data);
 
-		context.handle(null, null);
+		context.handle();
 		this.messToLog = context.getStateToLog();
 		tryLog(messToLog);
 		String messageToSend = context.popMessageToSend();
@@ -81,10 +80,10 @@ public class ConnectionHandler implements Runnable {
 				if (content.length() > 0) {
 
 					//Check if client message is an existing command
-					if (InputStateMachine.IsValidPOP3Request(content.toString())) {
-						InputStateMachine input = new InputStateMachine(content.toString());
+					if (InputStateMachinePOP3.IsValidPOP3Request(content.toString())) {
+						InputStateMachinePOP3 input = new InputStateMachinePOP3(content.toString());
 						tryLog("Received command: " + input.getCommand());
-						context.handle(new InputStateMachine(content.toString()));
+						context.handle(new InputStateMachinePOP3(content.toString()));
 						this.messToLog = context.getStateToLog();
 						tryLog(messToLog);
 

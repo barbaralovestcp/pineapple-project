@@ -2,20 +2,23 @@ package org.pineapple.server;
 
 import org.pineapple.*;
 import org.pineapple.stateMachine.Context;
-import org.pineapple.stateMachine.Exception.InvalidPOP3ArgumentsException;
+import org.pineapple.stateMachine.Exception.InvalidCommandArgumentsException;
 import org.pineapple.stateMachine.Exception.StateMachineException;
-import org.pineapple.stateMachine.State;
+import org.pineapple.stateMachine.IInputStateMachine;
+import org.pineapple.stateMachine.IState;
 
 import java.util.ArrayList;
 
-public class StateTransaction implements State {
-
+public class StateTransaction implements IState {
 
     @Override
-    public void handle(Context context, CommandPOP3 command, String[] args) {
+    public void handle(Context context, IInputStateMachine input) {
+
+        CommandPOP3 command = ((InputStateMachinePOP3)input).getCommand();
+        String[] args = input.getArguments();
 
         String toSend = "";
-        State nextState = null;
+        IState nextState = null;
         MailBox mailbox = context.getMailBox();
         switch (command) {
 
@@ -28,7 +31,7 @@ public class StateTransaction implements State {
 
                 if (args.length < 2) {
                     //System.out.println("Missing RETR arguments !");
-                    throw new InvalidPOP3ArgumentsException(command, "Missing arguments! Arguments expected : Message number");
+                    throw new InvalidCommandArgumentsException(command, "Missing arguments! Arguments expected : Message number");
                 }
 
                 int indexMessage = 0;
@@ -36,7 +39,7 @@ public class StateTransaction implements State {
                     indexMessage = Integer.parseInt(args[1]);
                 } catch (NumberFormatException err) {
                     //System.out.println("RETR argument is not a valid number !");
-                    throw new InvalidPOP3ArgumentsException(command, "Invalid arguments! Argument is not a valid number.");
+                    throw new InvalidCommandArgumentsException(command, "Invalid arguments! Argument is not a valid number.");
                 }
 
                 //prepare string
@@ -44,7 +47,7 @@ public class StateTransaction implements State {
 
                 if (indexMessage > messages.size() || indexMessage <= 0) {
                     //System.out.println("RETR : There's no " + indexMessage + "th message !");
-                    throw new InvalidPOP3ArgumentsException(command, "Invalid arguments! There's no " + indexMessage + "th message.");
+                    throw new InvalidCommandArgumentsException(command, "Invalid arguments! There's no " + indexMessage + "th message.");
                 }
 
                 //Get all messages
