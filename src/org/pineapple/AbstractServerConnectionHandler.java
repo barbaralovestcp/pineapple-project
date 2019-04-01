@@ -3,6 +3,8 @@ package org.pineapple;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.pineapple.stateMachine.Context;
+import org.pineapple.stateMachine.IState;
 
 import java.io.*;
 import java.math.BigInteger;
@@ -22,17 +24,22 @@ public abstract class AbstractServerConnectionHandler implements Runnable {
 	@Nullable
 	protected Function<String, Void> onLog;
 	
-	public AbstractServerConnectionHandler(@NotNull Socket so_client, @Nullable Function<String, Void> onLog) throws IOException {
+	protected String messToLog;
+	@NotNull
+	protected Context context;
+	
+	public AbstractServerConnectionHandler(@NotNull Socket so_client, @Nullable Function<String, Void> onLog, @NotNull IState initialState) throws IOException {
 		setClient(so_client);
 		
 		in_data = new InputStreamReader(so_client.getInputStream(), StandardCharsets.ISO_8859_1);
 		out_data = new PrintStream(so_client.getOutputStream());
+		context = new Context(initialState);
 		setOnLog(onLog);
 		
 		tryLog("New connection: " + getClientName());
 	}
-	public AbstractServerConnectionHandler(@NotNull Socket so_client) throws IOException {
-		this(so_client, null);
+	public AbstractServerConnectionHandler(@NotNull Socket so_client, @NotNull IState initialState) throws IOException {
+		this(so_client, null, initialState);
 	}
 	
 	public String getClientName() {
@@ -41,6 +48,10 @@ public abstract class AbstractServerConnectionHandler implements Runnable {
 	
 	/* CONNECTION HANDLER METHODS */
 	
+	/**
+	 * Send the string `message` to the client.
+	 * @param message Message to send
+	 */
 	public void sendMessage(@NotNull String message){
 		if(out_data != null) {
 			out_data.print(message.replaceAll("\\r(?!\\n)", "\r\n"));
@@ -48,6 +59,35 @@ public abstract class AbstractServerConnectionHandler implements Runnable {
 			out_data.flush();
 			tryLog("Command sent");
 		}
+	}
+	
+	/**
+	 * Check if a message is waiting to be sent. If so, send it to the client, otherwise do nothing.
+	 */
+	public void sendMessageIfNeeded() {
+		String messageToSend = context.popMessageToSend();
+		//If there's a message to send, send it
+		if (messageToSend != null && !messageToSend.equals("")) {
+			tryLog("Sending message \"" + messageToSend.replace("\n", "\n\t") + "\"");
+			sendMessage(messageToSend);
+		}
+	}
+	
+	/**
+	 * Call `context.handle()`, stack the new message to send (if there is) and log the message.
+	 */
+	public void handleState() {
+		context.handle();
+		this.messToLog = context.getStateToLog();
+		tryLog(messToLog);
+	}
+	
+	/**
+	 * Handle the current context, and send the associated message to the client (if there is a message to send).
+	 */
+	public void handleStateAndSendMessage() {
+		handleState();
+		sendMessageIfNeeded();
 	}
 	
 	@Nullable
