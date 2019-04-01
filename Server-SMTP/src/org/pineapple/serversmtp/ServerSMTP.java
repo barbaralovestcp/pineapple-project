@@ -9,12 +9,16 @@ import java.net.Socket;
 
 public class ServerSMTP extends AbstractServer implements Runnable {
 	
+	public ServerSMTP() {
+		super(25);
+	}
+	
 	public static void main(String[] args) {
 		launch(args);
 	}
 	
 	@Override
-	protected @NotNull AbstractServerConnectionHandler instanciateConnectionHandler(@NotNull Socket com_cli) throws IOException {
+	protected @NotNull AbstractServerConnectionHandler instantiateConnectionHandler(@NotNull Socket com_cli) throws IOException {
 		/*return new ConnectionHandler(com_cli, s -> {
 			log(s);
 			return null;

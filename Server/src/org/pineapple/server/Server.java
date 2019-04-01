@@ -18,7 +18,7 @@ public class Server extends AbstractServer implements Runnable {
 	}
 	
 	@Override
-	protected @NotNull AbstractServerConnectionHandler instanciateConnectionHandler(@NotNull Socket com_cli) throws IOException {
+	protected @NotNull AbstractServerConnectionHandler instantiateConnectionHandler(@NotNull Socket com_cli) throws IOException {
 		return new ConnectionHandler(com_cli, s -> {
 			log(s);
 			return null;

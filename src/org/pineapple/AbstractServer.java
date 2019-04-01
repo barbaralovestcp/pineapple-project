@@ -13,18 +13,14 @@ import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.function.Function;
 
 public abstract class AbstractServer extends Application implements Runnable {
 	
@@ -156,7 +152,7 @@ public abstract class AbstractServer extends Application implements Runnable {
 					// Accept a connection (it will block this thread until a connection arrived)
 					Socket com_cli = soc.accept();
 					
-					Thread t = new Thread(instanciateConnectionHandler(com_cli));
+					Thread t = new Thread(instantiateConnectionHandler(com_cli));
 					t.start();
 					connections.add(t);
 				} catch (SocketException ignored) { }
@@ -176,7 +172,7 @@ public abstract class AbstractServer extends Application implements Runnable {
 	}
 	
 	@NotNull
-	protected abstract AbstractServerConnectionHandler instanciateConnectionHandler(@NotNull Socket com_cli) throws IOException;
+	protected abstract AbstractServerConnectionHandler instantiateConnectionHandler(@NotNull Socket com_cli) throws IOException;
 	
 	@Override
 	public void stop() throws Exception {
