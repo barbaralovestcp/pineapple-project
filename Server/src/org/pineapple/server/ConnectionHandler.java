@@ -3,6 +3,7 @@ package org.pineapple.server;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.pineapple.AbstractServerConnectionHandler;
 import org.pineapple.MailBox;
 import org.pineapple.Message;
 import org.pineapple.server.stateMachine.Context;
@@ -21,31 +22,17 @@ import java.util.function.Function;
  * This class has been made with the help of Stack Overflow community
  * Source: https://stackoverflow.com/questions/28629669/java-tcp-simple-webserver-problems-with-response-codes-homework?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
  */
-public class ConnectionHandler implements Runnable {
+public class ConnectionHandler extends AbstractServerConnectionHandler implements Runnable {
 
-    @NotNull
-	private Socket so_client;
-	private InputStreamReader in_data;
-	private PrintStream out_data;
+	private String messToLog;
 	@NotNull
 	private Context context;
-	private String messToLog;
-
-	@Nullable
-	private Function<String, Void> onLog;
 
 	public ConnectionHandler(@NotNull Socket so_client, @Nullable Function<String, Void> onLog) throws IOException {
-		setClient(so_client);
-
-		in_data = new InputStreamReader(so_client.getInputStream(), StandardCharsets.ISO_8859_1);
-		out_data = new PrintStream(so_client.getOutputStream());
-		context = new Context();
-		setOnLog(onLog);
-
-		tryLog("New connection: " + getClientName());
+		super(so_client, onLog);
 	}
 	public ConnectionHandler(@NotNull Socket so_client) throws IOException {
-		this(so_client, null);
+		super(so_client);
 	}
 
 	@Override
@@ -113,20 +100,7 @@ public class ConnectionHandler implements Runnable {
 
 	}
 
-	public String getClientName() {
-		return so_client.getInetAddress().getHostAddress() + ":" + so_client.getPort() + " (\"" + so_client.getInetAddress().getCanonicalHostName() + "\")";
-	}
-
 	/* CONNECTION HANDLER METHODS */
-
-	public void sendMessage(@NotNull String message){
-		if(out_data != null) {
-			out_data.print(message.replaceAll("\\r(?!\\n)", "\r\n"));
-			System.out.println(String.format("%040x", new BigInteger(1, message.getBytes(StandardCharsets.ISO_8859_1))));
-			out_data.flush();
-			tryLog("Command sent");
-		}
-	}
 
 	//Send a message of the mailbox
 	public void sendMailBoxMessage( @NotNull String command, @NotNull String message){
@@ -141,37 +115,6 @@ public class ConnectionHandler implements Runnable {
 						.buildMessage());
 			out_data.flush();
 			tryLog("Message sent");
-		}
-	}
-
- 	@Nullable
-	public byte[] getFileData(@NotNull File file) {
-		FileInputStream in = null;
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		byte[] raw = new byte[4096];
-		int size;
-
-		try {
-			in = new FileInputStream(file);
-
-			while ((size = in.read(raw)) >= 0)
-				baos.write(raw, 0, size);
-
-			baos.flush();
-			baos.close();
-
-			return baos.toByteArray();
-		} catch (IOException ex) {
-			ex.printStackTrace();
-			return null;
-		} finally {
-			if (in != null) {
-				try {
-					in.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
 		}
 	}
 
