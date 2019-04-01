@@ -5,7 +5,8 @@ public enum CommandSMTP implements ICommand {
     MAIL,
     RCPT,
     DATA,
-    REST;
+    REST,
+    QUIT;
 
     public static void printCommandNames() {
         String log = "Available SMTP Commands : ";
