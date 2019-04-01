@@ -1,6 +1,7 @@
 package org.pineapple.clientsmtp;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Insets;
 import javafx.scene.Group;
@@ -16,7 +17,10 @@ import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
 import javafx.stage.Stage;
 
-public class Interface extends Application {
+import java.util.Observable;
+import java.util.Observer;
+
+public class Interface extends Application implements Observer {
     public static void main(String[] args) {
         launch(args);
     }
@@ -34,6 +38,7 @@ public class Interface extends Application {
     private final TextArea text = new TextArea ("");
 
     private String address = " ";
+    private ClientSMTP client;
 
     @Override public void start(Stage stage) {
 
@@ -69,6 +74,7 @@ public class Interface extends Application {
 
         GridPane grid = new GridPane();
         notification.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
+        button.setDisable(true);
         grid.setVgap(4);
         grid.setHgap(10);
         grid.setPadding(new Insets(5, 5, 5, 5));
@@ -86,4 +92,19 @@ public class Interface extends Application {
         stage.show();
 
     }
+
+    @Override
+    public void update(Observable observable, Object o) {
+        if(client.isConnected()) {
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    notification.setText(client.getServerMessage());
+                    button.setDisable(false);
+                }
+            });
+        }
+
+    }
+
 }
