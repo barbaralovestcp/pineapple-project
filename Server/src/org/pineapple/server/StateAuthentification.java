@@ -1,9 +1,10 @@
-package org.pineapple.server.stateMachine;
+package org.pineapple.server;
 
 import org.pineapple.*;
-import org.pineapple.server.stateMachine.Exception.InvalidPOP3ArgumentsException;
-import org.pineapple.server.stateMachine.Exception.InvalidPOP3ArgumentsException;
-import org.pineapple.server.stateMachine.Exception.StateMachineException;
+import org.pineapple.stateMachine.Context;
+import org.pineapple.stateMachine.Exception.InvalidPOP3ArgumentsException;
+import org.pineapple.stateMachine.Exception.StateMachineException;
+import org.pineapple.stateMachine.State;
 
 public class StateAuthentification implements State {
 

@@ -1,14 +1,11 @@
-package org.pineapple.server.stateMachine;
+package org.pineapple.stateMachine;
 
 import org.jetbrains.annotations.Nullable;
 import org.pineapple.CommandPOP3;
 import org.pineapple.MailBox;
-import org.pineapple.server.stateMachine.Exception.InvalidPOP3ArgumentsException;
-import org.pineapple.server.stateMachine.Exception.InvalidPOP3CommandException;
-import org.pineapple.server.stateMachine.Exception.StateMachineException;
-
-import java.net.Socket;
-import java.util.Observable;
+import org.pineapple.stateMachine.Exception.InvalidPOP3ArgumentsException;
+import org.pineapple.stateMachine.Exception.InvalidPOP3CommandException;
+import org.pineapple.stateMachine.Exception.StateMachineException;
 
 public class Context {
 
@@ -27,10 +24,6 @@ public class Context {
         currentState = initialState;
         toQuit = false;
         messageToSend = null;
-    }
-
-    public Context() {
-        this(new StateServerListening());
     }
 
     /*

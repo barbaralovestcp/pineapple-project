@@ -13,7 +13,6 @@ import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.pineapple.server.stateMachine.Context;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -24,7 +23,6 @@ import java.net.SocketException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Observer;
 
 public class Server extends Application implements Runnable {
 

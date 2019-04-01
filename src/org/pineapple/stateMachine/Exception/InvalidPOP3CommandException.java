@@ -1,4 +1,4 @@
-package org.pineapple.server.stateMachine.Exception;
+package org.pineapple.stateMachine.Exception;
 
 public class InvalidPOP3CommandException extends RuntimeException {
 

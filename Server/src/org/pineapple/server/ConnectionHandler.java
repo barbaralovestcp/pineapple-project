@@ -3,10 +3,9 @@ package org.pineapple.server;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.pineapple.MailBox;
 import org.pineapple.Message;
-import org.pineapple.server.stateMachine.Context;
-import org.pineapple.server.stateMachine.InputStateMachine;
+import org.pineapple.stateMachine.Context;
+import org.pineapple.stateMachine.InputStateMachine;
 
 import java.io.*;
 import java.math.BigInteger;
@@ -39,7 +38,7 @@ public class ConnectionHandler implements Runnable {
 
 		in_data = new InputStreamReader(so_client.getInputStream(), StandardCharsets.ISO_8859_1);
 		out_data = new PrintStream(so_client.getOutputStream());
-		context = new Context();
+		context = new Context(new StateServerListening());
 		setOnLog(onLog);
 
 		tryLog("New connection: " + getClientName());
