@@ -103,7 +103,7 @@ public abstract class AbstractServerConnectionHandler implements Runnable {
 		this.onLog = onLog;
 	}
 	
-	public void tryLog(String message) {
+	public void tryLog(@Nullable String message) {
 		if (getOnLog() != null)
 			getOnLog().apply(message);
 	}

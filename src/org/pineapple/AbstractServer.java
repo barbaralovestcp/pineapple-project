@@ -53,6 +53,7 @@ public abstract class AbstractServer extends Application implements Runnable {
 	
 	protected ServerSocket soc;
 	protected ArrayList<Thread> connections;
+	protected int port;
 	
 	protected BorderPane root;
 	protected ToolBar tb_buttons;
@@ -77,6 +78,10 @@ public abstract class AbstractServer extends Application implements Runnable {
 			"</body>" +
 					"</html>";
 	protected int timeout;
+	
+	public AbstractServer(int port) {
+		setPort(port);
+	}
 	
 	@Override
 	public void start(Stage primaryStage) throws Exception {
@@ -127,12 +132,10 @@ public abstract class AbstractServer extends Application implements Runnable {
 	@Override
 	public void run() {
 		try {
-			int port = 110;
 			soc = new ServerSocket(port);
 			log("Server open on port " + soc.getLocalPort());
-			if (getState() == ServerState.INITIALIZED) {
+			if (getState() == ServerState.INITIALIZED)
 				startServer();
-			}
 			
 			// Wait for "start"
 			while (getState() == ServerState.INITIALIZED);
@@ -196,39 +199,6 @@ public abstract class AbstractServer extends Application implements Runnable {
 		log("Good bye.");
 		Platform.exit();
 		Runtime.getRuntime().halt(0);
-	}
-	
-	/**
-	 * Create a thread that will manage an answer for the client
-	 * @param com_cli The socket of the client
-	 * @param message The message that the client gave
-	 * @return Return a thread that contain a runnable to manage the client. You have to start it.
-	 */
-	protected Thread createThread(@NotNull Socket com_cli, @NotNull final String message) {
-		return new Thread(() -> {
-			log("New connection: " + com_cli.getInetAddress().getHostName() + " port " + com_cli.getPort());
-			
-			log("data received: \"" + message + "\".");
-			
-			// Sending an answer
-			String answer = "";
-			boolean stopServer = false;
-			try{
-				BufferedWriter response = new BufferedWriter(new OutputStreamWriter(com_cli.getOutputStream()));
-				//answer = constructResponse(message, com_cli);
-				response.write(answer);
-				log("Answered \"" + answer +"\"");
-				response.flush();
-			}catch(IOException ex){
-				ex.printStackTrace();
-			}
-
-			/*try {
-				com_cli.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}*/
-		});
 	}
 	
 	@SuppressWarnings("ConstantConditions")
@@ -331,5 +301,13 @@ public abstract class AbstractServer extends Application implements Runnable {
 	
 	public synchronized void addCurrentContent(String currentContent) {
 		setCurrentContent(getCurrentContent() + currentContent);
+	}
+	
+	public int getPort() {
+		return port;
+	}
+	
+	public void setPort(int port) {
+		this.port = port;
 	}
 }
