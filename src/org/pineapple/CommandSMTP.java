@@ -1,6 +1,6 @@
 package org.pineapple;
 
-public enum CommandSMTP {
+public enum CommandSMTP implements ICommand {
     EHLO,
     MAIL,
     RCPT,
