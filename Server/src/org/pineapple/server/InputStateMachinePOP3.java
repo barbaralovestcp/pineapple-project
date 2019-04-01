@@ -1,35 +1,31 @@
-package org.pineapple.stateMachine;
+package org.pineapple.server;
 
 import org.pineapple.CommandPOP3;
-import org.pineapple.stateMachine.Exception.InvalidPOP3CommandException;
+import org.pineapple.stateMachine.Exception.InvalidCommandException;
+import org.pineapple.stateMachine.IInputStateMachine;
 
 /**
  * The input of the state machine, it contains the CommandPOP3 enum + optional strings.
  */
-public class InputStateMachine {
+public class InputStateMachinePOP3 implements IInputStateMachine {
 
     private CommandPOP3 command;
     private String[] arguments;
 
 
     /**
-     * Create a InputStateMachine from a POP3 request. Throws an error if it's not a valid POP3 command.
+     * Create a InputStateMachinePOP3 from a POP3 request. Throws an error if it's not a valid POP3 command.
      * @param request
      */
-    public InputStateMachine(String request) {
+    public InputStateMachinePOP3(String request) {
 
         this.arguments = request.split("\\s+");
         try {
             this.command = CommandPOP3.valueOf(arguments[0].toUpperCase());
         }
         catch (IllegalArgumentException err) {
-            throw new InvalidPOP3CommandException("Invalid POP3 Command " + "\'" + arguments[0] + "\'", err);
+            throw new InvalidCommandException("Invalid POP3 Command " + "\'" + arguments[0] + "\'", err);
         }
-    }
-
-    public InputStateMachine(CommandPOP3 command, String[] arguments) {
-        this.command = command;
-        this.arguments = arguments;
     }
 
     //Region Static Methods

@@ -1,15 +1,13 @@
 package org.pineapple.stateMachine;
 
 import org.jetbrains.annotations.Nullable;
-import org.pineapple.CommandPOP3;
 import org.pineapple.MailBox;
-import org.pineapple.stateMachine.Exception.InvalidPOP3ArgumentsException;
-import org.pineapple.stateMachine.Exception.InvalidPOP3CommandException;
+import org.pineapple.stateMachine.Exception.InvalidCommandArgumentsException;
 import org.pineapple.stateMachine.Exception.StateMachineException;
 
 public class Context {
 
-    private State currentState;
+    private IState currentState;
     private String stateToLog;
     private boolean toQuit;
 
@@ -18,9 +16,7 @@ public class Context {
     @Nullable
     private String messageToSend;
 
-    //TODO : Give an attribute to interact with the server : Send message. Will be used by States when processing commands.
-
-    public Context(State initialState) {
+    public Context(IState initialState) {
         currentState = initialState;
         toQuit = false;
         messageToSend = null;
@@ -38,54 +34,37 @@ public class Context {
 
             I don't know yet where's the best place to put this process
             (split the received string into enum + string), make the server handle it and pass
-            it to the StateMachine, or give the StateMachine/State the responsability to process it ?
+            it to the StateMachine, or give the StateMachine/IState the responsability to process it ?
      */
 
-    public void handle(InputStateMachine input) {
-        handle(input.getCommand(), input.getArguments());
+    //Server listening skipstep
+    public void handle() {
+        currentState.handle(this, null);
     }
 
-    public void handle(String fullCommand) {
-
-        InputStateMachine input;
+    public void handle(IInputStateMachine input) {
         try {
-            input = new InputStateMachine(fullCommand);
-        } catch (InvalidPOP3CommandException err) {
-            throw err;
+            currentState.handle(this, input);
         }
-
-        handle(input);
-    }
-    public void handle(final CommandPOP3 entry, final String[] args) {
-
-
-        try {
-            currentState.handle(this, entry, args);
-        }
-        catch (StateMachineException | InvalidPOP3ArgumentsException err) {
+        catch (StateMachineException | InvalidCommandArgumentsException err) {
             System.out.println("ERROR : " + err.getMessage() );
         }
-
     }
 
     /**
-     * Set the new State of the State Machine.
+     * Set the new IState of the IState Machine.
      * Should only be used by States, when finishing their treatment.
      * @param newState next state of the stateMachine
      */
-    public void setState(State newState) {
-        String mess = "Successful State Transition : " + currentState.getClass().getSimpleName() + " ---> " + newState.getClass().getSimpleName();
+    public void setState(IState newState) {
+        String mess = "Successful IState Transition : " + currentState.getClass().getSimpleName() + " ---> " + newState.getClass().getSimpleName();
         System.out.println(mess);
         this.setStateToLog(mess);
         currentState = newState;
     }
     
-    public State getCurrentState() {
+    public IState getCurrentState() {
         return currentState;
-    }
-    
-    public void setCurrentState(State currentState) {
-        this.currentState = currentState;
     }
 
     public MailBox getMailBox() { return this.mailBox; }
