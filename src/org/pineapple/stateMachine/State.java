@@ -1,4 +1,4 @@
-package org.pineapple.server.stateMachine;
+package org.pineapple.stateMachine;
 
 import org.pineapple.CommandPOP3;
 

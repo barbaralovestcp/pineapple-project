@@ -1,7 +1,9 @@
-package org.pineapple.server.stateMachine;
+package org.pineapple.server;
 
 import org.pineapple.CodeOK;
 import org.pineapple.CommandPOP3;
+import org.pineapple.stateMachine.Context;
+import org.pineapple.stateMachine.State;
 
 public class StateServerListening implements State {
 

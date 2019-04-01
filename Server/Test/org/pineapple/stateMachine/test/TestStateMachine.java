@@ -1,8 +1,9 @@
-package org.pineapple.server.stateMachine.test;
+package org.pineapple.stateMachine.test;
 
 import org.pineapple.CommandPOP3;
-import org.pineapple.server.stateMachine.*;
-import org.pineapple.server.stateMachine.Exception.InvalidPOP3CommandException;
+import org.pineapple.server.StateServerListening;
+import org.pineapple.stateMachine.*;
+import org.pineapple.stateMachine.Exception.InvalidPOP3CommandException;
 
 import java.util.Scanner;
 
@@ -14,7 +15,7 @@ public class TestStateMachine {
         Scanner in = new Scanner(System.in);
 
         CommandPOP3.printCommandNames();
-        Context stateMachine = new Context();
+        Context stateMachine = new Context(new StateServerListening());
 
         do {
             System.out.println("\nInput a command : ");

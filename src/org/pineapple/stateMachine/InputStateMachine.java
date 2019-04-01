@@ -1,7 +1,7 @@
-package org.pineapple.server.stateMachine;
+package org.pineapple.stateMachine;
 
 import org.pineapple.CommandPOP3;
-import org.pineapple.server.stateMachine.Exception.InvalidPOP3CommandException;
+import org.pineapple.stateMachine.Exception.InvalidPOP3CommandException;
 
 /**
  * The input of the state machine, it contains the CommandPOP3 enum + optional strings.
