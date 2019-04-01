@@ -20,7 +20,7 @@ import java.util.function.Function;
  * This class has been made with the help of Stack Overflow community
  * Source: https://stackoverflow.com/questions/28629669/java-tcp-simple-webserver-problems-with-response-codes-homework?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
  */
-public class ConnectionHandler extends AbstractServerConnectionHandler implements Runnable {
+public class ConnectionHandler extends AbstractServerConnectionHandler {
 
 	private String messToLog;
 	@NotNull
@@ -39,7 +39,7 @@ public class ConnectionHandler extends AbstractServerConnectionHandler implement
 	    // Transitioning from state "Listening" to "Authentication"
 		if (in_data == null)
 			throw new NullPointerException();
-	  
+		
 		// Reading message from client
 		BufferedReader br = new BufferedReader(in_data);
 
@@ -115,32 +115,5 @@ public class ConnectionHandler extends AbstractServerConnectionHandler implement
 			out_data.flush();
 			tryLog("Message sent");
 		}
-	}
-
-	/* GETTERS & SETTERS */
-    
-    @NotNull
-	@Contract(pure = true)
-	public Socket getClient() {
-		return so_client;
-	}
-
-	public void setClient(@NotNull Socket so_client) {
-		this.so_client = so_client;
-	}
-
-	@Nullable
-	@Contract(pure = true)
-	public Function<String, Void> getOnLog() {
-		return onLog;
-	}
-
-	public void setOnLog(@Nullable Function<String, Void> onLog) {
-		this.onLog = onLog;
-	}
-
-	public void tryLog(String message) {
-		if (getOnLog() != null)
-			getOnLog().apply(message);
 	}
 }

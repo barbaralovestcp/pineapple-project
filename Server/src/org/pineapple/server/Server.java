@@ -8,7 +8,11 @@ import java.io.IOException;
 import java.net.Socket;
 
 public class Server extends AbstractServer implements Runnable {
-
+	
+	public Server() {
+		super(110);
+	}
+	
 	public static void main(String[] args) {
 		launch(args);
 	}
