@@ -7,14 +7,14 @@ import org.pineapple.stateMachine.Exception.StateMachineException;
 
 public class Context {
 
-    private IState currentState;
+    protected IState currentState;
     private String stateToLog;
-    private boolean toQuit;
+    protected boolean toQuit;
 
     private MailBox mailBox;
 
     @Nullable
-    private String messageToSend;
+    protected String messageToSend;
 
     public Context(IState initialState) {
         currentState = initialState;
