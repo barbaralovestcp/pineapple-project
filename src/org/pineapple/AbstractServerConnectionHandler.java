@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.pineapple.stateMachine.AbstractInputStateMachine;
 import org.pineapple.stateMachine.Context;
+import org.pineapple.stateMachine.IInputStateMachine;
 import org.pineapple.stateMachine.IState;
 
 import java.io.*;
@@ -34,11 +35,11 @@ public abstract class AbstractServerConnectionHandler<T extends ICommand> implem
 	protected Context context;
 	
 	@NotNull
-	protected Class<AbstractInputStateMachine<T>> clazzInputStateMachine;
+	protected Class<? extends AbstractInputStateMachine<T>> clazzInputStateMachine;
 	@NotNull
-	protected Function<String, AbstractInputStateMachine<T>> inputStateMachineGenerator;
+	protected Function<String, ? extends AbstractInputStateMachine<T>> inputStateMachineGenerator;
 	
-	public AbstractServerConnectionHandler(@NotNull Socket so_client, @Nullable Function<String, Void> onLog, @NotNull IState initialState, @NotNull Class<AbstractInputStateMachine<T>> clazzInputStateMachine, @NotNull Function<String, AbstractInputStateMachine<T>> inputStateMachineGenerator) throws IOException {
+	public AbstractServerConnectionHandler(@NotNull Socket so_client, @Nullable Function<String, Void> onLog, @NotNull IState initialState, @NotNull Class<? extends AbstractInputStateMachine<T>> clazzInputStateMachine, @NotNull Function<String, ? extends AbstractInputStateMachine<T>> inputStateMachineGenerator) throws IOException {
 		setClient(so_client);
 		
 		in_data = new InputStreamReader(so_client.getInputStream(), StandardCharsets.ISO_8859_1);
