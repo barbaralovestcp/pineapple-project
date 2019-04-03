@@ -17,6 +17,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.IntFunction;
 
@@ -28,7 +29,7 @@ public abstract class AbstractServerConnectionHandler<T extends ICommand> implem
 	protected PrintStream out_data;
 	
 	@Nullable
-	protected Function<String, Void> onLog;
+	protected Consumer<String> onLog;
 	
 	protected String messToLog;
 	@NotNull
@@ -39,7 +40,7 @@ public abstract class AbstractServerConnectionHandler<T extends ICommand> implem
 	@NotNull
 	protected Function<String, ? extends AbstractInputStateMachine<T>> inputStateMachineGenerator;
 	
-	public AbstractServerConnectionHandler(@NotNull Socket so_client, @Nullable Function<String, Void> onLog, @NotNull IState initialState, @NotNull Class<? extends AbstractInputStateMachine<T>> clazzInputStateMachine, @NotNull Function<String, ? extends AbstractInputStateMachine<T>> inputStateMachineGenerator) throws IOException {
+	public AbstractServerConnectionHandler(@NotNull Socket so_client, @Nullable Consumer<String> onLog, @NotNull IState initialState, @NotNull Class<? extends AbstractInputStateMachine<T>> clazzInputStateMachine, @NotNull Function<String, ? extends AbstractInputStateMachine<T>> inputStateMachineGenerator) throws IOException {
 		setClient(so_client);
 		
 		in_data = new InputStreamReader(so_client.getInputStream(), StandardCharsets.ISO_8859_1);
@@ -204,16 +205,16 @@ public abstract class AbstractServerConnectionHandler<T extends ICommand> implem
 	
 	@Nullable
 	@Contract(pure = true)
-	public Function<String, Void> getOnLog() {
+	public Consumer<String> getOnLog() {
 		return onLog;
 	}
 	
-	public void setOnLog(@Nullable Function<String, Void> onLog) {
+	public void setOnLog(@Nullable Consumer<String> onLog) {
 		this.onLog = onLog;
 	}
 	
 	public void tryLog(@Nullable String message) {
 		if (getOnLog() != null)
-			getOnLog().apply(message);
+			getOnLog().accept(message);
 	}
 }
