@@ -21,6 +21,9 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.IntFunction;
 
+/**
+ * This class is used by ConnectionHandler (POP3) and ConnectionHandler (SMTP). Do not change it just for ConnectionHandler (SMTP)!
+ */
 public abstract class AbstractServerConnectionHandler<T extends ICommand> implements Runnable {
 	
 	@NotNull
