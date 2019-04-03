@@ -21,14 +21,16 @@ public class StateAuthentification implements IState {
         switch (command) {
             case EHLO:
                 //TODO : Traiter EHLO
+
+                nextState = new StateWaitMailFrom();
                 break;
             case QUIT:
                 //TODO : Traiter QUIT
+                nextState = new StateListening();
                 break;
             default:
                 throw new StateMachineException(this, command);
         }
-
 
         context.setMessageToSend(toSend);
         context.setState(nextState);
