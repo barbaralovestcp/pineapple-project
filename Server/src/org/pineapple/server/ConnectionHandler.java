@@ -21,6 +21,7 @@ import java.util.function.Function;
  */
 public class ConnectionHandler extends AbstractServerConnectionHandler {
 
+	private String domain = "pine.apple";
 	private String messToLog;
 	@NotNull
 	private Context context;

@@ -1,4 +1,4 @@
-package org.pineapple.clientsmtp;
+package org.pineapple.clientsmtp.stateMachine;
 
 import org.pineapple.stateMachine.Context;
 import org.pineapple.stateMachine.Exception.StateMachineException;
