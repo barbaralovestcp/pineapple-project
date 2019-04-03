@@ -19,10 +19,6 @@ public class ServerSMTP extends AbstractServer implements Runnable {
 	
 	@Override
 	protected @NotNull AbstractServerConnectionHandler instantiateConnectionHandler(@NotNull Socket com_cli) throws IOException {
-		/*return new ConnectionHandler(com_cli, s -> {
-			log(s);
-			return null;
-		});*/
-		return null;
+		return new ConnectionHandler(com_cli, this::log);
 	}
 }

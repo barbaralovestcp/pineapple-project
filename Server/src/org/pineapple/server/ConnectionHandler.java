@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
@@ -22,7 +23,7 @@ public class ConnectionHandler extends AbstractServerConnectionHandler<CommandPO
 	
 	private String domain = "pine.apple";
 	
-	public ConnectionHandler(@NotNull Socket so_client, @Nullable Function<String, Void> onLog) throws IOException {
+	public ConnectionHandler(@NotNull Socket so_client, @Nullable Consumer<String> onLog) throws IOException {
 		super(so_client, onLog, new StateServerListening(), InputStateMachinePOP3.class, InputStateMachinePOP3::new);
 	}
 	public ConnectionHandler(@NotNull Socket so_client) throws IOException {
