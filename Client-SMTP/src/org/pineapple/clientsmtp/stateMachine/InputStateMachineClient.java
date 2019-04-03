@@ -25,4 +25,10 @@ public class InputStateMachineClient implements IInputStateMachine {
         System.out.println("WARNING : Input State Machine doesn't use commands!");
         return null;
     }
+
+    public static boolean isValidCommand(String request){
+        String[] arguments = request.split("\\s+");
+        return arguments.length > 0  && (arguments[0].equals("250") || arguments[0].equals("220") ||
+                arguments[0].equals("354") ||arguments[0].equals("550"));
+    }
 }

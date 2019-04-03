@@ -7,13 +7,11 @@ import org.pineapple.stateMachine.IState;
 
 import java.util.ArrayList;
 
-public class StateWaitingMailFromAnswer implements IState {
-
+public class StateWaitingDataReady implements IState {
     @Override
     public void handle(Context context, IInputStateMachine input) {
 
         ArrayList<String> recipients = ((ContextClient) context).getRecipient();
-        assert (recipients.size() > 0);
 
         String[] arguments = input.getArguments();
         String toSend = "";
@@ -22,13 +20,16 @@ public class StateWaitingMailFromAnswer implements IState {
         //case ok
         if (arguments[0].equals("250")) {
 
-            if (arguments[1].equals("MAIL")) {
-                nextState = new StateWaitingRcptAnswer(); //TODO : Replace with next state when class is created
-                toSend = "RCPT:" + recipients.get(0);
-                ((ContextClient) context).iterate();
-            }
-            else if (arguments[1].equals("QUIT")) {
-                nextState = new StateConnected(); //TODO : Bon state?
+            if (arguments[1].equals("RCPT")) {
+                if(((ContextClient) context).getRecipientIterator() < recipients.size()){
+                    nextState = new StateWaitingRcptAnswer();
+                    toSend = "RCPT:" + recipients.get(((ContextClient) context).getRecipientIterator());
+                    ((ContextClient) context).iterate();
+                }else{
+                    nextState = new StateWaitingDataReady();
+                    toSend = "RCPT:" + recipients.get(((ContextClient) context).getRecipientIterator());
+                    ((ContextClient) context).iterate();
+                }
             }
         }
         //case err

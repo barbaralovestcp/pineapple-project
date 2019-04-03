@@ -2,6 +2,7 @@ package org.pineapple.clientsmtp.stateMachine;
 
 import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
+import org.pineapple.Message;
 import org.pineapple.stateMachine.Context;
 
 import java.util.ArrayList;
@@ -11,17 +12,22 @@ public class ContextClient extends Context {
     //TODO : Il y a aura peut-être besoin de passer en Protected des attributs de Context.
 
     @NotNull
+    private String domain;
+    @NotNull
     private String name;
     @Nullable
-    private String message;
+    private Message message;
     private ArrayList<String> recipient;
+    private int recipientIterator = 0;
 
     public ContextClient() {
         super(new StateConnected());
     }
 
-    public ContextClient(String name) {
+    public ContextClient(String name, String domain) {
         super(new StateConnected());
+        this.name = name;
+        this.domain = domain;
     }
 
     public void handle(String request) {
@@ -32,11 +38,15 @@ public class ContextClient extends Context {
         return name;
     }
 
-    public String getMessage() {
+    public String getDomain() {
+        return domain;
+    }
+
+    public Message getMessage() {
         return message;
     }
 
-    public void setMessage(String message) {
+    public void setMessage(Message message) {
         this.message = message;
     }
 
@@ -46,5 +56,17 @@ public class ContextClient extends Context {
 
     public void setRecipient(ArrayList<String> recipient) {
         this.recipient = recipient;
+    }
+
+    public int getRecipientIterator() {
+        return recipientIterator;
+    }
+
+    public void setRecipientIterator(int recipientIterator) {
+        this.recipientIterator = recipientIterator;
+    }
+
+    public void iterate(){
+        this.recipientIterator++;
     }
 }

@@ -38,12 +38,13 @@ public class Interface extends Application implements Observer {
     private final TextArea text = new TextArea ("");
 
     private String address = " ";
-    private String name = "pdg@apple";
+    private String name = "pdg";
+    private String domain = "apple";
     private ClientSMTP client;
 
     @Override public void start(Stage stage) {
 
-        client = new ClientSMTP(name);
+        client = new ClientSMTP(name, domain);
         stage.setTitle("Nouveau message");
         Scene scene = new Scene(new Group(), 500, 340, gradient);
 

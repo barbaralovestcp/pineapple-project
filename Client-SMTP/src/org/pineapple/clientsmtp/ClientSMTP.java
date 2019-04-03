@@ -1,6 +1,11 @@
 package org.pineapple.clientsmtp;
 
 
+import com.sun.istack.internal.NotNull;
+import org.pineapple.clientsmtp.stateMachine.ContextClient;
+import org.pineapple.clientsmtp.stateMachine.InputStateMachineClient;
+import org.pineapple.stateMachine.Context;
+
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
@@ -13,29 +18,82 @@ public class ClientSMTP extends Observable {
     private String serverMessage;
 
     private String address = "127.0.0.1";
+    @NotNull
     private String name;
+    @NotNull
+    private String domain;
+
+    //CONNEXION
     private OutputStream op;
     private InputStream inp;
+    private Socket con_serv;
 
-    public ClientSMTP(String name) {
+    //STATES
+    private Context context;
+
+
+    public ClientSMTP(String name, String domain) {
         this.name = name;
+        this.domain = domain;
         System.out.println("Connexion...");
     }
 
     public void connect() {
         try {
-            Socket con_serv = new Socket(InetAddress.getByName(address), 25);
+            con_serv = new Socket(InetAddress.getByName(address), 25);
             printWelcome();
 
             //flux d'entrée
             this.inp = con_serv.getInputStream();
             //flux de sortie
             this.op = con_serv.getOutputStream();
+            this.context = new ContextClient(name,domain);
 
             InputStreamReader indata = new InputStreamReader(inp, StandardCharsets.ISO_8859_1);
             BufferedReader br = new BufferedReader(indata);
 
-            StringBuilder content = new StringBuilder();
+            context.handle();
+            System.out.println(context.getStateToLog());
+
+            while ( !context.isToQuit() ) {
+                StringBuilder content = new StringBuilder();
+                try {
+                    String line;
+
+                    line = br.readLine(); //Read single line, looping block the line
+                    String[] parts = line.split("[\u0003\u0001]");
+                    line = parts[parts.length-1];
+                    System.out.println("Received server message : " + line);
+                    content.append(line);
+                    this.serverMessage = content.toString();
+
+                    if (content.length() > 0) {
+
+                        //Check if server message is a valid code (250,220,550,354)
+                        if (InputStateMachineClient.isValidCommand(content.toString())) {
+                            context.handle(new InputStateMachineClient(content.toString()));
+                            System.out.println(context.getStateToLog());
+
+                            String messageToSend = context.popMessageToSend();
+                            //If there's a message to send, send it
+                            if (messageToSend != null && !messageToSend.equals("")) {
+                                System.out.println("Sending message \"" + messageToSend.replace("\n", "\n\t") + "\"");
+                                send(messageToSend);
+                            }
+                            //Quit if to quit.
+                            else if (context.isToQuit()) {
+                                System.out.println("Connection closed with server");
+                                this.con_serv.close();
+                            }
+                        }
+                        else {
+                            System.out.println("Invalid POP3 Request !");
+                        }
+                    }
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+            }
 
             while (true) {
                 String line = br.readLine();
