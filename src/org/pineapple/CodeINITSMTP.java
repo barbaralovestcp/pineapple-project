@@ -4,9 +4,11 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class CodeDATASMTP extends Code implements ParametrizedToString {
+public class CodeINITSMTP extends Code implements ParametrizedToString{
     public enum CodeEnum implements ICodeEnum {
-        START(parameter -> "Start mail input; end with <CRLF>.<CRLF>");
+        INIT(parameter -> ""),
+        INIT_SERVICE_READY(parameter -> "Simple Mail Transfer Service Ready"),
+        ;
 
         @NotNull
         private ICodeEnum toString;
@@ -37,11 +39,11 @@ public class CodeDATASMTP extends Code implements ParametrizedToString {
         }
     }
 
-    public CodeDATASMTP(ICodeEnum codeType) {
+    public CodeINITSMTP(ICodeEnum codeType) {
         super(codeType);
     }
-    public CodeDATASMTP() {
-        super(CodeERRSMTP.CodeEnum.ERR);
+    public CodeINITSMTP() {
+        super(CodeINITSMTP.CodeEnum.INIT);
     }
 
     /* OVERRIDES */

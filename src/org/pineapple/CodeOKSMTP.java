@@ -8,13 +8,15 @@ public class CodeOKSMTP extends Code implements ParametrizedToString {
 
     public enum CodeEnum implements ICodeEnum {
         OK(parameter -> ""),
-        OK_SERVICE_READY(parameter -> "Simple Mail Transfer Service Ready"),
         OK_GREETING(parameter -> {
             if (parameter == null)
-                throw new NullPointerException("OK_GREETING needs a parameter: Name of the client.");
+                throw new NullPointerException("OK GREETING needs a parameter: Name of the client.");
 
             return  "greets " + parameter;
         }),
+        OK_MAIL_FROM(parameter -> "mail from received"),
+        OK_USER_FOUND(parameter -> "user found"),
+        OK_DATA_RECEIVED(parameter -> "data received"),
         ;
 
         @NotNull

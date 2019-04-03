@@ -1,4 +1,4 @@
-package org.pineapple.clientsmtp;
+package org.pineapple.clientsmtp.stateMachine;
 
 import org.pineapple.ICommand;
 import org.pineapple.stateMachine.IInputStateMachine;
