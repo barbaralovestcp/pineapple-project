@@ -9,4 +9,8 @@ public class StateMachineException extends RuntimeException {
     public StateMachineException(IState state, ICommand command) {
         super("Unhandled Command entry \'" + command.toString() + "\' in the state \'" + state.getClass().getSimpleName() + "\'");
     }
+
+    public StateMachineException(IState state, String command) {
+        super("Unhandled Command entry \'" + command + "\' in the state \'" + state.getClass().getSimpleName() + "\'");
+    }
 }
