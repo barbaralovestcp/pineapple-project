@@ -150,7 +150,11 @@ public class MailBox extends Application implements Observer {
 
         ObservableList<Message> inboxMessages = FXCollections
                 .observableArrayList(inboxList);
-        inbox = new Box("Inbox", inboxMessages);
+        
+        if (inbox == null)
+            inbox = new Box("Inbox", inboxMessages);
+        else
+            inbox.setMessages(inboxMessages);
         messageView.setItems(inboxMessages);
 
         BorderPane borderPane = new BorderPane();
@@ -235,7 +239,11 @@ public class MailBox extends Application implements Observer {
     public void add(Message m, int number) {
         this.messagesList.put(number, m);
     }
-
+    
+    private void refreshGUI() {
+        Platform.runLater(() -> messageView.setItems(inbox.getMessages()));
+    }
+    
     private void initButtonStyle(Button btn, String text) {
         btn.setText(text);
         btn.setTextFill(Color.WHITE);
@@ -261,13 +269,10 @@ public class MailBox extends Application implements Observer {
     @Override
     public void update(Observable o, Object arg) {
         if(!isInitMailbox && client.isConnected()){
-            Platform.runLater(new Runnable() {
-                @Override
-                public void run() {
-                    primaryStage.close();
-                    initMailbox();
-                    isInitMailbox = true;
-                }
+            Platform.runLater(() -> {
+                primaryStage.close();
+                initMailbox();
+                isInitMailbox = true;
             });
         }
         //Get Mailbox messages
@@ -275,6 +280,10 @@ public class MailBox extends Application implements Observer {
         ObservableList<Message> newInboxMessages = FXCollections
                 .observableArrayList(newMessages);
 
-        inbox = new Box("Inbox", newInboxMessages);
+        if (inbox == null)
+            inbox = new Box("Inbox", newInboxMessages);
+        else
+            inbox.setMessages(newInboxMessages);
+        refreshGUI();
     }
 }
