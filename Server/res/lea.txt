@@ -7,6 +7,7 @@ Message-ID: <20080325073317.GA23390@pine.apple>
 Philippine, ceci est un test.
 
 Bonne journée :)
+.
 ******
 From: philippine <philippine@pine.apple>
 To: lea@pine.apple
@@ -17,6 +18,7 @@ Message-ID: <20080325073400.GA23390@pine.apple>
 Ca marche !
 
 Bonne journée à toi aussi!
+.
 ******
 From: elie <elie@pine.apple>
 To: lea@pine.apple
@@ -25,6 +27,7 @@ Date: Mon, 25 Mar 2019 09:35:00 +0200
 Message-ID: <20080325073500.GA23390@pine.apple>
 
 Tu as du chocolat ?
+.
 ******
 From: lea <lea@pine.apple>
 To: elie@pine.apple
@@ -33,4 +36,5 @@ Date: Mon, 25 Mar 2019 09:36:00 +0200
 Message-ID: <20080325073600.GA23390@pine.apple>
 
 Plus maintenant >:)
+.
 ******

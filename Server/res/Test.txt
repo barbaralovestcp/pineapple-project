@@ -7,6 +7,7 @@ Message-ID: <20080909073317.GA23390@sources.org>
 Le son, avec Linux, c'est vraiment pénible.
 
 J'ai un Dell Inspiron 7500 dont le son ne marche pas du tout. Silence complet.
+.
 ******
 From: Stephane Bortzmeyer <stephane@sources.org>
 To: ubuntu-fr@lists.ubuntu.com
@@ -17,4 +18,5 @@ Message-ID: <20080909073317.GA23390@sources.org>
 Le son, avec Linux, c'est vraiment pénible.
 
 J'ai un Dell Inspiron 7500 dont le son ne marche pas du tout. Silence complet.
+.
 ******
