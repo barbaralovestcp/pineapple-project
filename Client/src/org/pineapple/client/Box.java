@@ -1,6 +1,7 @@
 package org.pineapple.client;
 
 import javafx.collections.ObservableList;
+import org.jetbrains.annotations.NotNull;
 import org.pineapple.Message;
 
 public class Box {
@@ -36,7 +37,11 @@ public class Box {
         }
         return messages;
     }
-
+    
+    public void setMessages(@NotNull ObservableList<Message> messages) {
+        this.messages = messages;
+    }
+    
     public String toString() {
         return this.name;
     }

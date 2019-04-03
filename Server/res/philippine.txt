@@ -7,6 +7,7 @@ Message-ID: <20080325073317.GA23390@pine.apple>
 Philippine, ceci est un test.
 
 Bonne journée :)
+.
 ******
 From: philippine <philippine@pine.apple>
 To: lea@pine.apple
@@ -16,7 +17,8 @@ Message-ID: <20080325073400.GA23390@pine.apple>
 
 Ca marche !
 
-Bonne journée à toi aussi!*
+Bonne journée à toi aussi!
+.
 ******
 From: valentin <valentin@pine.apple>
 To: philippine@pine.apple
@@ -25,5 +27,6 @@ Date: Mon, 25 Mar 2019 09:39:00 +0200
 Message-ID: <20080325073900.GA23390@pine.apple>
 
 Oh nooooon...
-J'ai une tache de fraise molle sur ma cravate laide...*
+J'ai une tache de fraise molle sur ma cravate laide...
+.
 ******

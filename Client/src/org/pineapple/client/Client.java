@@ -42,16 +42,19 @@ public class Client extends Observable {
 			StringBuilder content = new StringBuilder();
 
 			boolean isMessage = false;
-			while(true){
+			while (true){
 				String line = br.readLine();
 
 				if(line != null){
+					
 					System.out.println(line);
-					content.append(line.replace("+OK", ""));
+					String parsedLine = line.replaceAll("\\+OK\\s*", "");
+					content.append(line.equals(".") ? "" : parsedLine)
+							.append("\r\n");
 					if(line.contains("From:")){
 						isMessage = true;
 					}else if(isMessage){
-						if(content.length() > 0 && content.toString().contains("*")){
+						if(content.length() > 0 && line.equals(".")){
 							this.messageHandler.addMessages(Message.parse(content.toString()));
 							isMessage = false;
 						}
@@ -138,9 +141,10 @@ public class Client extends Observable {
 
 		} else if(message.contains("+OK")){
 			String[] parts = message.split(" ");
-			int number = Integer.parseInt(parts[1]);
-			this.askAllMessages(number);
-//			this.sendMessage(CommandPOP3.RETR, "1");
+			if (parts.length >= 2) {
+				int number = Integer.parseInt(parts[1]);
+				this.askAllMessages(number);
+			}
 		}
 	}
 
