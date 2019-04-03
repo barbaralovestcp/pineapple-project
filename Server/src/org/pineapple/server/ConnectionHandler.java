@@ -1,11 +1,9 @@
 package org.pineapple.server;
 
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.pineapple.AbstractServerConnectionHandler;
 import org.pineapple.Message;
-import org.pineapple.stateMachine.Context;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -38,7 +36,7 @@ public class ConnectionHandler extends AbstractServerConnectionHandler {
 		
 		// Reading message from client
 		BufferedReader br = new BufferedReader(in_data);
-
+		
 		handleStateAndSendMessage();
 
 		while ( !context.isToQuit() ) {
@@ -55,7 +53,7 @@ public class ConnectionHandler extends AbstractServerConnectionHandler {
 				if (content.length() > 0) {
 
 					//Check if client message is an existing command
-					if (InputStateMachinePOP3.IsValidPOP3Request(content.toString())) {
+					if (InputStateMachinePOP3.isValidRequest(content.toString())) {
 						InputStateMachinePOP3 input = new InputStateMachinePOP3(content.toString());
 						tryLog("Received command: " + input.getCommand());
 						context.handle(new InputStateMachinePOP3(content.toString()));
