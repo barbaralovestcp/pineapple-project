@@ -1,42 +1,57 @@
 package org.pineapple.clientsmtp.stateMachine;
 
-import com.sun.istack.internal.NotNull;
-import com.sun.istack.internal.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.pineapple.Message;
 import org.pineapple.stateMachine.Context;
+import org.pineapple.stateMachine.IState;
 
 import java.util.ArrayList;
 
 public class ContextClient extends Context {
 
-    //TODO : Il y a aura peut-être besoin de passer en Protected des attributs de Context.
-
+    @NotNull
+    private String domain;
     @NotNull
     private String name;
     @Nullable
-    private String message;
+    private Message message;
     private ArrayList<String> recipient;
+    private int recipientIterator = 0;
 
     public ContextClient() {
         super(new StateConnected());
     }
 
-    public ContextClient(String name) {
-        super(new StateConnected());
+    public ContextClient(String name, String domain, IState initialState) {
+        super(initialState);
+        this.name = name;
+        this.domain = domain;
     }
 
     public void handle(String request) {
         handle(new InputStateMachineClient(request));
     }
 
+    public void iterate() {
+        this.recipientIterator++;
+    }
+
+    //ACCESSORS
+
     public String getName() {
         return name;
     }
 
-    public String getMessage() {
+    public String getDomain() {
+        return domain;
+    }
+
+    public Message getMessage() {
         return message;
     }
 
-    public void setMessage(String message) {
+    public void setMessage(Message message) {
         this.message = message;
     }
 
@@ -47,4 +62,13 @@ public class ContextClient extends Context {
     public void setRecipient(ArrayList<String> recipient) {
         this.recipient = recipient;
     }
+
+    public int getRecipientIterator() {
+        return recipientIterator;
+    }
+
+    public void setRecipientIterator(int recipientIterator) {
+        this.recipientIterator = recipientIterator;
+    }
+
 }

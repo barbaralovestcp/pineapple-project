@@ -11,17 +11,14 @@ public class StateConnected implements IState {
     @Override
     public void handle(Context context, IInputStateMachine input) {
 
+        String domain = ((ContextClient) context).getDomain();
         String[] arguments = input.getArguments();
         String toSend = "";
         IState nextState = null;
 
-        if (arguments[0].equals("250")) {
+        if (arguments[0].equals("220")) {
             nextState = new StateWaitingGreeting();
-            toSend = CommandSMTP.EHLO + " client"; //TODO : Specify Client?
-        }
-        //TODO : ADD ERROR CASE?
-        else {
-            throw new StateMachineException(this, arguments[0]);
+            toSend = CommandSMTP.EHLO + " " + domain;
         }
 
         context.setMessageToSend(toSend);

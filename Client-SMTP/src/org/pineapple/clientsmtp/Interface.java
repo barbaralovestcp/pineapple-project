@@ -32,18 +32,20 @@ public class Interface extends Application implements Observer {
             new Stop(0, primary), new Stop(1, secondary));
     private Background background = new Background(new BackgroundFill(secondary, CornerRadii.EMPTY, Insets.EMPTY));
 
-    private final Button button = new Button ("Send");
-    private final Label notification = new Label ();
+    private final Button button = new Button("Send");
+    private final Label notification = new Label();
     private final TextField subject = new TextField("");
-    private final TextArea text = new TextArea ("");
+    private final TextArea text = new TextArea("");
 
     private String address = " ";
-    private String name = "pdg@apple";
+    private String name = "pdg";
+    private String domain = "apple";
     private ClientSMTP client;
 
-    @Override public void start(Stage stage) {
+    @Override
+    public void start(Stage stage) {
 
-        client = new ClientSMTP(name);
+        client = new ClientSMTP(name, domain);
         stage.setTitle("Nouveau message");
         Scene scene = new Scene(new Group(), 500, 340, gradient);
 
@@ -62,14 +64,13 @@ public class Interface extends Application implements Observer {
 
         button.setOnAction(e -> {
             if (emailComboBox.getValue() != null &&
-                    !emailComboBox.getValue().toString().isEmpty()){
+                    !emailComboBox.getValue().toString().isEmpty()) {
                 notification.setText("Your message was successfully sent"
                         + " to " + address);
                 emailComboBox.setValue(null);
                 subject.clear();
                 text.clear();
-            }
-            else {
+            } else {
                 notification.setText("You have not selected a receiver!");
             }
         });
@@ -86,18 +87,30 @@ public class Interface extends Application implements Observer {
         grid.add(subject, 1, 1, 3, 1);
         grid.add(text, 0, 2, 4, 1);
         grid.add(button, 0, 3);
-        grid.add (notification, 1, 3, 3, 1);
+        grid.add(notification, 1, 3, 3, 1);
 
-        Group root = (Group)scene.getRoot();
+        Group root = (Group) scene.getRoot();
         root.getChildren().add(grid);
         stage.setScene(scene);
         stage.show();
+
+//        client.connect();
+
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                client.connect();
+            }
+        });
+//
+//        Thread t = new Thread(() -> client.connect());
+//        t.start();
 
     }
 
     @Override
     public void update(Observable observable, Object o) {
-        if(client.isConnected()) {
+        if (client.isConnected()) {
             Platform.runLater(new Runnable() {
                 @Override
                 public void run() {

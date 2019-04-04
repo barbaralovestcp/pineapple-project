@@ -9,13 +9,15 @@ public class StateWaitingGreeting implements IState {
     @Override
     public void handle(Context context, IInputStateMachine input) {
 
+        String domain = ((ContextClient) context).getDomain();
+        String name = ((ContextClient) context).getDomain();
         String[] arguments = input.getArguments();
         String toSend = "";
         IState nextState = null;
 
         if (arguments[0].equals("250")) {
             nextState = new StateWaitingMailFromAnswer();
-            toSend = "MAIL FROM:" + "<Get mail>"; //TODO : Get Client mail from Context
+            toSend = "MAIL FROM:" + " " + name + "@" + domain;
         }
         //TODO : ADD ERROR CASE?
         //invalid answer
