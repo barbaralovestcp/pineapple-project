@@ -1,15 +1,14 @@
 package org.pineapple.clientsmtp.stateMachine;
 
-import com.sun.istack.internal.NotNull;
-import com.sun.istack.internal.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.pineapple.Message;
 import org.pineapple.stateMachine.Context;
+import org.pineapple.stateMachine.IState;
 
 import java.util.ArrayList;
 
 public class ContextClient extends Context {
-
-    //TODO : Il y a aura peut-être besoin de passer en Protected des attributs de Context.
 
     @NotNull
     private String domain;
@@ -24,8 +23,8 @@ public class ContextClient extends Context {
         super(new StateConnected());
     }
 
-    public ContextClient(String name, String domain) {
-        super(new StateConnected());
+    public ContextClient(String name, String domain, IState initialState) {
+        super(initialState);
         this.name = name;
         this.domain = domain;
     }
@@ -33,6 +32,12 @@ public class ContextClient extends Context {
     public void handle(String request) {
         handle(new InputStateMachineClient(request));
     }
+
+    public void iterate() {
+        this.recipientIterator++;
+    }
+
+    //ACCESSORS
 
     public String getName() {
         return name;
@@ -66,7 +71,4 @@ public class ContextClient extends Context {
         this.recipientIterator = recipientIterator;
     }
 
-    public void iterate(){
-        this.recipientIterator++;
-    }
 }

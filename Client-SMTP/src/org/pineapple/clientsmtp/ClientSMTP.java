@@ -4,7 +4,7 @@ package org.pineapple.clientsmtp;
 import com.sun.istack.internal.NotNull;
 import org.pineapple.clientsmtp.stateMachine.ContextClient;
 import org.pineapple.clientsmtp.stateMachine.InputStateMachineClient;
-import org.pineapple.stateMachine.Context;
+import org.pineapple.clientsmtp.stateMachine.StateConnected;
 
 import java.io.*;
 import java.net.InetAddress;
@@ -29,16 +29,16 @@ public class ClientSMTP extends Observable {
     private Socket con_serv;
 
     //STATES
-    private Context context;
+    private ContextClient context;
 
 
     public ClientSMTP(String name, String domain) {
         this.name = name;
         this.domain = domain;
-        System.out.println("Connexion...");
     }
 
     public void connect() {
+        System.out.println("Connexion...");
         try {
             con_serv = new Socket(InetAddress.getByName(address), 25);
             printWelcome();
@@ -47,13 +47,10 @@ public class ClientSMTP extends Observable {
             this.inp = con_serv.getInputStream();
             //flux de sortie
             this.op = con_serv.getOutputStream();
-            this.context = new ContextClient(name,domain);
+            this.context = new ContextClient(name,domain,new StateConnected());
 
             InputStreamReader indata = new InputStreamReader(inp, StandardCharsets.ISO_8859_1);
             BufferedReader br = new BufferedReader(indata);
-
-            context.handle();
-            System.out.println(context.getStateToLog());
 
             while ( !context.isToQuit() ) {
                 StringBuilder content = new StringBuilder();
@@ -61,48 +58,42 @@ public class ClientSMTP extends Observable {
                     String line;
 
                     line = br.readLine(); //Read single line, looping block the line
-                    String[] parts = line.split("[\u0003\u0001]");
-                    line = parts[parts.length-1];
-                    System.out.println("Received server message : " + line);
-                    content.append(line);
-                    this.serverMessage = content.toString();
+                    if(line != null){
+                        String[] parts = line.split("[\u0003\u0001]");
+                        line = parts[parts.length-1];
+                        System.out.println("Received server message : " + line);
+                        content.append(line);
+                        this.serverMessage = content.toString();
 
-                    if (content.length() > 0) {
+                        if (content.length() > 0) {
 
-                        //Check if server message is a valid code (250,220,550,354)
-                        if (InputStateMachineClient.isValidCommand(content.toString())) {
-                            context.handle(new InputStateMachineClient(content.toString()));
-                            System.out.println(context.getStateToLog());
+                            //Check if server message is a valid code (250,220,550,354)
+                            if (InputStateMachineClient.isValidCommand(content.toString())) {
+                                context.handle(new InputStateMachineClient(content.toString()));
+                                System.out.println(context.getStateToLog());
 
-                            String messageToSend = context.popMessageToSend();
-                            //If there's a message to send, send it
-                            if (messageToSend != null && !messageToSend.equals("")) {
-                                System.out.println("Sending message \"" + messageToSend.replace("\n", "\n\t") + "\"");
-                                send(messageToSend);
+                                String messageToSend = context.popMessageToSend();
+                                //If there's a message to send, send it
+                                if (messageToSend != null && !messageToSend.equals("")) {
+                                    System.out.println("Sending message \"" + messageToSend.replace("\n", "\n\t") + "\"");
+                                    send(messageToSend);
+                                }
+                                //Quit if to quit.
+                                else if (context.isToQuit()) {
+                                    System.out.println("Connection closed with server");
+                                    this.con_serv.close();
+                                }
                             }
-                            //Quit if to quit.
-                            else if (context.isToQuit()) {
-                                System.out.println("Connection closed with server");
-                                this.con_serv.close();
+                            else {
+                                System.out.println("Invalid message from server!");
                             }
-                        }
-                        else {
-                            System.out.println("Invalid POP3 Request !");
+
+                            setChanged();
+                            notifyObservers();
                         }
                     }
                 } catch (IOException e1) {
                     e1.printStackTrace();
-                }
-            }
-
-            while (true) {
-                String line = br.readLine();
-
-                if (line != null) {
-                    System.out.println(line);
-                    setChanged();
-                    notifyObservers();
-
                 }
             }
         } catch (java.net.ConnectException ce) {

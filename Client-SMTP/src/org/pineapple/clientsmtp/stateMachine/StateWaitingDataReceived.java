@@ -7,7 +7,7 @@ import org.pineapple.stateMachine.IState;
 
 import java.util.ArrayList;
 
-public class WaitingDataReceived implements IState {
+public class StateWaitingDataReceived implements IState {
     @Override
     public void handle(Context context, IInputStateMachine input) {
 

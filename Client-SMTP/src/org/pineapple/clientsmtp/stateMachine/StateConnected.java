@@ -20,10 +20,6 @@ public class StateConnected implements IState {
             nextState = new StateWaitingGreeting();
             toSend = CommandSMTP.EHLO + " " + domain;
         }
-        //TODO : ADD ERROR CASE?
-        else {
-            throw new StateMachineException(this, arguments[0]);
-        }
 
         context.setMessageToSend(toSend);
         context.setState(nextState);
