@@ -6,7 +6,8 @@ import org.pineapple.stateMachine.Exception.StateMachineException;
 import org.pineapple.stateMachine.IInputStateMachine;
 import org.pineapple.stateMachine.IState;
 
-public class StateTransaction implements IState {
+public class StateWaitMailFrom implements IState {
+
     @Override
     public void handle(Context context, IInputStateMachine input) {
 
@@ -17,17 +18,18 @@ public class StateTransaction implements IState {
         IState nextState = null;
 
         switch (command) {
-            case REST:
-                //TODO : Traiter REST
-                nextState = this;
-                break;
-            case DATA:
-                //TODO : Traiter DATA
-                nextState = new StateReceivingData();
-                break;
-            case QUIT:
-                //TODO : Traiter QUIT
-                nextState = new StateListening();
+            case MAIL:
+                //TODO : Traiter MAIL
+
+                boolean mailIsValid = true;
+                if (mailIsValid) {
+                    //TODO : Traiter mail valide
+                    nextState = new StateWaitRCPT();
+                }
+                else {
+                    //TODO : Traiter ERROR
+                    nextState = this; //A changer?
+                }
                 break;
             default:
                 throw new StateMachineException(this, command);

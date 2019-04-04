@@ -22,6 +22,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+/**
+ * This class is used by Server (POP3) and ServerSMTP. Do not change it just for ServerSMTP!
+ */
 public abstract class AbstractServer extends Application implements Runnable {
 	
 	public enum ServerState {
