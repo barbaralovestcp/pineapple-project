@@ -93,18 +93,9 @@ public class Interface extends Application implements Observer {
         root.getChildren().add(grid);
         stage.setScene(scene);
         stage.show();
-
-//        client.connect();
-
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                client.connect();
-            }
-        });
-//
-//        Thread t = new Thread(() -> client.connect());
-//        t.start();
+        
+        Thread t = new Thread(() -> client.connect());
+        t.start();
 
     }
 
