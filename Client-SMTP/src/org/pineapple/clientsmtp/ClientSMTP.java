@@ -5,6 +5,7 @@ import com.sun.istack.internal.NotNull;
 import org.pineapple.clientsmtp.stateMachine.ContextClient;
 import org.pineapple.clientsmtp.stateMachine.InputStateMachineClient;
 import org.pineapple.clientsmtp.stateMachine.StateConnected;
+import org.pineapple.CodeOKSMTP;
 
 import java.io.*;
 import java.net.InetAddress;
@@ -68,6 +69,9 @@ public class ClientSMTP extends Observable {
                         if (content.length() > 0) {
 
                             //Check if server message is a valid code (250,220,550,354)
+                            if(this.serverMessage == new CodeOKSMTP(CodeOKSMTP.CodeEnum.OK_CONNECTED).toString("pineapple.com")) {
+                                this.setConnected(true);
+                            }
                             if (InputStateMachineClient.isValidCommand(content.toString())) {
                                 context.handle(new InputStateMachineClient(content.toString()));
                                 System.out.println(context.getStateToLog());
@@ -103,6 +107,7 @@ public class ClientSMTP extends Observable {
         }
     }
 
+
     private static void printWelcome() {
         System.out.println("--------");
         System.out.println("Bienvenue !");
@@ -128,6 +133,10 @@ public class ClientSMTP extends Observable {
 
     boolean isConnected() {
         return isConnected;
+    }
+
+    public void setConnected(boolean connected) {
+        isConnected = connected;
     }
 
     public String getServerMessage() {
