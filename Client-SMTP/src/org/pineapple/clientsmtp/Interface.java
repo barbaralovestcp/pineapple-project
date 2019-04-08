@@ -17,6 +17,7 @@ import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
 import javafx.stage.Stage;
 
+import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -32,22 +33,49 @@ public class Interface extends Application implements Observer {
             new Stop(0, primary), new Stop(1, secondary));
     private Background background = new Background(new BackgroundFill(secondary, CornerRadii.EMPTY, Insets.EMPTY));
 
-    private final Button button = new Button("Send");
+    private final Button sendBtn = new Button("Send");
     private final Label notification = new Label();
     private final TextField subject = new TextField("");
+    private final Label receiver = new Label();
     private final TextArea text = new TextArea("");
 
-    private String address = " ";
+    private ArrayList<String> address = new ArrayList<>();
     private String name = "pdg";
     private String domain = "apple";
     private ClientSMTP client;
+
+    private String receiversToString(ArrayList<String> address) {
+        StringBuilder receivers = new StringBuilder();
+        for (String a : address) {
+            receivers.append(a);
+            receivers.append("; ");
+        }
+        return receivers.toString();
+    }
+
+    private String getReceiversAndAddBtns(ArrayList<String> address, GridPane grid) {
+        StringBuilder receivers = new StringBuilder();
+        for (int i = 0; i < address.size(); i++) {
+            receivers.append(address.get(i));
+            receivers.append("; ");
+            Button btn = new Button(address.get(i));
+            grid.add(btn, i, 0);
+            final int buttonIndex = i;
+            btn.setOnAction(e -> {
+                btn.setVisible(false);
+                this.address.remove(buttonIndex);
+            });
+        }
+
+        return receivers.toString();
+    }
 
     @Override
     public void start(Stage stage) {
 
         client = new ClientSMTP(name, domain);
         stage.setTitle("Nouveau message");
-        Scene scene = new Scene(new Group(), 500, 340, gradient);
+        Scene scene = new Scene(new Group(), 600, 400, gradient);
 
         final ComboBox emailComboBox = new ComboBox();
         emailComboBox.getItems().addAll(
@@ -59,41 +87,46 @@ public class Interface extends Application implements Observer {
         );
         emailComboBox.setPromptText("Email address");
         emailComboBox.setEditable(true);
-        emailComboBox.valueProperty().addListener((ChangeListener<String>) (ov, t, t1) -> address = t1);
+//        emailComboBox.valueProperty().addListener((ChangeListener<String>) (ov, t, t1) ->
+//        {this.address.add(t1);
+//         receiver.setText(getReceiversAndAddBtns(this.address));});
 
 
-        button.setOnAction(e -> {
-            if (emailComboBox.getValue() != null &&
-                    !emailComboBox.getValue().toString().isEmpty()) {
-                notification.setText("Your message was successfully sent"
-                        + " to " + address);
-                emailComboBox.setValue(null);
-                subject.clear();
-                text.clear();
+        GridPane grid = new GridPane();
+        notification.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
+        sendBtn.setDisable(true);
+        grid.setVgap(4);
+        grid.setHgap(10);
+        grid.setPadding(new Insets(5, 5, 5, 5));
+        grid.add(new Label("To: "), 0, 0);
+        grid.add(emailComboBox, 1, 1);
+        grid.add(new Label("Subject: "), 0, 2);
+        grid.add(subject, 1, 2, 3, 1);
+        grid.add(text, 0, 3, 4, 1);
+        grid.add(sendBtn, 0, 4);
+        grid.add(notification, 1, 4, 3, 1);
+
+        emailComboBox.valueProperty().addListener((ChangeListener<String>) (ov, t, t1) ->
+        {
+            this.address.add(t1);
+            receiver.setText(getReceiversAndAddBtns(this.address, grid));
+        });
+
+        sendBtn.setOnAction(e -> {
+            if (this.address.size() > 0) {
+                notification.setText("Your message was successfully sent to " + receiversToString(this.address));
+                this.address.clear();
+                grid.getChildren().removeIf(node -> GridPane.getRowIndex(node) == 0 || GridPane.getRowIndex(node) == null);
             } else {
                 notification.setText("You have not selected a receiver!");
             }
         });
 
-        GridPane grid = new GridPane();
-        notification.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
-        button.setDisable(true);
-        grid.setVgap(4);
-        grid.setHgap(10);
-        grid.setPadding(new Insets(5, 5, 5, 5));
-        grid.add(new Label("To: "), 0, 0);
-        grid.add(emailComboBox, 1, 0);
-        grid.add(new Label("Subject: "), 0, 1);
-        grid.add(subject, 1, 1, 3, 1);
-        grid.add(text, 0, 2, 4, 1);
-        grid.add(button, 0, 3);
-        grid.add(notification, 1, 3, 3, 1);
-
         Group root = (Group) scene.getRoot();
         root.getChildren().add(grid);
         stage.setScene(scene);
         stage.show();
-        
+
         Thread t = new Thread(() -> client.connect());
         t.start();
 
@@ -106,7 +139,7 @@ public class Interface extends Application implements Observer {
                 @Override
                 public void run() {
                     notification.setText(client.getServerMessage());
-                    button.setDisable(false);
+                    sendBtn.setDisable(false);
                 }
             });
         }
