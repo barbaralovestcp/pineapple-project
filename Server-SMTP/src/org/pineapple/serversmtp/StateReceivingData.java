@@ -15,15 +15,9 @@ public class StateReceivingData implements IState {
         String toSend = "";
         IState nextState = null;
 
-        switch (command) {
-            case DATA: //A changer!
-            //TODO : Créer Case pour fin de reception de message?
-                nextState = new StateTransaction();
-                break;
-            default:
-                throw new StateMachineException(this, command);
-        }
+        //TODO : Pas de commande, on doit PARSE args !
 
+        //TODO : A COMPLETER
 
         context.setMessageToSend(toSend);
         context.setState(nextState);
