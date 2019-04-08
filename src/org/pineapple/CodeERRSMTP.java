@@ -8,7 +8,7 @@ public class CodeERRSMTP extends Code implements ParametrizedToString{
 
     public enum CodeEnum implements ICodeEnum {
         ERR(parameter -> ""),
-        ERR_INVALID_RCPT(parameter -> "No sush user here"),
+        ERR_INVALID_RCPT(parameter -> "No such user here"),
         ERR_MAIL_FROM(parameter -> "Wrong mail from");
 
         @NotNull

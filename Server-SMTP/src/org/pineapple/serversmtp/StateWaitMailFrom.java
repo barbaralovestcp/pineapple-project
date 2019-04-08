@@ -1,6 +1,7 @@
 package org.pineapple.serversmtp;
 
 import org.pineapple.CodeERRSMTP;
+import org.pineapple.CodeOKSMTP;
 import org.pineapple.CommandSMTP;
 import org.pineapple.stateMachine.Context;
 import org.pineapple.stateMachine.Exception.InvalidCommandArgumentsException;
@@ -24,24 +25,27 @@ public class StateWaitMailFrom implements IState {
             case MAIL:
                 //TODO : Traiter MAIL
 
-
                 if (args.length < 2) {
                     throw new InvalidCommandArgumentsException(command, "There must be at least 3 arguments !");
                 }
 
                 String mail = args[2];
                 System.out.println("DEBUG -- Mail : " + mail);
-                boolean mailIsValid = true;
+                boolean mailIsValid = true; //TODO : VERIFIER LE MAIL?
                 if (mailIsValid) {
+
                     contextServer.setMailFrom(mail);
-                    //TODO : Traiter mail valide
+                    toSend = new CodeOKSMTP(CodeOKSMTP.CodeEnum.OK_GREETING).toString();
                     nextState = new StateWaitRCPT();
                 }
                 else {
-                    //TODO : Traiter ERROR
                     toSend = new CodeERRSMTP(CodeERRSMTP.CodeEnum.ERR_MAIL_FROM).toString();
                     nextState = this; //A changer?
                 }
+                break;
+            case REST:
+                toSend = new CodeOKSMTP(CodeOKSMTP.CodeEnum.OK).toString();
+                nextState = new StateAuthentification();
                 break;
             default:
                 throw new StateMachineException(this, command);

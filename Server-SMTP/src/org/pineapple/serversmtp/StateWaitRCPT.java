@@ -1,5 +1,8 @@
 package org.pineapple.serversmtp;
 
+import org.pineapple.CodeDATASMTP;
+import org.pineapple.CodeERRSMTP;
+import org.pineapple.CodeOKSMTP;
 import org.pineapple.CommandSMTP;
 import org.pineapple.stateMachine.Context;
 import org.pineapple.stateMachine.Exception.StateMachineException;
@@ -19,17 +22,29 @@ public class StateWaitRCPT implements IState {
 
         switch (command) {
             case RCPT:
-                //TODO : Traiter MAIL
+                //TODO : Traiter RCPT
 
+                //TODO : Un mail est valide si il existe une mailbox pour ce mail
                 boolean rcptIsValid = true;
                 if (rcptIsValid) {
-                    //TODO : Traiter mail valide
-                    nextState = new StateTransaction();
+                    //TODO : Ajouter mail à une liste de destinataire dans ContextServer
+                    toSend = new CodeOKSMTP(CodeOKSMTP.CodeEnum.OK_USER_FOUND).toString();
+                    nextState = this;
                 }
                 else {
-                    //TODO : Traiter erreur
-                    nextState = new StateWaitRCPT(); //A changer?
+                    toSend = new CodeERRSMTP(CodeERRSMTP.CodeEnum.ERR_INVALID_RCPT).toString();
+                    nextState = this;
                 }
+                break;
+            case DATA:
+                //TODO : Verifier qu'il y a au moins un destinataire valide.
+
+                toSend = new CodeDATASMTP(CodeDATASMTP.CodeEnum.START).toString();
+                nextState = new StateReceivingData();
+                break;
+            case REST:
+                toSend = new CodeOKSMTP(CodeOKSMTP.CodeEnum.OK).toString();
+                nextState = new StateAuthentification();
                 break;
             default:
                 throw new StateMachineException(this, command);

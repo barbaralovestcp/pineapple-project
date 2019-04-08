@@ -22,16 +22,18 @@ public class StateAuthentification implements IState {
 
         switch (command) {
             case EHLO:
-                //TODO : Traiter EHLO
                 toSend = new CodeOKSMTP(CodeOKSMTP.CodeEnum.OK_CONNECTED).toString(contextServer.getDomain());
                 nextState = new StateWaitMailFrom();
                 break;
             case QUIT:
-                //TODO : Traiter QUIT
                 toSend = new CodeOKSMTP(CodeOKSMTP.CodeEnum.OK_QUIT).toString();
                 nextState = new StateListening();
                 contextServer.setToQuit(true);
+                break;
 
+            case REST:
+                toSend = new CodeOKSMTP(CodeOKSMTP.CodeEnum.OK).toString();
+                nextState = new StateAuthentification();
                 break;
             default:
                 throw new StateMachineException(this, command);

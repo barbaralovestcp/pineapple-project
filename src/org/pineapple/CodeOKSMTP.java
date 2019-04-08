@@ -7,7 +7,7 @@ import org.jetbrains.annotations.Nullable;
 public class CodeOKSMTP extends Code implements ParametrizedToString {
 
     public enum CodeEnum implements ICodeEnum {
-        OK(parameter -> ""),
+        OK(parameter -> "250 OK"),
         OK_CONNECTED(parameter -> {
             if (parameter == null)
                 throw new NullPointerException("OK CONNECTED needs a parameter: Name of the server.");
