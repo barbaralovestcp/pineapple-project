@@ -1,7 +1,6 @@
 package org.pineapple.serversmtp;
 
 
-import org.pineapple.CodeINITSMTP;
 import org.pineapple.CodeOKSMTP;
 import org.pineapple.CommandSMTP;
 import org.pineapple.stateMachine.Context;
@@ -24,14 +23,14 @@ public class StateAuthentification implements IState {
         switch (command) {
             case EHLO:
                 //TODO : Traiter EHLO
-                toSend = new CodeINITSMTP().toString(); //TODO / FINISH
-                //toSend = "220 " + contextServer.getDomain();
+                toSend = new CodeOKSMTP(CodeOKSMTP.CodeEnum.OK_CONNECTED).toString(contextServer.getDomain());
                 nextState = new StateWaitMailFrom();
                 break;
             case QUIT:
                 //TODO : Traiter QUIT
-                toSend = new CodeOKSMTP().toString();
+                toSend = new CodeOKSMTP(CodeOKSMTP.CodeEnum.OK_QUIT).toString();
                 nextState = new StateListening();
+                contextServer.setToQuit(true);
 
                 break;
             default:
