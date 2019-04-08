@@ -5,6 +5,7 @@ import com.sun.istack.internal.NotNull;
 import org.pineapple.clientsmtp.stateMachine.ContextClient;
 import org.pineapple.clientsmtp.stateMachine.InputStateMachineClient;
 import org.pineapple.clientsmtp.stateMachine.StateConnected;
+import org.pineapple.CodeOKSMTP;
 
 import java.io.*;
 import java.net.InetAddress;
@@ -103,6 +104,7 @@ public class ClientSMTP extends Observable {
         }
     }
 
+
     private static void printWelcome() {
         System.out.println("--------");
         System.out.println("Bienvenue !");
@@ -128,6 +130,10 @@ public class ClientSMTP extends Observable {
 
     boolean isConnected() {
         return isConnected;
+    }
+
+    public void setConnected(boolean connected) {
+        isConnected = connected;
     }
 
     public String getServerMessage() {
