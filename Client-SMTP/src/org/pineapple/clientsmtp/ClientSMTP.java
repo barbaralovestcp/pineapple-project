@@ -69,6 +69,9 @@ public class ClientSMTP extends Observable {
                         if (content.length() > 0) {
 
                             //Check if server message is a valid code (250,220,550,354)
+                            if(this.serverMessage == new CodeOKSMTP(CodeOKSMTP.CodeEnum.OK_CONNECTED).toString("pineapple.com")) {
+                                this.setConnected(true);
+                            }
                             if (InputStateMachineClient.isValidCommand(content.toString())) {
                                 context.handle(new InputStateMachineClient(content.toString()));
                                 System.out.println(context.getStateToLog());
