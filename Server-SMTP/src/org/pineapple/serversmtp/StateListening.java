@@ -9,8 +9,7 @@ public class StateListening implements IState {
     @Override
     public void handle(Context context, IInputStateMachine input) {
 
-        ContextServer contextServer = (ContextServer)context;
-        String toSend = new CodeOKSMTP(CodeOKSMTP.CodeEnum.OK).toString(contextServer.getDomain());
+        String toSend = new CodeOKSMTP(CodeOKSMTP.CodeEnum.OK_CONNECTED).toString(((ContextServer)context).getDomain());
         IState nextState = new StateWaitMailFrom();
 
         context.setMessageToSend(toSend);

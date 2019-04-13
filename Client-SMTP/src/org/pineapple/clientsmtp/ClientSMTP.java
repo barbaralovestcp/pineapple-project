@@ -74,7 +74,6 @@ public class ClientSMTP extends Observable {
                             }
                             if (InputStateMachineClient.isValidCommand(content.toString())) {
                                 context.handle(new InputStateMachineClient(content.toString()));
-                                System.out.println(context.getStateToLog());
 
                                 String messageToSend = context.popMessageToSend();
                                 //If there's a message to send, send it
@@ -121,7 +120,6 @@ public class ClientSMTP extends Observable {
         try {
             out_data.print(message + "\r\n");
             out_data.flush();
-            System.out.println("Sending : " + message);
             return true;
         } catch (Exception ex) {
             ex.printStackTrace();

@@ -22,7 +22,7 @@ public class StateAuthentification implements IState {
 
         switch (command) {
             case EHLO:
-                toSend = new CodeOKSMTP(CodeOKSMTP.CodeEnum.OK_CONNECTED).toString(contextServer.getDomain());
+                toSend = new CodeOKSMTP(CodeOKSMTP.CodeEnum.OK_GREETING).toString(contextServer.getDomain());
                 nextState = new StateWaitMailFrom();
                 break;
             case QUIT:

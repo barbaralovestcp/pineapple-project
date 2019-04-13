@@ -114,6 +114,12 @@ public abstract class AbstractServerConnectionHandler<T extends ICommand> implem
 		context.handle();
 		this.messToLog = context.getStateToLog();
 		tryLog(messToLog);
+		String messageToSend = context.popMessageToSend();
+		//If there's a message to send, send it
+		if (messageToSend != null && !messageToSend.equals("")) {
+			tryLog("Sending message \"" + messageToSend.replace("\n", "\n\t") + "\"");
+			sendMessage(messageToSend);
+		}
 		
 		while (!context.isToQuit()) {
 			StringBuilder content = new StringBuilder();
@@ -138,7 +144,7 @@ public abstract class AbstractServerConnectionHandler<T extends ICommand> implem
 						this.messToLog = context.getStateToLog();
 						tryLog(messToLog);
 						
-						String messageToSend = context.popMessageToSend();
+						messageToSend = context.popMessageToSend();
 						//If there's a message to send, send it
 						if (messageToSend != null && !messageToSend.equals("")) {
 							tryLog("Sending message \"" + messageToSend.replace("\n", "\n\t") + "\"");

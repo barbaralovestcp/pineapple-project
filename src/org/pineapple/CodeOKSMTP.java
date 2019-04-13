@@ -18,11 +18,11 @@ public class CodeOKSMTP extends Code implements ParametrizedToString {
             if (parameter == null)
                 throw new NullPointerException("OK GREETING needs a parameter: Name of the client.");
 
-            return  "greets " + parameter;
+            return  "250 greets " + parameter;
         }),
-        OK_MAIL_FROM(parameter -> "mail from received"),
-        OK_USER_FOUND(parameter -> "user found"),
-        OK_DATA_RECEIVED(parameter -> "data received"),
+        OK_MAIL_FROM(parameter -> "250 mail from received"),
+        OK_USER_FOUND(parameter -> "250 user found"),
+        OK_DATA_RECEIVED(parameter -> "250 data received"),
         OK_QUIT(parameter -> "250 OK"),
         ;
 
@@ -68,7 +68,7 @@ public class CodeOKSMTP extends Code implements ParametrizedToString {
     @Override
     public String toString(@Nullable String parameter) {
         String message = getCodeType().toString(parameter);
-        return "250 " + (message.length() > 0 ? " " + message : "") + "\r\n";
+        return (message.length() > 0 ? message : "") + "\r\n";
     }
 
     @NotNull
