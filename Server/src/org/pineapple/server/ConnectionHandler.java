@@ -20,9 +20,8 @@ import java.util.function.Function;
  * Source: https://stackoverflow.com/questions/28629669/java-tcp-simple-webserver-problems-with-response-codes-homework?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
  */
 public class ConnectionHandler extends AbstractServerConnectionHandler<CommandPOP3> {
-	
-	private String domain = "pine.apple";
-	
+
+
 	public ConnectionHandler(@NotNull Socket so_client, @Nullable Consumer<String> onLog) throws IOException {
 		super(so_client, onLog, new StateServerListening(), InputStateMachinePOP3.class, InputStateMachinePOP3::new);
 	}

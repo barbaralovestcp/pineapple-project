@@ -27,7 +27,7 @@ public class InputStateMachineClient implements IInputStateMachine {
     }
 
     public static boolean isValidCommand(String request){
-        String[] arguments = request.split("\\s+");
+        String[] arguments = request.split(" ");
         return arguments.length > 0  && (arguments[0].equals("250") || arguments[0].equals("220") ||
                 arguments[0].equals("354") ||arguments[0].equals("550"));
     }
