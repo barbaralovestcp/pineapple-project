@@ -15,10 +15,9 @@ import java.util.function.Function;
 
 public class ConnectionHandler extends AbstractServerConnectionHandler<CommandSMTP> {
 
-	private String domain = "pine.apple";
-
 	public ConnectionHandler(@NotNull Socket so_client, @Nullable Consumer<String> onLog) throws IOException {
 		super(so_client, onLog, new StateListening(), InputStateMachineSMTP.class, InputStateMachineSMTP::new);
+		this.context = new ContextServer();
 	}
 	public ConnectionHandler(@NotNull Socket so_client) throws IOException {
 		this(so_client, null);
