@@ -35,7 +35,7 @@ public class StateWaitMailFrom implements IState {
                 if (mailIsValid) {
 
                     contextServer.setMailFrom(mail);
-                    toSend = new CodeOKSMTP(CodeOKSMTP.CodeEnum.OK_GREETING).toString();
+                    toSend = new CodeOKSMTP(CodeOKSMTP.CodeEnum.OK_MAIL_FROM).toString();
                     nextState = new StateWaitRCPT();
                 }
                 else {

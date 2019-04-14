@@ -13,6 +13,7 @@ public class StateWaitingMailFromAnswer implements IState {
     public void handle(Context context, IInputStateMachine input) {
 
         ArrayList<String> recipients = ((ContextClient) context).getRecipient();
+        System.out.println(recipients);
         if(recipients.size() == 0){
             throw new StateMachineException(this, "Number of recipients cannot be 0");
         }

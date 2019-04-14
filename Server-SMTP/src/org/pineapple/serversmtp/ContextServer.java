@@ -1,7 +1,6 @@
 package org.pineapple.serversmtp;
 
 import org.pineapple.stateMachine.Context;
-import org.pineapple.stateMachine.IState;
 
 public class ContextServer extends Context {
 
@@ -11,7 +10,7 @@ public class ContextServer extends Context {
 
     public ContextServer() {
         super(new StateListening());
-        this.domain = "pineapple.com";
+        this.domain = "pine.apple";
     }
 
     public String getDomain() {

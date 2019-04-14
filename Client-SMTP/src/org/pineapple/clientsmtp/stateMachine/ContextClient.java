@@ -14,7 +14,6 @@ public class ContextClient extends Context {
     private String domain;
     @NotNull
     private String name;
-    @Nullable
     private Message message;
     private ArrayList<String> recipient;
     private int recipientIterator = 0;
@@ -27,10 +26,6 @@ public class ContextClient extends Context {
         super(initialState);
         this.name = name;
         this.domain = domain;
-    }
-
-    public void handle(String request) {
-        handle(new InputStateMachineClient(request));
     }
 
     public void iterate() {

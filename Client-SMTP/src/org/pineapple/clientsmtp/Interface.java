@@ -16,8 +16,10 @@ import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
 import javafx.stage.Stage;
+import org.pineapple.Message;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -74,6 +76,7 @@ public class Interface extends Application implements Observer {
     public void start(Stage stage) {
 
         client = new ClientSMTP(name, domain);
+        client.addObserver(this);
         stage.setTitle("Nouveau message");
         Scene scene = new Scene(new Group(), 600, 400, gradient);
 
@@ -115,6 +118,7 @@ public class Interface extends Application implements Observer {
         sendBtn.setOnAction(e -> {
             if (this.address.size() > 0) {
                 notification.setText("Your message was successfully sent to " + receiversToString(this.address));
+                this.client.initMailTransaction(this.getMessageToSend(), this.address);
                 this.address.clear();
                 grid.getChildren().removeIf(node -> GridPane.getRowIndex(node) == 0 || GridPane.getRowIndex(node) == null);
             } else {
@@ -130,6 +134,16 @@ public class Interface extends Application implements Observer {
         Thread t = new Thread(() -> client.connect());
         t.start();
 
+    }
+
+    public Message getMessageToSend(){
+        return new Message()
+                .setDate(new Date().toString())
+                .setSender("<" + this.name + "@" + this.domain + ">")
+                .setReceiver(receiversToString(this.address))
+                .setSubject(subject.getText())
+                .setMessageId("<" + new Date().getTime() + ">")
+                .setMessage(text.getText());
     }
 
     @Override

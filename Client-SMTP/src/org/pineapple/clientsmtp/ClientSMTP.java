@@ -2,15 +2,15 @@ package org.pineapple.clientsmtp;
 
 
 import com.sun.istack.internal.NotNull;
-import org.pineapple.clientsmtp.stateMachine.ContextClient;
-import org.pineapple.clientsmtp.stateMachine.InputStateMachineClient;
-import org.pineapple.clientsmtp.stateMachine.StateConnected;
+import org.pineapple.Message;
+import org.pineapple.clientsmtp.stateMachine.*;
 import org.pineapple.CodeOKSMTP;
 
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Observable;
 
 public class ClientSMTP extends Observable {
@@ -31,6 +31,8 @@ public class ClientSMTP extends Observable {
 
     //STATES
     private ContextClient context;
+    private Message message;
+    private ArrayList<String> recipient;
 
 
     public ClientSMTP(String name, String domain) {
@@ -53,6 +55,9 @@ public class ClientSMTP extends Observable {
             InputStreamReader indata = new InputStreamReader(inp, StandardCharsets.ISO_8859_1);
             BufferedReader br = new BufferedReader(indata);
 
+            //TODO enlever
+            this.setConnected(true);
+
             while ( !context.isToQuit() ) {
                 StringBuilder content = new StringBuilder();
                 try {
@@ -68,8 +73,8 @@ public class ClientSMTP extends Observable {
 
                         if (content.length() > 0) {
 
-                            //Check if server message is a valid code (250,220,550,354)
-                            if(this.serverMessage == new CodeOKSMTP(CodeOKSMTP.CodeEnum.OK_CONNECTED).toString("pineapple.com")) {
+                            //TODO debuger
+                            if(this.serverMessage.contains(new CodeOKSMTP(CodeOKSMTP.CodeEnum.OK_GREETING).toString(this.domain).replace("\n",""))) {
                                 this.setConnected(true);
                             }
                             if (InputStateMachineClient.isValidCommand(content.toString())) {
@@ -78,7 +83,6 @@ public class ClientSMTP extends Observable {
                                 String messageToSend = context.popMessageToSend();
                                 //If there's a message to send, send it
                                 if (messageToSend != null && !messageToSend.equals("")) {
-                                    System.out.println("Sending message \"" + messageToSend.replace("\n", "\n\t") + "\"");
                                     send(messageToSend);
                                 }
                                 //Quit if to quit.
@@ -119,6 +123,7 @@ public class ClientSMTP extends Observable {
         PrintStream out_data = new PrintStream(this.op);
         try {
             out_data.print(message + "\r\n");
+            System.out.println("\n Sending message \"" + message.replace("\n", "\n\t") + "\"");
             out_data.flush();
             return true;
         } catch (Exception ex) {
@@ -127,6 +132,16 @@ public class ClientSMTP extends Observable {
         }
     }
 
+    public void initMailTransaction(Message message, ArrayList<String> recipient){
+        this.context.setMessage(message);
+        this.context.setRecipient(recipient);
+        this.context.setRecipientIterator(0);
+        if(context.getCurrentState() instanceof StateWaitingGreeting){
+            String toSend = "MAIL FROM:" + " " + name + "@" + domain;
+            this.send(toSend);
+            this.context.setState(new StateWaitingMailFromAnswer());
+        }
+    }
 
 
     boolean isConnected() {
