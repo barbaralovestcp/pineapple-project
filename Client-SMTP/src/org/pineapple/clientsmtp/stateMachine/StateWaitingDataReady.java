@@ -18,19 +18,9 @@ public class StateWaitingDataReady implements IState {
         IState nextState = null;
 
         //case ok
-        if (arguments[0].equals("250")) {
-
-            if (arguments[1].equals("RCPT")) {
-                if(((ContextClient) context).getRecipientIterator() < recipients.size()){
-                    nextState = new StateWaitingRcptAnswer();
-                    toSend = "RCPT:" + recipients.get(((ContextClient) context).getRecipientIterator());
-                    ((ContextClient) context).iterate();
-                }else{
-                    nextState = new StateWaitingDataReady();
-                    toSend = "RCPT:" + recipients.get(((ContextClient) context).getRecipientIterator());
-                    ((ContextClient) context).iterate();
-                }
-            }
+        if (arguments[0].equals("220")) {
+            nextState = new StateWaitingDataReceived();
+            toSend = ((ContextClient) context).getMessage().buildMessage();
         }
         //case err
         else if (arguments[0].equals("550")){

@@ -12,6 +12,9 @@ public class StateWaitingGreeting implements IState {
         String[] arguments = input.getArguments();
         if(arguments[0].equals("550")){
             throw new StateMachineException(this, arguments[0]);
+        }else if(arguments[0].equals("250")){
+            IState nextState = new StateWaitingMailFromAnswer();
+            context.setState(nextState);
         }
         //else nothing : no mail to send
     }
