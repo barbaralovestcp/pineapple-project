@@ -29,10 +29,14 @@ public class ClientSMTP extends Observable {
     private InputStream inp;
     private Socket con_serv;
 
+    InputStreamReader indata;
+    BufferedReader br;
+
     //STATES
     private ContextClient context;
     private Message message;
     private ArrayList<String> recipient;
+
 
 
     public ClientSMTP(String name, String domain) {
@@ -52,57 +56,18 @@ public class ClientSMTP extends Observable {
             this.op = con_serv.getOutputStream();
             this.context = new ContextClient(name,domain,new StateConnected());
 
-            InputStreamReader indata = new InputStreamReader(inp, StandardCharsets.ISO_8859_1);
-            BufferedReader br = new BufferedReader(indata);
+            //TODO : Je ne suis pas sur si à chaque loop il devrait être ré-init ou non. Je les init qu'une seul fois pour l'instant
+            this.indata = new InputStreamReader(inp, StandardCharsets.ISO_8859_1);
+            this.br = new BufferedReader(indata);
+
 
             //TODO enlever
             this.setConnected(true);
 
-            while ( !context.isToQuit() ) {
-                StringBuilder content = new StringBuilder();
-                try {
-                    String line;
+            System.out.println("oui");
+            stateMachineLoop();
 
-                    line = br.readLine(); //Read single line, looping block the line
-                    if(line != null){
-                        String[] parts = line.split("[\u0003\u0001]");
-                        line = parts[parts.length-1];
-                        System.out.println("Received server message : " + line);
-                        content.append(line);
-                        this.serverMessage = content.toString();
 
-                        if (content.length() > 0) {
-
-                            //TODO debuger
-                            if(this.serverMessage.contains(new CodeOKSMTP(CodeOKSMTP.CodeEnum.OK_GREETING).toString(this.domain).replace("\n",""))) {
-                                this.setConnected(true);
-                            }
-                            if (InputStateMachineClient.isValidCommand(content.toString())) {
-                                context.handle(new InputStateMachineClient(content.toString()));
-
-                                String messageToSend = context.popMessageToSend();
-                                //If there's a message to send, send it
-                                if (messageToSend != null && !messageToSend.equals("")) {
-                                    send(messageToSend);
-                                }
-                                //Quit if to quit.
-                                else if (context.isToQuit()) {
-                                    System.out.println("Connection closed with server");
-                                    this.con_serv.close();
-                                }
-                            }
-                            else {
-                                System.out.println("Invalid message from server!");
-                            }
-
-                            setChanged();
-                            notifyObservers();
-                        }
-                    }
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
-            }
         } catch (java.net.ConnectException ce) {
             System.out.println("La connexion a échouée.\n");
         } catch (IOException e) {
@@ -110,6 +75,58 @@ public class ClientSMTP extends Observable {
         }
     }
 
+    private void stateMachineLoop() {
+
+        do {
+            StringBuilder content = new StringBuilder();
+            try {
+                String line;
+
+                //Read the next line sent by the server
+                line = br.readLine(); //Read single line, looping block the line
+                if(line != null){
+
+                    //Parse and read the line.
+                    String[] parts = line.split("[\u0003\u0001]");
+                    line = parts[parts.length-1];
+                    System.out.println("Received server message : " + line);
+                    content.append(line);
+                    this.serverMessage = content.toString();
+
+                    //If the line is not empty
+                    if (content.length() > 0) {
+
+                        //TODO debuger
+                        if(this.serverMessage.contains(new CodeOKSMTP(CodeOKSMTP.CodeEnum.OK_GREETING).toString(this.domain).replace("\n",""))) {
+                            this.setConnected(true);
+                        }
+                        if (InputStateMachineClient.isValidCommand(content.toString())) {
+                            context.handle(new InputStateMachineClient(content.toString()));
+
+                            String messageToSend = context.popMessageToSend();
+                            //If there's a message to send, send it
+                            if (messageToSend != null && !messageToSend.equals("")) {
+                                send(messageToSend);
+                            }
+                            //Quit if to quit.
+                            else if (context.isToQuit()) {
+                                System.out.println("Connection closed with server");
+                                this.con_serv.close();
+                            }
+                        }
+                        else {
+                            System.out.println("Invalid message from server!");
+                        }
+
+                        setChanged();
+                        notifyObservers();
+                    }
+                }
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+        } while ( !context.isToQuit() || !(context.getCurrentState() instanceof StateWaitingMailFromAnswer) );
+    }
 
     private static void printWelcome() {
         System.out.println("--------");
@@ -133,13 +150,38 @@ public class ClientSMTP extends Observable {
     }
 
     public void initMailTransaction(Message message, ArrayList<String> recipient){
-        this.context.setMessage(message);
-        this.context.setRecipient(recipient);
-        this.context.setRecipientIterator(0);
-        if(context.getCurrentState() instanceof StateWaitingGreeting){
+
+        if(context.getCurrentState() instanceof StateWaitingMailFromAnswer){
+
+            //Initialise the mail informations
+            this.context.setMessage(message);
+            this.context.setRecipient(recipient);
+            this.context.setRecipientIterator(0);
+
+            //Send message to server
             String toSend = "MAIL FROM:" + " " + name + "@" + domain;
             this.send(toSend);
-            this.context.setState(new StateWaitingMailFromAnswer());
+
+            //Wait for a server answer and resume the stateMachine automated loop
+            stateMachineLoop();
+        }
+        else {
+            System.out.println("DEBUG : Not in StateWaitingMailFromAnswer, can't take client input!");
+        }
+    }
+
+    public void quit() {
+        if(context.getCurrentState() instanceof StateWaitingMailFromAnswer){
+
+            //Send message to server
+            String toSend = "QUIT";
+            this.send(toSend);
+
+            //Wait for a server answer and resume the stateMachine automated loop
+            stateMachineLoop();
+        }
+        else {
+            System.out.println("DEBUG : Not in StateWaitingMailFromAnswer, can't take client input!");
         }
     }
 

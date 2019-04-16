@@ -133,6 +133,7 @@ public abstract class AbstractServer extends Application implements Runnable {
 		try {
 			soc = new ServerSocket(port);
 			log("Server open on port " + soc.getLocalPort());
+			log("Server open on adress " + soc.getInetAddress().toString());
 			if (getState() == ServerState.INITIALIZED)
 				startServer();
 			
