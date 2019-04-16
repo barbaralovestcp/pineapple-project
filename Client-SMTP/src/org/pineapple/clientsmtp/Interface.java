@@ -143,7 +143,7 @@ public class Interface extends Application implements Observer {
                 .setReceiver(receiversToString(this.address))
                 .setSubject(subject.getText())
                 .setMessageId("<" + new Date().getTime() + ">")
-                .setMessage(text.getText() + "\r\n" + "." + "\r\n");
+                .setMessage(text.getText() + "\r\n" + ".");
     }
 
     @Override

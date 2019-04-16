@@ -46,7 +46,8 @@ public abstract class AbstractInputStateMachine<T extends ICommand> implements I
 			valueOf.invoke(null, args[0].toUpperCase());
 			return true;
 		}
-		catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
+		catch (ArrayIndexOutOfBoundsException | IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
+			System.out.println("Invalid request: \"" + request + "\"");
 			return false;
 		} catch (NoSuchMethodException e) {
 			e.printStackTrace();
