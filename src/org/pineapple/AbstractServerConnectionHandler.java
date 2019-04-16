@@ -42,7 +42,7 @@ public abstract class AbstractServerConnectionHandler<T extends ICommand> implem
 	protected Class<? extends AbstractInputStateMachine<T>> clazzInputStateMachine;
 	@NotNull
 	protected Function<String, ? extends AbstractInputStateMachine<T>> inputStateMachineGenerator;
-	
+
 	public AbstractServerConnectionHandler(@NotNull Socket so_client, @Nullable Consumer<String> onLog, @NotNull IState initialState, @NotNull Class<? extends AbstractInputStateMachine<T>> clazzInputStateMachine, @NotNull Function<String, ? extends AbstractInputStateMachine<T>> inputStateMachineGenerator) throws IOException {
 		setClient(so_client);
 		
@@ -125,14 +125,25 @@ public abstract class AbstractServerConnectionHandler<T extends ICommand> implem
 			StringBuilder content = new StringBuilder();
 			try {
 				String line;
-				
-				line = br.readLine(); //Read single line, looping block the line
-				String[] parts = line.split("[\u0003\u0001]");
-				line = parts[parts.length-1];
-				System.out.println("Received client request : " + line);
-				content.append(line);
-				
-				if (content.length() > 0) {
+				boolean message = false;
+
+				while ((line = br.readLine()) !=null){
+					String[] parts = line.split("[\u0003\u0001]");
+					line = parts[parts.length-1];
+					System.out.println("Received client request : " + line);
+					content.append(line);
+					content.append("\r\n");
+					if(line.contains("From:")){
+						message = true;
+					}else if(line.equals(".")){
+						context.handle(this.inputStateMachineGenerator.apply(content.toString()));
+						break;
+					} else if(!message){
+						break;
+					}
+				}
+
+				if (content.length() > 0 && !message) {
 					
 					Method isValidRequest = clazzInputStateMachine.getMethod("isValidRequest", String.class);
 					

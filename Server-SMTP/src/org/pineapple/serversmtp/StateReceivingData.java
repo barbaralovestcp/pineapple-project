@@ -7,14 +7,15 @@ import org.pineapple.stateMachine.Exception.StateMachineException;
 import org.pineapple.stateMachine.IInputStateMachine;
 import org.pineapple.stateMachine.IState;
 
+import java.util.Arrays;
+
 public class StateReceivingData implements IState {
     @Override
     public void handle(Context context, IInputStateMachine input) {
         String[] args = input.getArguments();
-
         //CommandSMTP command = ((InputStateMachineSMTP)input).getCommand();
 
-        ContextServer contextServer = (ContextServer)context;
+        ContextServer contextServer = (ContextServer) context;
 
         String toSend = "";
         IState nextState;
@@ -24,28 +25,20 @@ public class StateReceivingData implements IState {
 
         //Parsing arguments :
 
-        //all the body should be in only one of the arguments case! (I dont remember which one, 0 or 1)
-        for (int i = 0; i < args.length; i++) {
+        //split by line returns
+        String[] lines = args[1].split("\\r\\n");
+        for (int j = 0; j < lines.length; j++) {
 
-            //split by line returns
-            String[] lines = args[i].split("\\r\\n");
-            for (int j = 0; j < lines.length; j++) {
-
-                //It is the last line ?
-                if (lines[j].equals(".")) {
-                    endOfData = true;
-                    break;
-                }
-                else {
-                    //Add the line to the body
-                    body.append(lines[j]).append("\r\n");
-                }
-            }
-
-            if (endOfData) {
+            //It is the last line ?
+            if (lines[j].equals(".")) {
+                endOfData = true;
                 break;
+            } else {
+                //Add the line to the body
+                body.append(lines[j]).append("\r\n");
             }
         }
+
 
         if (endOfData) {
             //Data received, back to waiting the next mail
@@ -57,8 +50,7 @@ public class StateReceivingData implements IState {
 
             //Clear the mail informations
             contextServer.clearMailData();
-        }
-        else {
+        } else {
             //We wait for more data.
             nextState = this;
         }
