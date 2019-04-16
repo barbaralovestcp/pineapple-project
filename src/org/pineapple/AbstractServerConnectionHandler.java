@@ -126,6 +126,7 @@ public abstract class AbstractServerConnectionHandler<T extends ICommand> implem
 			try {
 				String line;
 				boolean message = false;
+				boolean endDetected = false;
 
 				while ((line = br.readLine()) !=null){
 					String[] parts = line.split("[\u0003\u0001]");
@@ -133,12 +134,17 @@ public abstract class AbstractServerConnectionHandler<T extends ICommand> implem
 					System.out.println("Received client request : " + line);
 					content.append(line);
 					content.append("\r\n");
-					if(line.contains("From:")){
+					if (line.contains("From:")) {
 						message = true;
-					}else if(line.equals(".")){
+					}
+					else if (line.equals(".")) {
+						endDetected = true;
+					}
+					else if (line.equals("") && endDetected) {
 						context.handle(this.inputStateMachineGenerator.apply(content.toString()));
 						break;
-					} else if(!message){
+					}
+					else if (!message) {
 						break;
 					}
 				}
