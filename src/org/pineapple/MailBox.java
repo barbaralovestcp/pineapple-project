@@ -12,7 +12,12 @@ public class MailBox {
     private String name;
     private String password;
     private MBXManager fileManager;
-
+    
+    public MailBox(String name, String password, boolean isPasswordEncrypted) {
+        this.name = name;
+        this.password = password;
+        this.fileManager = new MBXManager(name, password, isPasswordEncrypted);
+    }
     public MailBox(String name, String password) {
         this.name = name;
         this.password = password;

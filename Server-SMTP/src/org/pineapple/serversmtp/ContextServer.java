@@ -2,7 +2,9 @@ package org.pineapple.serversmtp;
 
 import org.pineapple.MailBox;
 import org.pineapple.Message;
+import org.pineapple.UserManager;
 import org.pineapple.stateMachine.Context;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -56,18 +58,19 @@ public class ContextServer extends Context {
         mail.setMessage(mailBody.toString());
 
         //Add the message to the mailbox of each recipient
-        /*
-        for (String rcpt : mailRcpt ) {
-            //TODO : GET THE RECIPIENTS MAILBOXES
-            MailBox recipient = new MailBox("dummy", "dummy");
+        for (String rcpt : mailRcpt) {
+            String encryptedPassword = UserManager.getEncryptedPassword(rcpt);
+    
+            MailBox recipient;
+            
+            // If recipient does not exist, create a mailbox
+            if (encryptedPassword == null)
+                recipient = new MailBox(rcpt, "", false);
+            else
+                recipient = new MailBox(rcpt, encryptedPassword, true);
+            
             recipient.addMessages(mail);
-        } */
-
-        //Placeholder : Place in dummy mailbox
-        MailBox recipient = new MailBox("dummy", "dummy");
-        recipient.addMessages(mail);
-
-
+        }
     }
 
     public String getDomain() {
