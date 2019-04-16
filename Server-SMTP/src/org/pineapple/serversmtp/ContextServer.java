@@ -59,17 +59,28 @@ public class ContextServer extends Context {
 
         //Add the message to the mailbox of each recipient
         for (String rcpt : mailRcpt) {
-            String encryptedPassword = UserManager.getEncryptedPassword(rcpt);
+            // Get username
+            String[] parts = rcpt.split("@");
+            
+            if (parts.length == 2) {
+                String username = parts[0];
+                String domain = parts[1];
+                
+                if (!domain.equals(this.domain))
+                    username = rcpt;
+                
+                String encryptedPassword = UserManager.getEncryptedPassword(username);
     
-            MailBox recipient;
-            
-            // If recipient does not exist, create a mailbox
-            if (encryptedPassword == null)
-                recipient = new MailBox(rcpt, "", false);
-            else
-                recipient = new MailBox(rcpt, encryptedPassword, true);
-            
-            recipient.addMessages(mail);
+                MailBox recipient;
+    
+                // If recipient does not exist, create a mailbox
+                if (encryptedPassword == null)
+                    recipient = new MailBox(username, "", false);
+                else
+                    recipient = new MailBox(username, encryptedPassword, true);
+    
+                recipient.addMessages(mail);
+            }
         }
     }
 
