@@ -25,12 +25,12 @@ public class StateWaitingMailFromAnswer implements IState {
         //case ok
         if (arguments[0].equals("250")) {
 
-            if (arguments[1].equals("MAIL")) {
+            if (arguments[1].toLowerCase().equals("mail")) {
                 nextState = new StateWaitingRcptAnswer();
-                toSend = "RCPT:" + recipients.get(0);
+                toSend = "RCPT " + recipients.get(0);
                 ((ContextClient) context).iterate();
             }
-            else if (arguments[1].equals("QUIT")) {
+            else if (arguments[1].toLowerCase().equals("QUIT")) {
                 nextState = new StateConnected(); //TODO : Bon state?
             }
         }

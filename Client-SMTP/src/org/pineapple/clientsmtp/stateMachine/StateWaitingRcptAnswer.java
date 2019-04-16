@@ -22,10 +22,10 @@ public class StateWaitingRcptAnswer implements IState {
         //case ok
         if (arguments[0].equals("250")) {
 
-            if (arguments[1].equals("RCPT")) {
+            if (arguments[1].toLowerCase().equals("user")) {
                 if(((ContextClient) context).getRecipientIterator() < recipients.size()){
                     nextState = new StateWaitingRcptAnswer();
-                    toSend = "RCPT:" + recipients.get(((ContextClient) context).getRecipientIterator());
+                    toSend = "RCPT " + recipients.get(((ContextClient) context).getRecipientIterator());
                     ((ContextClient) context).iterate();
                 }else{
                     nextState = new StateWaitingDataReady();
