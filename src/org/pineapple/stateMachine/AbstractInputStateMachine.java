@@ -20,8 +20,13 @@ public abstract class AbstractInputStateMachine<T extends ICommand> implements I
 		String name = clazz.getSimpleName();
 		if (name.matches("Command[a-zA-Z0-9]+"))
 			name = name.replace("Command", "");
+
+		if(request.split("\\s+")[0].toUpperCase().contains("FROM")){
+			this.arguments = new String[]{"DATA", request};
+		}else{
+			this.arguments = request.split("\\s+");
+		}
 		
-		this.arguments = request.split("\\s+");
 		try {
 			Method valueOf = clazz.getMethod("valueOf", String.class);
 			this.command = clazz.cast(valueOf.invoke(null, arguments[0].toUpperCase()));
