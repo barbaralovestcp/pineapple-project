@@ -31,9 +31,10 @@ public class StateAuthentification implements IState {
                 contextServer.setToQuit(true);
                 break;
 
-            case REST:
-                toSend = new CodeOKSMTP(CodeOKSMTP.CodeEnum.OK).toString();
-                nextState = new StateAuthentification();
+            case RSET:
+                //NOOP!
+                nextState = this;
+
                 break;
             default:
                 throw new StateMachineException(this, command);

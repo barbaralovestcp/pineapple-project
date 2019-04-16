@@ -17,17 +17,21 @@ public class StateWaitRCPT implements IState {
         String[] args = input.getArguments();
         CommandSMTP command = ((InputStateMachineSMTP)input).getCommand();
 
+        ContextServer contextServer = (ContextServer)context;
+
         String toSend = "";
         IState nextState = null;
 
         switch (command) {
             case RCPT:
-                //TODO : Traiter RCPT
+                String rcpt = args[1];
 
-                //TODO : Un mail est valide si il existe une mailbox pour ce mail
+                //Un mail est valide si il existe une mailbox pour ce mail :
+                //TODO : FAIRE VALIDATION
                 boolean rcptIsValid = true;
+
                 if (rcptIsValid) {
-                    //TODO : Ajouter mail à une liste de destinataire dans ContextServer
+                    contextServer.addMailRcpt(rcpt);
                     toSend = new CodeOKSMTP(CodeOKSMTP.CodeEnum.OK_USER_FOUND).toString();
                     nextState = this;
                 }
@@ -37,14 +41,18 @@ public class StateWaitRCPT implements IState {
                 }
                 break;
             case DATA:
-                //TODO : Verifier qu'il y a au moins un destinataire valide.
+
+                //TODO : Verifier qu'il y a au moins un destinataire valide (A gérer coté client?)
 
                 toSend = new CodeDATASMTP(CodeDATASMTP.CodeEnum.START).toString();
                 nextState = new StateReceivingData();
                 break;
-            case REST:
+            case RSET:
                 toSend = new CodeOKSMTP(CodeOKSMTP.CodeEnum.OK).toString();
-                nextState = new StateAuthentification();
+                nextState = new StateWaitMailFrom();
+
+                //clear mail data
+                contextServer.clearMailData();
                 break;
             default:
                 throw new StateMachineException(this, command);

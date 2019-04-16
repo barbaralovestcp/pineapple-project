@@ -36,7 +36,7 @@ public class StateWaitingRcptAnswer implements IState {
         //case err
         else if (arguments[0].equals("550")){
             nextState = new StateWaitingMailFromAnswer();
-            toSend = "REST";
+            toSend = "RSET";
         }
         //invalid answer
         else {
