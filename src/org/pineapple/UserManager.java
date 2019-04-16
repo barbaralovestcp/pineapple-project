@@ -1,6 +1,7 @@
 package org.pineapple;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,6 +39,17 @@ public class UserManager {
 		HashMap<String, String> map = new HashMap<>(1);
 		map.put(username, password);
 		write(map, false);
+	}
+	
+	/**
+	 * Return the password (encrypted) associated to the user `username`.
+	 * @param username The username.
+	 * @return Return the encrypted password.
+	 */
+	@Nullable
+	public static String getEncryptedPassword(@NotNull String username) {
+		HashMap<String, String> userPass = read();
+		return userPass.getOrDefault(username, null);
 	}
 	
 	@NotNull
