@@ -111,7 +111,10 @@ public class ClientSMTP extends Observable {
                             //Quit if to quit.
                             else if (context.isToQuit()) {
                                 System.out.println("Connection closed with server");
-                                this.con_serv.close();
+                                if(this.con_serv.isConnected()){
+                                    this.con_serv.close();
+                                    break;
+                                }
                             }
                         }
                         else {
@@ -125,7 +128,7 @@ public class ClientSMTP extends Observable {
             } catch (IOException e1) {
                 e1.printStackTrace();
             }
-        } while ( !context.isToQuit() || !(context.getCurrentState() instanceof StateWaitingMailFromAnswer) );
+        } while (this.con_serv.isConnected() && !context.isToQuit());
     }
 
     private static void printWelcome() {
@@ -136,7 +139,7 @@ public class ClientSMTP extends Observable {
         System.out.println("--------");
     }
 
-    private boolean send(String message) {
+    public boolean send(String message) {
         PrintStream out_data = new PrintStream(this.op);
         try {
             out_data.print(message + "\r\n");

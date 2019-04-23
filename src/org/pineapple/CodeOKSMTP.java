@@ -23,7 +23,7 @@ public class CodeOKSMTP extends Code implements ParametrizedToString {
         OK_MAIL_FROM(parameter -> "250 mail from received"),
         OK_USER_FOUND(parameter -> "250 user found"),
         OK_DATA_RECEIVED(parameter -> "250 data received"),
-        OK_QUIT(parameter -> "250 OK"),
+        OK_QUIT(parameter -> "250 quit"),
         ;
 
         @NotNull

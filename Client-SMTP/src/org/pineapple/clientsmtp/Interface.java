@@ -16,6 +16,8 @@ import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
+import org.pineapple.CommandPOP3;
 import org.pineapple.Message;
 
 import java.util.ArrayList;
@@ -85,8 +87,8 @@ public class Interface extends Application implements Observer {
                 "valentin@pine.apple",
                 "elie@pine.apple",
                 "lea@pine.apple",
-                "philippine@pine.apple"
-
+                "philippine@pine.apple",
+                "aaaa@ipc.fr"
         );
         emailComboBox.setPromptText("Email address");
         emailComboBox.setEditable(true);
@@ -129,6 +131,7 @@ public class Interface extends Application implements Observer {
         Group root = (Group) scene.getRoot();
         root.getChildren().add(grid);
         stage.setScene(scene);
+        scene.getWindow().addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, this::closeWindowEvent);
         stage.show();
 
         Thread t = new Thread(() -> client.connect());
@@ -144,6 +147,12 @@ public class Interface extends Application implements Observer {
                 .setSubject(subject.getText())
                 .setMessageId("<" + new Date().getTime() + ">")
                 .setMessage(text.getText() + "\r\n" + ".");
+    }
+
+    private void closeWindowEvent(WindowEvent event){
+        System.out.println("QUIT connexion");
+        String toSend = "QUIT";
+        this.client.send(toSend);
     }
 
     @Override

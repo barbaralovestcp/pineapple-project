@@ -41,6 +41,13 @@ public class StateWaitMailFrom implements IState {
 
                 contextServer.clearMailData();
                 break;
+            case QUIT:
+                toSend = new CodeOKSMTP(CodeOKSMTP.CodeEnum.OK_QUIT).toString();
+                nextState = new StateListening();
+
+                context.setToQuit(true);
+
+                break;
             default:
                 throw new StateMachineException(this, command);
         }

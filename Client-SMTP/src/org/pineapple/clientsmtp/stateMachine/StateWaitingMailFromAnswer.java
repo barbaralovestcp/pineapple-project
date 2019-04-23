@@ -13,10 +13,6 @@ public class StateWaitingMailFromAnswer implements IState {
     public void handle(Context context, IInputStateMachine input) {
 
         ArrayList<String> recipients = ((ContextClient) context).getRecipient();
-        System.out.println(recipients);
-        if(recipients.size() == 0){
-            throw new StateMachineException(this, "Number of recipients cannot be 0");
-        }
 
         String[] arguments = input.getArguments();
         String toSend = "";
@@ -26,12 +22,18 @@ public class StateWaitingMailFromAnswer implements IState {
         if (arguments[0].equals("250")) {
 
             if (arguments[1].toLowerCase().equals("mail")) {
+                if(recipients.size() == 0){
+                    throw new StateMachineException(this, "Number of recipients cannot be 0");
+                }
                 nextState = new StateWaitingRcptAnswer();
                 toSend = "RCPT " + recipients.get(0);
                 ((ContextClient) context).iterate();
             }
-            else if (arguments[1].toLowerCase().equals("QUIT")) {
-                nextState = new StateConnected(); //TODO : Bon state?
+            else if (arguments[1].toLowerCase().equals("quit")) {
+                nextState = new StateConnected();
+                context.setToQuit(true);
+            }else{
+                nextState = this;
             }
         }
         //case err

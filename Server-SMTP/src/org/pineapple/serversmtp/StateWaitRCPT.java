@@ -1,9 +1,6 @@
 package org.pineapple.serversmtp;
 
-import org.pineapple.CodeDATASMTP;
-import org.pineapple.CodeERRSMTP;
-import org.pineapple.CodeOKSMTP;
-import org.pineapple.CommandSMTP;
+import org.pineapple.*;
 import org.pineapple.stateMachine.Context;
 import org.pineapple.stateMachine.Exception.StateMachineException;
 import org.pineapple.stateMachine.IInputStateMachine;
@@ -28,7 +25,9 @@ public class StateWaitRCPT implements IState {
 
                 //Un mail est valide si il existe une mailbox pour ce mail :
                 //TODO : FAIRE VALIDATION
-                boolean rcptIsValid = true;
+                String[] parts = rcpt.split("@");
+                boolean rcptIsValid = UserManager.checkUserExists(parts[0])
+                        && parts[1].equals(((ContextServer) context).getDomain());
 
                 if (rcptIsValid) {
                     contextServer.addMailRcpt(rcpt);
