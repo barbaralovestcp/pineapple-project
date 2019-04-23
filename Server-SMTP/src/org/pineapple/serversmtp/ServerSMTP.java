@@ -11,7 +11,7 @@ import java.net.Socket;
 public class ServerSMTP extends AbstractServer implements Runnable {
 	
 	public ServerSMTP() {
-		super(25);
+		super(1025);
 		// Disable MD5/AES file encryption for the SMTP server, in order to read the mail as text files.
 		MBXManager.setUseEncryption(false);
 	}

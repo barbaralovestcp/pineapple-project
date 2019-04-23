@@ -128,10 +128,11 @@ public abstract class AbstractServerConnectionHandler<T extends ICommand> implem
 				boolean message = false;
 				boolean endDetected = false;
 
+				// RECEVING DATA
+				// TODO : arranger
 				while ((line = br.readLine()) !=null){
 					String[] parts = line.split("[\u0003\u0001]");
 					line = parts[parts.length-1];
-					System.out.println("Received client request : " + line);
 					content.append(line);
 					content.append("\r\n");
 					if (line.contains("From:")) {
@@ -141,7 +142,13 @@ public abstract class AbstractServerConnectionHandler<T extends ICommand> implem
 						endDetected = true;
 					}
 					else if (line.equals("") && endDetected) {
+						System.out.println("Received client message : " + content);
 						context.handle(this.inputStateMachineGenerator.apply(content.toString()));
+						messageToSend = context.popMessageToSend();
+						if (messageToSend != null && !messageToSend.equals("")) {
+							tryLog("Sending message \"" + messageToSend.replace("\n", "\n\t") + "\"");
+							sendMessage(messageToSend);
+						}
 						break;
 					}
 					else if (!message) {

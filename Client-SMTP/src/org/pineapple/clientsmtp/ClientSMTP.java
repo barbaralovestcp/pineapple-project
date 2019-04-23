@@ -47,7 +47,7 @@ public class ClientSMTP extends Observable {
     public void connect() {
         System.out.println("Connexion...");
         try {
-            con_serv = new Socket(InetAddress.getByName(address), 25);
+            con_serv = new Socket(InetAddress.getByName(address), 1025);
             printWelcome();
 
             //flux d'entrée
@@ -101,7 +101,9 @@ public class ClientSMTP extends Observable {
                             this.setConnected(true);
                         }
                         if (InputStateMachineClient.isValidCommand(content.toString())) {
+                            boolean isPreviousStateDataReceived = context.getCurrentState() instanceof StateWaitingDataReceived;
                             context.handle(new InputStateMachineClient(content.toString()));
+                            boolean isWaitingMailFrom = context.getCurrentState() instanceof StateWaitingMailFromAnswer;
 
                             String messageToSend = context.popMessageToSend();
                             //If there's a message to send, send it
@@ -115,6 +117,10 @@ public class ClientSMTP extends Observable {
                                     this.con_serv.close();
                                     break;
                                 }
+                            }
+
+                            if(isPreviousStateDataReceived && isWaitingMailFrom){
+                                break;
                             }
                         }
                         else {
