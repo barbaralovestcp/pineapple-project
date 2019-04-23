@@ -35,6 +35,11 @@ public class MBXManager {
 	private File file;
 	
 	/**
+	 * Static variable tht tell if encryption (MD5/AES) should be used. Default value is `true`.
+	 */
+	private static boolean useEncryption = true;
+	
+	/**
 	 * Constructor that try to create the file.
 	 * @param username The username associated to the user.
 	 */
@@ -111,8 +116,11 @@ public class MBXManager {
 	 */
 	@NotNull
 	private String readRaw() {
-		String encrypted = FUtils.readRaw(file);
-		return MD5.decrypt(getPassword(), encrypted);
+		String fileContent = FUtils.readRaw(file);
+		if (MBXManager.useEncryption)
+			return MD5.decrypt(getPassword(), fileContent);
+		else
+			return fileContent;
 	}
 	
 	/**
@@ -121,8 +129,10 @@ public class MBXManager {
 	 */
 	@NotNull
 	private void writeRaw(@NotNull String content) {
-		String encrypted = MD5.encrypt(getPassword(), content);
-		FUtils.writeRaw(file, encrypted);
+		if (MBXManager.useEncryption)
+			content = MD5.encrypt(getPassword(), content);
+		
+		FUtils.writeRaw(file, content);
 	}
 	
 	/**
@@ -218,6 +228,7 @@ public class MBXManager {
 	 * @return The encrypted password.
 	 */
 	@NotNull
+	@Contract(pure = true)
 	public String getPassword() {
 		return password;
 	}
@@ -244,8 +255,18 @@ public class MBXManager {
 	}
 	
 	@NotNull
+	@Contract(pure = true)
 	public File getFile() {
 		return file;
+	}
+	
+	@Contract(pure = true)
+	public static boolean isUseEncryption() {
+		return useEncryption;
+	}
+	
+	public static void setUseEncryption(boolean useEncryption) {
+		MBXManager.useEncryption = useEncryption;
 	}
 	
 	/* OVERRIDES */
