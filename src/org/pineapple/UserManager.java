@@ -5,13 +5,23 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
 public class UserManager {
 	
 	public static boolean checkUserExists(@NotNull String username) {
-		return new File("res/" + username).exists();
+//		HashMap<String, String> userPass = read();
+//		return userPass.containsKey(username);
+
+		ArrayList<String> users = new ArrayList<>();
+		users.add("elie");
+		users.add("valentin");
+		users.add("lea");
+		users.add("philippine");
+		return users.contains(username);
+//		return new File("res/" + username).exists();
 	}
 	
 	public static boolean checkPassword(@NotNull String username, @NotNull String password, boolean isPasswordEncrypted) {
