@@ -12,6 +12,8 @@ import java.util.HashMap;
 public class UserManager {
 	
 	public static boolean checkUserExists(@NotNull String username) {
+		//TODO : tester si mailbox presente
+
 //		HashMap<String, String> userPass = read();
 //		return userPass.containsKey(username);
 

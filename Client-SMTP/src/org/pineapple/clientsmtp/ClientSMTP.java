@@ -166,6 +166,7 @@ public class ClientSMTP extends Observable {
             this.context.setMessage(message);
             this.context.setRecipient(recipient);
             this.context.setRecipientIterator(0);
+            this.context.setValidIRecipient(0);
 
             //Send message to server
             String toSend = "MAIL FROM:" + " " + name + "@" + domain;
