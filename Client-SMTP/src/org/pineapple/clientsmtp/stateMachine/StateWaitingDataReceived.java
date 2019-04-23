@@ -1,5 +1,6 @@
 package org.pineapple.clientsmtp.stateMachine;
 
+import org.pineapple.serversmtp.StateWaitMailFrom;
 import org.pineapple.stateMachine.Context;
 import org.pineapple.stateMachine.Exception.StateMachineException;
 import org.pineapple.stateMachine.IInputStateMachine;
@@ -19,8 +20,8 @@ public class StateWaitingDataReceived implements IState {
         IState nextState = null;
 
         //case ok
-        if (arguments[0].equals("354")) {
-            nextState = new StateWaitingDataReady();
+        if (arguments[0].equals("250")) {
+            nextState = new StateWaitingMailFromAnswer();
             toSend = context.getMessageToSend();
         }
         //case err
