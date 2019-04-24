@@ -28,6 +28,9 @@ public class MBXManager {
 	@NotNull
 	private String password;
 	
+	@NotNull
+	private static String resPath = new File("res/").getAbsolutePath();
+	
 	/**
 	 * The file to the user's mailbox file.
 	 */
@@ -42,6 +45,9 @@ public class MBXManager {
 	/**
 	 * Constructor that try to create the file.
 	 * @param username The username associated to the user.
+	 * @param password The password associated to the user. It can be encrypted or not.
+	 * @param passwordEncrypted Tell of the given password is encrypted or not. It is not encrypted, it will be
+	 *                          automatically.
 	 */
 	public MBXManager(@NotNull String username, @NotNull String password, boolean passwordEncrypted) {
 		setUsername(username);
@@ -68,8 +74,12 @@ public class MBXManager {
 	
 	@NotNull
 	@Contract(pure = true)
-	public static String getPath() {
-		return new File("res/").getAbsolutePath();
+	public static String getResPath() {
+		return MBXManager.resPath;
+	}
+	
+	public static void setResPath(@NotNull String resPath) {
+		MBXManager.resPath = resPath;
 	}
 	
 	@NotNull
@@ -81,7 +91,7 @@ public class MBXManager {
 	@NotNull
 	@Contract(pure = true)
 	public String getFilePath() {
-		String path = getPath();
+		String path = getResPath();
 		if (!path.endsWith("/"))
 			path += "/";
 		return new File(path + getUsername() + getFileExtension(true)).getAbsolutePath();
