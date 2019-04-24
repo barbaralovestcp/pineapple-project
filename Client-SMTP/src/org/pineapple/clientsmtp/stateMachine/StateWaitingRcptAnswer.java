@@ -14,6 +14,7 @@ public class StateWaitingRcptAnswer implements IState {
     public void handle(Context context, IInputStateMachine input) {
 
         ArrayList<String> recipients = ((ContextClient) context).getRecipient();
+        int iterator = ((ContextClient) context).getRecipientIterator();
         assert (recipients.size() > 0);
 
         String[] arguments = input.getArguments();
@@ -24,6 +25,13 @@ public class StateWaitingRcptAnswer implements IState {
         if (Arrays.toString(input.getArguments()).toLowerCase().contains("user")) {
             if (arguments[0].equals("250")) {
                 ((ContextClient) context).iterateRecipentValid();
+                if(iterator -1 < recipients.size()){
+                    ((ContextClient) context).getStateRecipient().put(recipients.get(iterator -1),"User found");
+                }
+            }else if(arguments[0].equals("550")){
+                if(iterator -1 < recipients.size()){
+                    ((ContextClient) context).getStateRecipient().put(recipients.get(iterator -1),"Invalid user or domain");
+                }
             }
 
             //sending next rcpt

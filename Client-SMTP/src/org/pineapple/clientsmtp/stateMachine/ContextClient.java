@@ -7,6 +7,7 @@ import org.pineapple.stateMachine.Context;
 import org.pineapple.stateMachine.IState;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class ContextClient extends Context {
 
@@ -18,6 +19,7 @@ public class ContextClient extends Context {
     private ArrayList<String> recipient;
     private int recipientIterator = 0;
     private int validIRecipient = 0;
+    private HashMap<String,String> stateRecipient;
 
     public ContextClient() {
         super(new StateConnected());
@@ -27,6 +29,7 @@ public class ContextClient extends Context {
         super(initialState);
         this.name = name;
         this.domain = domain;
+        this.stateRecipient = new HashMap<>();
     }
 
     public void iterateRecipentSend() {
@@ -77,5 +80,21 @@ public class ContextClient extends Context {
 
     public void setValidIRecipient(int validIRecipient) {
         this.validIRecipient = validIRecipient;
+    }
+
+    public HashMap<String, String> getStateRecipient() {
+        return stateRecipient;
+    }
+
+    public void setStateRecipient(HashMap<String, String> stateRecipient) {
+        this.stateRecipient = stateRecipient;
+    }
+
+    public String logStateRecipient(){
+        String tolog = null;
+        if(this.getStateRecipient().size() > 0){
+            tolog = this.getStateRecipient().toString();
+        }
+        return tolog;
     }
 }

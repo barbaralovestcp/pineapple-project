@@ -14,6 +14,7 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Observable;
 
 public class ClientSMTP extends Observable {
@@ -22,7 +23,7 @@ public class ClientSMTP extends Observable {
     private String serverMessage;
     private String logMessage;
 
-    private String address = "127.0.0.1";
+    private String address = "192.168.43.16";
     @NotNull
     private String name;
     @NotNull
@@ -38,8 +39,6 @@ public class ClientSMTP extends Observable {
 
     //STATES
     private ContextClient context;
-    private Message message;
-    private ArrayList<String> recipient;
 
 
     public ClientSMTP(String name, String domain) {
@@ -67,9 +66,7 @@ public class ClientSMTP extends Observable {
             //TODO enlever
             this.setConnected(true);
 
-            System.out.println("oui");
             stateMachineLoop();
-
 
         } catch (java.net.ConnectException ce) {
             System.out.println("La connexion a échouée.\n");
@@ -104,14 +101,17 @@ public class ClientSMTP extends Observable {
                             this.setConnected(true);
                         }
                         if (InputStateMachineClient.isValidCommand(content.toString())) {
-                            //boolean isPreviousStateDataReceived = context.getCurrentState() instanceof StateWaitingDataReceived;
                             context.handle(new InputStateMachineClient(content.toString()));
-                            //boolean isWaitingMailFrom = context.getCurrentState() instanceof StateWaitingMailFromAnswer;
 
                             String messageToSend = context.popMessageToSend();
+                            String messageToLog = context.logStateRecipient();
                             //If there's a message to send, send it
                             if (messageToSend != null && !messageToSend.equals("")) {
                                 send(messageToSend);
+                            }
+                            //If there's a message to log, log it
+                            if (messageToLog != null && !messageToLog.equals("")) {
+                                this.logMessage = messageToLog;
                             }
                             //Quit if to quit.
                             else if (context.isToQuit()) {
@@ -121,11 +121,8 @@ public class ClientSMTP extends Observable {
                                     break;
                                 }
                             }
-
-                            /*if(isPreviousStateDataReceived && isWaitingMailFrom){
-                                break;
-                            }*/
-                        } else {
+                        }
+                        else {
                             System.out.println("Invalid message from server!");
                         }
 
@@ -169,6 +166,7 @@ public class ClientSMTP extends Observable {
             this.context.setRecipient(recipient);
             this.context.setRecipientIterator(0);
             this.context.setValidIRecipient(0);
+            this.context.getStateRecipient().clear();
 
             //Send message to server
             String toSend = "MAIL FROM:" + " " + name + "@" + domain;
