@@ -101,9 +101,9 @@ public class ClientSMTP extends Observable {
                             this.setConnected(true);
                         }
                         if (InputStateMachineClient.isValidCommand(content.toString())) {
-                            boolean isPreviousStateDataReceived = context.getCurrentState() instanceof StateWaitingDataReceived;
+                            //boolean isPreviousStateDataReceived = context.getCurrentState() instanceof StateWaitingDataReceived;
                             context.handle(new InputStateMachineClient(content.toString()));
-                            boolean isWaitingMailFrom = context.getCurrentState() instanceof StateWaitingMailFromAnswer;
+                            //boolean isWaitingMailFrom = context.getCurrentState() instanceof StateWaitingMailFromAnswer;
 
                             String messageToSend = context.popMessageToSend();
                             //If there's a message to send, send it
@@ -119,9 +119,9 @@ public class ClientSMTP extends Observable {
                                 }
                             }
 
-                            if(isPreviousStateDataReceived && isWaitingMailFrom){
+                            /*if(isPreviousStateDataReceived && isWaitingMailFrom){
                                 break;
-                            }
+                            }*/
                         }
                         else {
                             System.out.println("Invalid message from server!");
@@ -134,7 +134,7 @@ public class ClientSMTP extends Observable {
             } catch (IOException e1) {
                 e1.printStackTrace();
             }
-        } while (this.con_serv.isConnected() && !context.isToQuit());
+        } while ( !(context.getCurrentState() instanceof StateWaitingMailFromAnswer) && this.con_serv.isConnected() && !context.isToQuit() );
     }
 
     private static void printWelcome() {
