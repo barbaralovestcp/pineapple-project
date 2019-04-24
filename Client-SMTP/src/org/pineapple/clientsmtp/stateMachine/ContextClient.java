@@ -17,6 +17,7 @@ public class ContextClient extends Context {
     private Message message;
     private ArrayList<String> recipient;
     private int recipientIterator = 0;
+    private int validIRecipient = 0;
 
     public ContextClient() {
         super(new StateConnected());
@@ -28,8 +29,12 @@ public class ContextClient extends Context {
         this.domain = domain;
     }
 
-    public void iterate() {
+    public void iterateRecipentSend() {
         this.recipientIterator++;
+    }
+
+    public void iterateRecipentValid() {
+        this.validIRecipient++;
     }
 
     //ACCESSORS
@@ -66,4 +71,11 @@ public class ContextClient extends Context {
         this.recipientIterator = recipientIterator;
     }
 
+    public int getValidIRecipient() {
+        return validIRecipient;
+    }
+
+    public void setValidIRecipient(int validIRecipient) {
+        this.validIRecipient = validIRecipient;
+    }
 }

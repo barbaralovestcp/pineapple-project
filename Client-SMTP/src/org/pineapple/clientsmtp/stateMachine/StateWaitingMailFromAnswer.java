@@ -27,7 +27,7 @@ public class StateWaitingMailFromAnswer implements IState {
                 }
                 nextState = new StateWaitingRcptAnswer();
                 toSend = "RCPT " + recipients.get(0);
-                ((ContextClient) context).iterate();
+                ((ContextClient) context).iterateRecipentSend();
             }
             else if (arguments[1].toLowerCase().equals("quit")) {
                 nextState = new StateConnected();

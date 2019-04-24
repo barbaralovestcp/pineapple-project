@@ -6,6 +6,7 @@ import org.pineapple.stateMachine.IInputStateMachine;
 import org.pineapple.stateMachine.IState;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class StateWaitingRcptAnswer implements IState {
 
@@ -19,24 +20,28 @@ public class StateWaitingRcptAnswer implements IState {
         String toSend = "";
         IState nextState = null;
 
-        //case ok
-        if (arguments[0].equals("250")) {
+        //case rcpt asnwer
+        if (Arrays.toString(input.getArguments()).toLowerCase().contains("user")) {
+            if (arguments[0].equals("250")) {
+                ((ContextClient) context).iterateRecipentValid();
+            }
 
-            if (arguments[1].toLowerCase().equals("user")) {
-                if(((ContextClient) context).getRecipientIterator() < recipients.size()){
-                    nextState = new StateWaitingRcptAnswer();
-                    toSend = "RCPT " + recipients.get(((ContextClient) context).getRecipientIterator());
-                    ((ContextClient) context).iterate();
+            //sending next rcpt
+            if(((ContextClient) context).getRecipientIterator() < recipients.size()){
+                nextState = this;
+                toSend = "RCPT " + recipients.get(((ContextClient) context).getRecipientIterator());
+                ((ContextClient) context).iterateRecipentSend();
+            }else{
+
+                // no valid rcpt : RCT
+                if(((ContextClient) context).getValidIRecipient() == 0){
+                    nextState = new StateWaitingMailFromAnswer();
+                    toSend = "RSET";
                 }else{
                     nextState = new StateWaitingDataReady();
                     toSend = "DATA";
                 }
             }
-        }
-        //case err
-        else if (arguments[0].equals("550")){
-            nextState = new StateWaitingMailFromAnswer();
-            toSend = "RSET";
         }
         //invalid answer
         else {
