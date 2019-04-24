@@ -1,6 +1,5 @@
 package org.pineapple.clientsmtp.stateMachine;
 
-import org.pineapple.serversmtp.StateWaitMailFrom;
 import org.pineapple.stateMachine.Context;
 import org.pineapple.stateMachine.Exception.StateMachineException;
 import org.pineapple.stateMachine.IInputStateMachine;
