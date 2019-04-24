@@ -54,7 +54,7 @@ class MBXManagerTest {
 	@Test
 	@Order(1)
 	void getPath() {
-		String path = MBXManager.getPath();
+		String path = MBXManager.getResPath();
 		System.out.println(path);
 		if (path.endsWith("\\"))
 			path = path.substring(0, path.length()-2);
