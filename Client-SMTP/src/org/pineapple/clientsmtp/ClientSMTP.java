@@ -2,9 +2,12 @@ package org.pineapple.clientsmtp;
 
 
 import com.sun.istack.internal.NotNull;
-import org.pineapple.Message;
-import org.pineapple.clientsmtp.stateMachine.*;
 import org.pineapple.CodeOKSMTP;
+import org.pineapple.Message;
+import org.pineapple.clientsmtp.stateMachine.ContextClient;
+import org.pineapple.clientsmtp.stateMachine.InputStateMachineClient;
+import org.pineapple.clientsmtp.stateMachine.StateConnected;
+import org.pineapple.clientsmtp.stateMachine.StateWaitingMailFromAnswer;
 
 import java.io.*;
 import java.net.InetAddress;
@@ -17,6 +20,7 @@ public class ClientSMTP extends Observable {
 
     private boolean isConnected;
     private String serverMessage;
+    private String logMessage;
 
     private String address = "127.0.0.1";
     @NotNull
@@ -38,7 +42,6 @@ public class ClientSMTP extends Observable {
     private ArrayList<String> recipient;
 
 
-
     public ClientSMTP(String name, String domain) {
         this.name = name;
         this.domain = domain;
@@ -54,7 +57,7 @@ public class ClientSMTP extends Observable {
             this.inp = con_serv.getInputStream();
             //flux de sortie
             this.op = con_serv.getOutputStream();
-            this.context = new ContextClient(name,domain,new StateConnected());
+            this.context = new ContextClient(name, domain, new StateConnected());
 
             //TODO : Je ne suis pas sur si à chaque loop il devrait être ré-init ou non. Je les init qu'une seul fois pour l'instant
             this.indata = new InputStreamReader(inp, StandardCharsets.ISO_8859_1);
@@ -84,11 +87,11 @@ public class ClientSMTP extends Observable {
 
                 //Read the next line sent by the server
                 line = br.readLine(); //Read single line, looping block the line
-                if(line != null){
+                if (line != null) {
 
                     //Parse and read the line.
                     String[] parts = line.split("[\u0003\u0001]");
-                    line = parts[parts.length-1];
+                    line = parts[parts.length - 1];
                     System.out.println("Received server message : " + line);
                     content.append(line);
                     this.serverMessage = content.toString();
@@ -97,7 +100,7 @@ public class ClientSMTP extends Observable {
                     if (content.length() > 0) {
 
                         //TODO debuger
-                        if(this.serverMessage.contains(new CodeOKSMTP(CodeOKSMTP.CodeEnum.OK_GREETING).toString(this.domain).replace("\n",""))) {
+                        if (this.serverMessage.contains(new CodeOKSMTP(CodeOKSMTP.CodeEnum.OK_GREETING).toString(this.domain).replace("\n", ""))) {
                             this.setConnected(true);
                         }
                         if (InputStateMachineClient.isValidCommand(content.toString())) {
@@ -113,7 +116,7 @@ public class ClientSMTP extends Observable {
                             //Quit if to quit.
                             else if (context.isToQuit()) {
                                 System.out.println("Connection closed with server");
-                                if(this.con_serv.isConnected()){
+                                if (this.con_serv.isConnected()) {
                                     this.con_serv.close();
                                     break;
                                 }
@@ -122,8 +125,7 @@ public class ClientSMTP extends Observable {
                             /*if(isPreviousStateDataReceived && isWaitingMailFrom){
                                 break;
                             }*/
-                        }
-                        else {
+                        } else {
                             System.out.println("Invalid message from server!");
                         }
 
@@ -134,7 +136,7 @@ public class ClientSMTP extends Observable {
             } catch (IOException e1) {
                 e1.printStackTrace();
             }
-        } while ( !(context.getCurrentState() instanceof StateWaitingMailFromAnswer) && this.con_serv.isConnected() && !context.isToQuit() );
+        } while (!(context.getCurrentState() instanceof StateWaitingMailFromAnswer) && this.con_serv.isConnected() && !context.isToQuit());
     }
 
     private static void printWelcome() {
@@ -158,9 +160,9 @@ public class ClientSMTP extends Observable {
         }
     }
 
-    public void initMailTransaction(Message message, ArrayList<String> recipient){
+    public void initMailTransaction(Message message, ArrayList<String> recipient) {
 
-        if(context.getCurrentState() instanceof StateWaitingMailFromAnswer){
+        if (context.getCurrentState() instanceof StateWaitingMailFromAnswer) {
 
             //Initialise the mail informations
             this.context.setMessage(message);
@@ -174,14 +176,13 @@ public class ClientSMTP extends Observable {
 
             //Wait for a server answer and resume the stateMachine automated loop
             stateMachineLoop();
-        }
-        else {
+        } else {
             System.out.println("DEBUG : Not in StateWaitingMailFromAnswer, can't take client input!");
         }
     }
 
     public void quit() {
-        if(context.getCurrentState() instanceof StateWaitingMailFromAnswer){
+        if (context.getCurrentState() instanceof StateWaitingMailFromAnswer) {
 
             //Send message to server
             String toSend = "QUIT";
@@ -189,8 +190,7 @@ public class ClientSMTP extends Observable {
 
             //Wait for a server answer and resume the stateMachine automated loop
             stateMachineLoop();
-        }
-        else {
+        } else {
             System.out.println("DEBUG : Not in StateWaitingMailFromAnswer, can't take client input!");
         }
     }
@@ -206,5 +206,9 @@ public class ClientSMTP extends Observable {
 
     public String getServerMessage() {
         return serverMessage;
+    }
+
+    public String getLogMessage() {
+        return logMessage;
     }
 }
