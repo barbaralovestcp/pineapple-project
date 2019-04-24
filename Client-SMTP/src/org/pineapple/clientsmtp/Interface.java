@@ -39,6 +39,7 @@ public class Interface extends Application implements Observer {
 
     private final Button sendBtn = new Button("Send");
     private final Label notification = new Label();
+    private final Label notificationServer = new Label();
     private final TextField subject = new TextField("");
     private final Label receiver = new Label();
     private final TextArea text = new TextArea("");
@@ -87,8 +88,7 @@ public class Interface extends Application implements Observer {
                 "valentin@pine.apple",
                 "elie@pine.apple",
                 "lea@pine.apple",
-                "philippine@pine.apple",
-                "aaaa@ipc.fr"
+                "philippine@pine.apple"
         );
         emailComboBox.setPromptText("Email address");
         emailComboBox.setEditable(true);
@@ -99,6 +99,7 @@ public class Interface extends Application implements Observer {
 
         GridPane grid = new GridPane();
         notification.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
+        notificationServer.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
         sendBtn.setDisable(true);
         grid.setVgap(4);
         grid.setHgap(10);
@@ -110,6 +111,7 @@ public class Interface extends Application implements Observer {
         grid.add(text, 0, 3, 4, 1);
         grid.add(sendBtn, 0, 4);
         grid.add(notification, 1, 4, 3, 1);
+        grid.add(notificationServer, 1, 5, 3, 1);
 
         emailComboBox.valueProperty().addListener((ChangeListener<String>) (ov, t, t1) ->
         {
@@ -161,7 +163,8 @@ public class Interface extends Application implements Observer {
             Platform.runLater(new Runnable() {
                 @Override
                 public void run() {
-                    notification.setText(client.getServerMessage());
+                    notificationServer.setText(client.getServerMessage());
+                    notification.setText(client.getLogMessage());
                     sendBtn.setDisable(false);
                 }
             });
