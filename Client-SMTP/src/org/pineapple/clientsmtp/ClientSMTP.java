@@ -23,7 +23,7 @@ public class ClientSMTP extends Observable {
     private String serverMessage;
     private String logMessage;
 
-    private String address = "192.168.43.16";
+    private String address = "127.0.0.1";
     @NotNull
     private String name;
     @NotNull
